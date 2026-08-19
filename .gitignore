@@ -13,6 +13,7 @@ dist/
 # This PC only. Delete _private, .cursor, and .env before sharing the project folder.
 _private/
 .cursor/
+README.md
 
 # logs and OS
 npm-debug.log*
