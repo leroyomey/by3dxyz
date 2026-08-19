@@ -87,7 +87,7 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
   </form>
 </div>
 
-<script is:inline define:vars={{ notifyEmail, rate: customWork.hourlyRate, jobFloor: customWork.jobFloor, packages: customWork.packages, complexities: customWork.complexities, defaultJob: defaultCustomPackageId, defaultComplexity: defaultCustomComplexityId }}>
+<script is:inline define:vars={{ notifyEmail, contactEmail: site.email, rate: customWork.hourlyRate, jobFloor: customWork.jobFloor, packages: customWork.packages, complexities: customWork.complexities, defaultJob: defaultCustomPackageId, defaultComplexity: defaultCustomComplexityId }}>
   (function () {
     const root = document.querySelector("[data-custom]");
     const form = document.querySelector("[data-custom-form]");
@@ -229,7 +229,7 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
       };
       if (isTweakJob(job)) payload.sku = String(data.get("sku") || "");
       if (!notifyEmail) {
-        if (status) status.textContent = "Could not send. Email hello@by3dxyz.com instead.";
+        if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";
         return;
       }
       if (button instanceof HTMLButtonElement) button.disabled = true;
@@ -248,7 +248,7 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
           if (status) {
             status.textContent = result.ok
               ? "Request sent. Watch for a quote in a few days."
-              : "Could not send. Email hello@by3dxyz.com instead.";
+              : "Could not send. Email " + contactEmail + " instead.";
           }
           if (result.ok) {
             form.reset();
@@ -259,7 +259,7 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
           paint();
         })
         .catch(function () {
-          if (status) status.textContent = "Could not send. Email hello@by3dxyz.com instead.";
+          if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";
         })
         .finally(function () {
           if (button instanceof HTMLButtonElement) button.disabled = false;

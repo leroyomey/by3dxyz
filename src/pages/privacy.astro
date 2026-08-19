@@ -14,8 +14,10 @@ import { site } from "../data/site";
     <h2>What this site collects</h2>
     <p>
       If you use the contact form, your email app sends the message to {site.email}. Custom requests on the
-      <a href="/custom">custom page</a> go to the same shop inbox as paid-order notices. The footer shows a public
-      visit total. That number is a count only, not your name, email, or order details.
+      <a href="/custom">custom page</a>, and paid-order notices after checkout, are emailed to the shop through
+      Formsubmit. That order-notify inbox is set when the site is built and can be a different address from the
+      public contact email. The footer shows a public visit total. That number is a count only, not your name,
+      email, or order details.
     </p>
     <h2>Checkout</h2>
     <p>
@@ -32,6 +34,6 @@ import { site } from "../data/site";
       not run ads.
     </p>
     <h2>Contact</h2>
-    <p>{site.email}</p>
+    <p>Shop questions: {site.email}</p>
   </section>
 </Layout>

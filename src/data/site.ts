@@ -7,5 +7,5 @@ export const site = {
   description:
     "by3DXYZ designs and 3D-prints useful objects. The shop currently features pottery tools, with other printed items added over time.",
   etsyUrl: "https://by3dxyz.etsy.com",
-  email: "hello@by3dxyz.com",
+  email: "itsbman97@gmail.com",
 };
