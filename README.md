@@ -54,7 +54,7 @@ npm run catalog:auth
 npm run catalog:sync
 ```
 
-One-time shop login: add callback `http://localhost:3456/callback` on the Etsy app at [etsy.com/developers/your-apps](https://www.etsy.com/developers/your-apps), then `npm run catalog:auth` and allow access. After that, `catalog:sync` pulls stock per color and size.
+One-time shop login: on the **Open API** app (not Etsy Ads) at [etsy.com/developers/your-apps](https://www.etsy.com/developers/your-apps), add callback `https://by3dxyz.com/callback`, click **Save**, then `npm run catalog:auth` and allow access. After that, `catalog:sync` pulls stock per color and size. GitHub can run that sync every 8 hours once `ETSY_REFRESH_TOKEN` is in Actions secrets.
 
 ## GitHub Pages (after the one-time PC login)
 

@@ -6,9 +6,13 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-export const ETSY_REDIRECT = "http://localhost:3456/callback";
 const TOKEN_URL = "https://api.etsy.com/v3/public/oauth/token";
 const SCOPE = "listings_r";
+
+export function redirectUri() {
+  const raw = (process.env.ETSY_REDIRECT_URI || "https://by3dxyz.com/callback").trim().replace(/\/$/, "");
+  return raw.endsWith("/callback") ? raw : `${raw}/callback`;
+}
 
 function envPath() {
   return join(root, ".env");
@@ -53,7 +57,7 @@ function openBrowser(url) {
 function waitForCode(expectedState) {
   return new Promise((resolve, reject) => {
     const server = createServer((req, res) => {
-      const url = new URL(req.url || "/", ETSY_REDIRECT);
+      const url = new URL(req.url || "/", "http://127.0.0.1:3456");
       if (url.pathname !== "/callback") {
         res.writeHead(404);
         res.end();
@@ -175,27 +179,29 @@ export async function cmdEtsyAuth() {
     process.exitCode = 1;
     return;
   }
+  const callback = redirectUri();
   const state = randomBytes(16).toString("hex");
   const { verifier, challenge } = pkce();
   const connect = new URL("https://www.etsy.com/oauth/connect");
   connect.searchParams.set("response_type", "code");
   connect.searchParams.set("client_id", id);
-  connect.searchParams.set("redirect_uri", ETSY_REDIRECT);
+  connect.searchParams.set("redirect_uri", callback);
   connect.searchParams.set("scope", SCOPE);
   connect.searchParams.set("state", state);
   connect.searchParams.set("code_challenge", challenge);
   connect.searchParams.set("code_challenge_method", "S256");
 
-  console.log("1. In your Etsy app, add this callback URL exactly:");
-  console.log(`   ${ETSY_REDIRECT}`);
-  console.log("   https://www.etsy.com/developers/your-apps");
-  console.log("2. A browser window will open. Log in as the by3DXYZ shop and allow listings access.");
+  console.log("1. Open the Open API app (not Etsy Ads) at https://www.etsy.com/developers/your-apps");
+  console.log("2. Callback URL, exact, then Save:");
+  console.log(`   ${callback}`);
+  console.log("3. A browser window will open. Log in as the by3DXYZ shop and allow listings access.");
+  console.log("   Keep this terminal open. Etsy sends you to by3dxyz.com, which hands the login back to this PC.");
   openBrowser(connect.toString());
   const code = await waitForCode(state);
   const json = await requestToken({
     grant_type: "authorization_code",
     client_id: id,
-    redirect_uri: ETSY_REDIRECT,
+    redirect_uri: callback,
     code,
     code_verifier: verifier,
   });

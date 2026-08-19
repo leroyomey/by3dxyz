@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Etsy shop login</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #0b0a10;
+        color: #f3efe6;
+        max-width: 40rem;
+        margin: 4rem auto;
+        padding: 0 1.25rem;
+        line-height: 1.5;
+      }
+      code {
+        font-size: 0.95em;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Sending you back to this PC to finish the Etsy shop login.</p>
+    <p>
+      If this tab stays here, run <code>npm run catalog:auth</code> on the shop PC first, then allow access on Etsy
+      again.
+    </p>
+    <script is:inline>
+      (function () {
+        var q = window.location.search || "";
+        if (!q) return;
+        window.location.replace("http://127.0.0.1:3456/callback" + q);
+      })();
+    </script>
+  </body>
+</html>
