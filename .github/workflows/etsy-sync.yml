@@ -12,13 +12,29 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      - name: Skip if Etsy refresh token is not set
+        id: gate
+        env:
+          ETSY_REFRESH_TOKEN: ${{ secrets.ETSY_REFRESH_TOKEN }}
+        run: |
+          if [ -z "$ETSY_REFRESH_TOKEN" ]; then
+            echo "ETSY_REFRESH_TOKEN is not set. Skipping catalog sync until catalog:auth is finished. Local Windows task by3DXYZ-Etsy-sync still owns stock updates."
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/checkout@v4
+        if: steps.gate.outputs.proceed == 'true'
       - uses: actions/setup-node@v4
+        if: steps.gate.outputs.proceed == 'true'
         with:
           node-version: "22"
           cache: npm
-      - run: npm ci
+      - name: Install
+        if: steps.gate.outputs.proceed == 'true'
+        run: npm ci
       - name: Refresh catalog from Etsy
+        if: steps.gate.outputs.proceed == 'true'
         env:
           ETSY_API_KEY: ${{ secrets.ETSY_API_KEY }}
           ETSY_API_SHARED_SECRET: ${{ secrets.ETSY_API_SHARED_SECRET }}
@@ -28,6 +44,7 @@ jobs:
           ETSY_TOKEN_EXPIRES: ${{ secrets.ETSY_TOKEN_EXPIRES }}
         run: npm run catalog:sync
       - name: Commit catalog updates
+        if: steps.gate.outputs.proceed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
