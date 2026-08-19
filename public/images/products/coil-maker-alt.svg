@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="Coil maker alternate view">
+  <rect width="800" height="800" fill="#1f8a7a"/>
+  <circle cx="400" cy="400" r="220" fill="#14685c"/>
+  <path d="M220 430c90-120 180-120 270 0" fill="none" stroke="#f6f0e6" stroke-width="34" stroke-linecap="round"/>
+  <path d="M310 430c60-70 120-70 180 0" fill="none" stroke="#e06c4f" stroke-width="22" stroke-linecap="round"/>
+  <rect x="330" y="250" width="140" height="90" rx="18" fill="#fffaf3"/>
+</svg>

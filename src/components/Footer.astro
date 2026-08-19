@@ -1,0 +1,25 @@
+---
+import { site } from "../data/site";
+import VisitCount from "./VisitCount.astro";
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <strong class="logo-type">
+        <span class="logo-by">by</span>3D<span class="axis-x">X</span><span class="axis-y">Y</span><span class="axis-z">Z</span>
+      </strong>
+      <p class="muted">3D-printed pottery tools and other printed goods.</p>
+      <VisitCount />
+    </div>
+    <div class="footer-links">
+      <a href="/tools">All tools</a>
+      <a href="/custom">Custom</a>
+      <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy shop</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="/privacy">Privacy</a>
+    </div>
+  </div>
+  <p class="wrap footer-copy">© 2026 {site.name}</p>
+</footer>

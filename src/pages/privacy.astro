@@ -1,0 +1,37 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { site } from "../data/site";
+---
+
+<Layout title="Privacy" description="Privacy information for the by3DXYZ shop.">
+  <section class="wrap page-hero prose">
+    <p class="kicker">Privacy</p>
+    <h1>Privacy</h1>
+    <p>
+      This page explains what the shop collects when you visit, write, or pay. There are no customer accounts on this
+      site.
+    </p>
+    <h2>What this site collects</h2>
+    <p>
+      If you use the contact form, your email app sends the message to {site.email}. Custom requests on the
+      <a href="/custom">custom page</a> go to the same shop inbox as paid-order notices. The footer shows a public
+      visit total. That number is a count only, not your name, email, or order details.
+    </p>
+    <h2>Checkout</h2>
+    <p>
+      Payments on this site go through PayPal. Card details are handled by PayPal, not by our servers. After payment,
+      the shop receives the SKU, selected options (color, size), quantity, and the ship-to address PayPal collected, so
+      the order can be printed and mailed. See PayPal’s privacy policy for details.
+    </p>
+    <p>
+      Purchases on Etsy follow Etsy’s policies: <a href={site.etsyUrl}>{site.etsyUrl}</a>
+    </p>
+    <h2>Cookies and ads</h2>
+    <p>
+      PayPal may set cookies on its checkout page. This site does not run its own shopping-cart cookies, and it does
+      not run ads.
+    </p>
+    <h2>Contact</h2>
+    <p>{site.email}</p>
+  </section>
+</Layout>

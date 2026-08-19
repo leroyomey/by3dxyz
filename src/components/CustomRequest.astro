@@ -1,0 +1,247 @@
+---
+import {
+  customWork,
+  defaultCustomComplexityId,
+  defaultCustomPackageId,
+  estimateCustom,
+  formatUsd,
+} from "../data/custom-work";
+import { site } from "../data/site";
+
+const notifyEmail =
+  import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
+const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexityId);
+---
+
+<div class="custom-board" data-custom>
+  <div class="custom-estimate">
+    <p class="kicker">Starting range</p>
+    <p class="custom-range" data-estimate-label>{first.label}</p>
+    <p class="muted" data-estimate-note>
+      From a drawing or sketch. This is a starting range. The email quote is a fixed price.
+    </p>
+    <ul class="custom-estimate-bits muted">
+      <li>{customWork.includedRevisions} revision rounds in the quote</li>
+      <li>Extra round: ${customWork.extraRevision}</li>
+    </ul>
+  </div>
+
+  <form class="form custom-form" data-custom-form>
+    <label for="custom-name">Name</label>
+    <input id="custom-name" name="name" autocomplete="name" required />
+
+    <label for="custom-email">Email</label>
+    <input id="custom-email" name="email" type="email" autocomplete="email" required />
+
+    <label for="custom-job">What do you need?</label>
+    <select id="custom-job" name="job" data-estimate-job required>
+      {customWork.packages.map((item) => (
+        <option value={item.id} selected={item.id === defaultCustomPackageId}>
+          {item.name} (from {formatUsd(item.from)})
+        </option>
+      ))}
+    </select>
+
+    <div class="custom-sku-field hidden" data-sku-field>
+      <label for="custom-sku">Closest shop SKU, if this is a change</label>
+      <input id="custom-sku" name="sku" placeholder="BO-001" disabled />
+    </div>
+
+    <div class="custom-qty-row">
+      <label>
+        Quantity
+        <select name="qty" data-estimate-qty>
+          {Array.from({ length: 8 }, (_, i) => i + 1).map((n) => (
+            <option value={n} selected={n === 1}>
+              {n}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        Extra sizes
+        <select name="extra_sizes" data-estimate-sizes>
+          {Array.from({ length: 5 }, (_, i) => i).map((n) => (
+            <option value={n} selected={n === 0}>
+              {n}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
+
+    <label for="custom-notes">Describe the sketch, including measurements. Detail makes the quote easier.</label>
+    <textarea id="custom-notes" name="notes" rows="6" required></textarea>
+
+    <label for="custom-photo">Link to a sketch (a photo of it is fine)</label>
+    <input id="custom-photo" name="photo" type="url" placeholder="https://" />
+
+    <input type="text" name="_gotcha" class="hidden" tabindex="-1" autocomplete="off" />
+    <input type="hidden" name="estimate" data-estimate-field value={first.label} />
+
+    <p class="muted" data-custom-status></p>
+    <button class="btn btn-teal" type="submit" data-custom-submit>Send request</button>
+  </form>
+</div>
+
+<script is:inline define:vars={{ notifyEmail, rate: customWork.hourlyRate, jobFloor: customWork.jobFloor, packages: customWork.packages, complexities: customWork.complexities, defaultJob: defaultCustomPackageId, defaultComplexity: defaultCustomComplexityId }}>
+  (function () {
+    const root = document.querySelector("[data-custom]");
+    const form = document.querySelector("[data-custom-form]");
+    if (!root || !(form instanceof HTMLFormElement)) return;
+
+    function roundFive(value) {
+      return Math.round(value / 5) * 5;
+    }
+
+    function pack(id) {
+      const list = packages || [];
+      return (
+        list.find(function (item) {
+          return item.id === id;
+        }) ||
+        list.find(function (item) {
+          return item.id === defaultJob;
+        }) ||
+        list[0]
+      );
+    }
+
+    function complexityOf(id) {
+      const list = complexities || [];
+      return (
+        list.find(function (item) {
+          return item.id === id;
+        }) ||
+        list.find(function (item) {
+          return item.id === defaultComplexity;
+        }) ||
+        list[1] ||
+        list[0]
+      );
+    }
+
+    function estimate() {
+      const job = root.querySelector("[data-estimate-job]");
+      const qtyEl = root.querySelector("[data-estimate-qty]");
+      const sizeEl = root.querySelector("[data-estimate-sizes]");
+      const chosen = pack(job instanceof HTMLSelectElement ? job.value : defaultJob);
+      const complexity = complexityOf(defaultComplexity);
+      if (!chosen || !complexity) return null;
+      const copies = Math.max(1, Math.min(8, Number(qtyEl && qtyEl.value) || 1));
+      const sizes = Math.max(0, Math.min(4, Number(sizeEl && sizeEl.value) || 0));
+      const hours = chosen.hours * complexity.hoursMul;
+      const raw = roundFive(hours * rate + chosen.print);
+      const fromFloor = roundFive(chosen.from * Math.min(1, complexity.hoursMul));
+      const first = Math.max(jobFloor, fromFloor, raw);
+      const total = first + chosen.extraCopy * (copies - 1) + chosen.extraSize * sizes;
+      const high = Math.max(total, roundFive(total * 1.3));
+      return {
+        chosen: chosen,
+        complexity: complexity,
+        copies: copies,
+        sizes: sizes,
+        low: total,
+        high: high,
+        label: high > total ? "$" + total + "-$" + high : "$" + total,
+      };
+    }
+
+    function isTweakJob(id) {
+      return id === "tweak";
+    }
+
+    function syncSkuField() {
+      const job = root.querySelector("[data-estimate-job]");
+      const wrap = root.querySelector("[data-sku-field]");
+      const sku = root.querySelector("#custom-sku");
+      const show = job instanceof HTMLSelectElement && isTweakJob(job.value);
+      if (wrap) wrap.classList.toggle("hidden", !show);
+      if (sku instanceof HTMLInputElement) {
+        sku.disabled = !show;
+        sku.required = false;
+        if (!show) sku.value = "";
+      }
+    }
+
+    function paint() {
+      syncSkuField();
+      const result = estimate();
+      const label = root.querySelector("[data-estimate-label]");
+      const note = root.querySelector("[data-estimate-note]");
+      const field = root.querySelector("[data-estimate-field]");
+      if (!result) return;
+      if (label) label.textContent = result.label;
+      if (field instanceof HTMLInputElement) field.value = result.label;
+      if (note) {
+        const extra =
+          result.copies > 1 ? " " + result.copies + " pieces." : "";
+        const sizes = result.sizes ? " +" + result.sizes + " extra size" + (result.sizes === 1 ? "" : "s") + "." : "";
+        note.textContent =
+          result.chosen.name +
+          "." +
+          extra +
+          sizes +
+          " This is a starting range. The email quote is a fixed price.";
+      }
+    }
+
+    root.addEventListener("change", paint);
+    paint();
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const status = root.querySelector("[data-custom-status]");
+      const button = root.querySelector("[data-custom-submit]");
+      const data = new FormData(form);
+      if (data.get("_gotcha")) return;
+      const job = String(data.get("job") || "");
+      const payload = {
+        _subject: "by3DXYZ custom request",
+        _template: "table",
+        _captcha: "false",
+        name: String(data.get("name") || ""),
+        email: String(data.get("email") || ""),
+        job: job,
+        quantity: String(data.get("qty") || "1"),
+        extra_sizes: String(data.get("extra_sizes") || "0"),
+        notes: String(data.get("notes") || ""),
+        photo: String(data.get("photo") || ""),
+        estimate: String(data.get("estimate") || ""),
+        hourly_rate: String(rate),
+      };
+      if (isTweakJob(job)) payload.sku = String(data.get("sku") || "");
+      if (!notifyEmail) {
+        if (status) status.textContent = "Could not send. Email hello@by3dxyz.com instead.";
+        return;
+      }
+      if (button instanceof HTMLButtonElement) button.disabled = true;
+      if (status) status.textContent = "Sending…";
+      fetch("https://formsubmit.co/ajax/" + encodeURIComponent(notifyEmail), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+      })
+        .then(function (res) {
+          return res.json().then(function (json) {
+            return { ok: res.ok, json: json };
+          });
+        })
+        .then(function (result) {
+          if (status) {
+            status.textContent = result.ok
+              ? "Request sent. Watch for a quote in a few days."
+              : "Could not send. Email hello@by3dxyz.com instead.";
+          }
+          if (result.ok) form.reset();
+          paint();
+        })
+        .catch(function () {
+          if (status) status.textContent = "Could not send. Email hello@by3dxyz.com instead.";
+        })
+        .finally(function () {
+          if (button instanceof HTMLButtonElement) button.disabled = false;
+        });
+    });
+  })();
+</script>

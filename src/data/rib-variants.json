@@ -1,0 +1,34 @@
+{
+  "id": "rib",
+  "groups": [
+    {
+      "id": "color",
+      "label": "Primary color",
+      "placeholder": "Select a color",
+      "values": [
+        { "name": "Black" },
+        { "name": "Green" },
+        { "name": "Orange" },
+        { "name": "Burnt Orange" },
+        { "name": "Red" },
+        { "name": "Candy Red" },
+        { "name": "Light Pink" },
+        { "name": "Fuchsia" },
+        { "name": "Yellow" },
+        { "name": "Vintage Rose" },
+        { "name": "New Army Green" }
+      ]
+    },
+    {
+      "id": "size",
+      "label": "Size",
+      "placeholder": "Select an option",
+      "values": [
+        { "name": "4in/10.16cm", "price": 11.5 },
+        { "name": "5in/12.7cm", "price": 12.5 },
+        { "name": "6in/15.24cm", "price": 13.5 },
+        { "name": "Set of 3 - 4/5/6in", "price": 30 }
+      ]
+    }
+  ]
+}

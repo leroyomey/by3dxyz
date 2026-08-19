@@ -1,0 +1,38 @@
+---
+import { site } from "../data/site";
+
+const path = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="logo" href="/">
+      <span class="logo-mark" aria-hidden="true">
+        <span class="gizmo-dot"></span>
+      </span>
+      <span class="logo-type">
+        <span class="logo-by">by</span>3D<span class="axis-x">X</span><span class="axis-y">Y</span><span class="axis-z">Z</span>
+      </span>
+    </a>
+    <nav class="nav">
+      <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false">Menu</button>
+      <div class="nav-links" data-nav-links>
+        <a href="/" aria-current={path === "/" ? "page" : undefined}>Home</a>
+        <a href="/tools" aria-current={path.startsWith("/tools") ? "page" : undefined}>Tools</a>
+        <a href="/custom" aria-current={path.startsWith("/custom") ? "page" : undefined}>Custom</a>
+        <a href="/about" aria-current={path === "/about" ? "page" : undefined}>About</a>
+        <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy</a>
+      </div>
+      <a class="cart-btn" href="/tools">Shop</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector("[data-menu-toggle]");
+  const links = document.querySelector("[data-nav-links]");
+  toggle?.addEventListener("click", () => {
+    const open = links?.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+</script>

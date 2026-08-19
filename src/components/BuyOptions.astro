@@ -1,0 +1,427 @@
+---
+import type { Product } from "../data/products";
+import { productVariants, formatPrice } from "../data/products";
+import { site } from "../data/site";
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const clientId = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID ?? "";
+const notifyEmail =
+  import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
+const variants = productVariants(product);
+const needsOptions = variants.length > 0;
+const stock = typeof product.etsyQuantity === "number" ? product.etsyQuantity : null;
+const stockMap = product.etsyStock || {};
+const hasOptionStock = Object.keys(stockMap).length > 0;
+const soldOut = hasOptionStock ? Object.values(stockMap).every((n) => !n) : stock === 0;
+const maxFromMap = hasOptionStock ? Math.max(0, ...Object.values(stockMap).map((n) => Number(n) || 0)) : null;
+const maxQty = Math.min(10, maxFromMap ?? (stock == null || stock < 1 ? 10 : stock));
+const quantities = Array.from({ length: Math.max(1, maxQty) }, (_, i) => i + 1);
+const etsyUrl = product.etsyUrl || site.etsyUrl;
+---
+
+<div
+  class="buy-options"
+  data-buy
+  data-currency={product.currency}
+  data-name={product.name}
+  data-sku={product.sku}
+  data-base-price={product.price}
+  data-stock={stock ?? ""}
+>
+  <div class="price-row">
+    <p class="price" data-total>{formatPrice(product.price, product.currency)}</p>
+    <span class="ship-free">FREE shipping</span>
+  </div>
+  <div class="buy-proof">
+    <slot />
+  </div>
+  <div class="buy-fields">
+    {
+      variants.map((group) => (
+        <label class="option-field">
+          <span>{group.label}</span>
+          <select data-option={group.id} data-option-label={group.label} required={needsOptions}>
+            <option value="">{group.placeholder}</option>
+            {group.values.map((value) => (
+              <option value={value.name} data-price={value.price ?? ""}>
+                {typeof value.price === "number" ? `${value.name} (${formatPrice(value.price, product.currency)})` : value.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      ))
+    }
+    <label class="option-field buy-qty">
+      <span>Quantity</span>
+      <select data-qty disabled={soldOut}>
+        {quantities.map((n) => (
+          <option value={n} selected={n === 1}>
+            {n}
+          </option>
+        ))}
+      </select>
+    </label>
+  </div>
+  <p class="stock-signal" data-variant-stock></p>
+  <p class="muted buy-hint" data-need-options={needsOptions ? "true" : "false"}>
+      {
+        soldOut ? (
+          <>
+            Sold out. Check{" "}
+            <a href={etsyUrl} target="_blank" rel="noopener noreferrer">
+              Etsy
+            </a>{" "}
+            or check back after a restock.
+          </>
+        ) : needsOptions ? (
+          "Please choose a color and size."
+        ) : (
+          ""
+        )
+      }
+  </p>
+  {
+    clientId && !soldOut ? (
+      <div class="paypal-box" id="buy">
+        <p class="muted buy-pay-label">Pay with PayPal or card</p>
+        <div id="paypal-paypal"></div>
+        <div id="paypal-paylater"></div>
+        <div id="paypal-card"></div>
+      </div>
+    ) : null
+  }
+  <a class="buy-alt" href={etsyUrl} target="_blank" rel="noopener noreferrer">View on Etsy</a>
+</div>
+
+{
+  clientId && !soldOut && (
+    <script
+      is:inline
+      define:vars={{ clientId, currency: product.currency, notifyEmail, stockMap }}
+    >
+      (function () {
+        const root = document.querySelector("[data-buy]");
+        const container = document.getElementById("buy");
+        if (!root || !container || !clientId) return;
+        const map = stockMap && typeof stockMap === "object" ? stockMap : {};
+
+        function stockKey(values) {
+          return values
+            .map(function (value) {
+              return String(value || "")
+                .toLowerCase()
+                .replace(/inch(?:es)?/g, "in")
+                .replace(/\s+/g, "");
+            })
+            .filter(Boolean)
+            .join("|");
+        }
+
+        function listingStock() {
+          const raw = root.getAttribute("data-stock");
+          if (!raw) return NaN;
+          const n = Number(raw);
+          return Number.isFinite(n) ? n : NaN;
+        }
+
+        function optionStock(options) {
+          const parts = [];
+          if (options.color) parts.push(options.color);
+          if (options.size) parts.push(options.size);
+          const key = stockKey(parts);
+          if (key && Object.prototype.hasOwnProperty.call(map, key)) return Number(map[key]);
+          return listingStock();
+        }
+
+        function fillQty(max) {
+          const sel = root.querySelector("[data-qty]");
+          if (!(sel instanceof HTMLSelectElement)) return;
+          const cap = Math.max(0, Math.min(10, Number.isFinite(max) ? max : 10));
+          const current = Number(sel.value) || 1;
+          sel.innerHTML = "";
+          const top = Math.max(1, cap);
+          for (let n = 1; n <= top; n += 1) {
+            const opt = document.createElement("option");
+            opt.value = String(n);
+            opt.textContent = String(n);
+            if (n === Math.min(current, top)) opt.selected = true;
+            sel.appendChild(opt);
+          }
+          sel.disabled = cap === 0;
+        }
+
+        function selected() {
+          const name = root.getAttribute("data-name") || "by3DXYZ tool";
+          const sku = (root.getAttribute("data-sku") || "").toUpperCase();
+          const base = Number(root.getAttribute("data-base-price") || "0");
+          const qty = Number(root.querySelector("[data-qty]")?.value || "1");
+          const selects = [...root.querySelectorAll("select[data-option]")];
+          const options = {};
+          const parts = [];
+          let unit = base;
+          let ready = true;
+          for (const select of selects) {
+            if (!(select instanceof HTMLSelectElement)) continue;
+            const id = select.getAttribute("data-option") || "option";
+            const label = select.getAttribute("data-option-label") || id;
+            if (!select.value) {
+              ready = false;
+              continue;
+            }
+            const picked = select.selectedOptions[0];
+            const priced = Number(picked?.getAttribute("data-price") || "");
+            if (Number.isFinite(priced) && priced > 0) unit = priced;
+            options[id] = select.value;
+            parts.push(label + ": " + select.value);
+          }
+          const total = unit * qty;
+          const left = optionStock(options);
+          if (Number.isFinite(left) && (left <= 0 || qty > left)) ready = false;
+          const optionLine = parts.join("; ");
+          const summary = [sku, name, optionLine, "Qty " + qty].filter(Boolean).join(" - ");
+          const customId = [sku, parts.map((part) => part.replace(": ", "=")).join("|"), "qty=" + qty]
+            .filter(Boolean)
+            .join("|")
+            .slice(0, 127);
+          return {
+            sku,
+            name,
+            qty,
+            unit,
+            total,
+            ready,
+            options,
+            optionLine,
+            summary,
+            customId,
+            itemName: (sku ? sku + " " : "") + name,
+          };
+        }
+
+        function paint() {
+          const selects = [...root.querySelectorAll("select[data-option]")];
+          const picked = {};
+          let complete = selects.length === 0;
+          if (selects.length) {
+            complete = true;
+            for (const select of selects) {
+              if (!(select instanceof HTMLSelectElement) || !select.value) complete = false;
+              else picked[select.getAttribute("data-option") || "option"] = select.value;
+            }
+          }
+          const left = optionStock(picked);
+          fillQty(Number.isFinite(left) ? left : 10);
+          const state = selected();
+          const total = root.querySelector("[data-total]");
+          const hint = root.querySelector("[data-need-options]");
+          const stockEl = root.querySelector("[data-variant-stock]");
+          const needs = hint?.getAttribute("data-need-options") === "true";
+          if (total) {
+            total.textContent = new Intl.NumberFormat("en-US", { style: "currency", currency }).format(state.total);
+          }
+          if (stockEl) {
+            if (!complete) stockEl.textContent = "";
+            else if (Number.isFinite(left) && left <= 0) stockEl.textContent = "Sold out";
+            else if (Number.isFinite(left)) stockEl.textContent = left === 1 ? "1 in stock" : left + " in stock";
+            else stockEl.textContent = "";
+            stockEl.classList.toggle("is-out", Boolean(complete && left === 0));
+          }
+          if (hint && needs) {
+            if (!complete) hint.textContent = "Please choose a color and size.";
+            else if (Number.isFinite(left) && left <= 0) hint.textContent = "That color and size is currently sold out.";
+            else hint.textContent = "";
+          }
+          container.classList.toggle("is-disabled", !state.ready);
+        }
+
+        function money(value) {
+          return Number(value).toFixed(2);
+        }
+
+        function shippingText(details) {
+          const unit = details && details.purchase_units && details.purchase_units[0];
+          const ship = unit && unit.shipping;
+          const addr = (ship && ship.address) || {};
+          const payer = details && details.payer;
+          const payerName =
+            (ship && ship.name && ship.name.full_name) ||
+            (payer && payer.name && [payer.name.given_name, payer.name.surname].filter(Boolean).join(" ")) ||
+            "";
+          return [
+            payerName,
+            addr.address_line_1,
+            addr.address_line_2,
+            [addr.admin_area_2, addr.admin_area_1, addr.postal_code].filter(Boolean).join(", "),
+            addr.country_code,
+          ]
+            .filter(Boolean)
+            .join("\n");
+        }
+
+        function notifyShop(state, details) {
+          if (!notifyEmail) return Promise.resolve();
+          const payer = details && details.payer;
+          const payload = {
+            _subject: "by3DXYZ order " + (state.sku || state.name),
+            _template: "table",
+            _captcha: "false",
+            sku: state.sku,
+            product: state.name,
+            color: state.options.color || "",
+            size: state.options.size || "",
+            options: state.optionLine,
+            quantity: String(state.qty),
+            unit_price: money(state.unit),
+            total: money(state.total) + " " + currency,
+            paypal_order_id: (details && details.id) || "",
+            buyer_name:
+              (payer && payer.name && [payer.name.given_name, payer.name.surname].filter(Boolean).join(" ")) || "",
+            buyer_email: (payer && payer.email_address) || "",
+            ship_to: shippingText(details),
+          };
+          return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(notifyEmail), {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify(payload),
+          }).catch(function () {});
+        }
+
+        root.addEventListener("change", paint);
+        paint();
+
+        function start() {
+          if (!window.paypal || container.dataset.ready) return;
+          container.dataset.ready = "true";
+          const paypal = window.paypal;
+          const shared = {
+            onClick: function (_data, actions) {
+              const state = selected();
+              if (!state.ready) return actions.reject();
+              return actions.resolve();
+            },
+            createOrder: function (_data, actions) {
+              const state = selected();
+              const value = money(state.total);
+              const unit = money(state.unit);
+              return actions.order.create({
+                application_context: {
+                  brand_name: "by3DXYZ",
+                  user_action: "PAY_NOW",
+                  shipping_preference: "GET_FROM_FILE",
+                },
+                purchase_units: [
+                  {
+                    custom_id: state.customId,
+                    description: state.summary.slice(0, 127),
+                    amount: {
+                      currency_code: currency,
+                      value: value,
+                      breakdown: {
+                        item_total: { currency_code: currency, value: value },
+                      },
+                    },
+                    items: [
+                      {
+                        name: state.itemName.slice(0, 127),
+                        sku: state.sku.slice(0, 127),
+                        description: (state.optionLine || "Standard").slice(0, 127),
+                        quantity: String(state.qty),
+                        unit_amount: { currency_code: currency, value: unit },
+                        category: "PHYSICAL_GOODS",
+                      },
+                    ],
+                  },
+                ],
+              });
+            },
+            onApprove: function (_data, actions) {
+              return actions.order.capture().then(function (details) {
+                const state = selected();
+                const snapshot = {
+                  sku: state.sku,
+                  name: state.name,
+                  options: state.options,
+                  optionLine: state.optionLine,
+                  qty: state.qty,
+                  total: money(state.total),
+                  currency: currency,
+                  paypalOrderId: (details && details.id) || "",
+                };
+                try {
+                  sessionStorage.setItem("by3dxyz-order", JSON.stringify(snapshot));
+                } catch (_err) {}
+                return Promise.race([
+                  notifyShop(state, details),
+                  new Promise(function (resolve) {
+                    setTimeout(resolve, 5000);
+                  }),
+                ]).finally(function () {
+                  window.location.href = "/thanks";
+                });
+              });
+            },
+          };
+
+          function mount(source, selector, style) {
+            const node = document.querySelector(selector);
+            if (!source || !node) return;
+            const eligible =
+              typeof paypal.isFundingEligible !== "function" || paypal.isFundingEligible(source);
+            if (!eligible) {
+              node.hidden = true;
+              return;
+            }
+            paypal
+              .Buttons(Object.assign({ fundingSource: source, style: style }, shared))
+              .render(node)
+              .catch(function () {
+                node.hidden = true;
+              });
+          }
+
+          mount(paypal.FUNDING.PAYPAL, "#paypal-paypal", {
+            color: "gold",
+            shape: "rect",
+            label: "paypal",
+            height: 45,
+            tagline: false,
+          });
+          mount(paypal.FUNDING.PAYLATER, "#paypal-paylater", {
+            color: "gold",
+            shape: "rect",
+            label: "paypal",
+            height: 45,
+            tagline: false,
+          });
+          mount(paypal.FUNDING.CARD, "#paypal-card", {
+            color: "black",
+            shape: "rect",
+            label: "pay",
+            height: 45,
+            tagline: false,
+          });
+        }
+
+        const src =
+          "https://www.paypal.com/sdk/js?client-id=" +
+          encodeURIComponent(clientId) +
+          "&currency=" +
+          encodeURIComponent(currency) +
+          "&enable-funding=card,paylater&disable-funding=venmo";
+        const existing = document.querySelector('script[src^="https://www.paypal.com/sdk/js"]');
+        if (window.paypal) start();
+        else if (existing) existing.addEventListener("load", start);
+        else {
+          const script = document.createElement("script");
+          script.src = src;
+          script.onload = start;
+          document.head.appendChild(script);
+        }
+      })();
+    </script>
+  )
+}

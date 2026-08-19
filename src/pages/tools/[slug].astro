@@ -1,0 +1,93 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import BuyOptions from "../../components/BuyOptions.astro";
+import CartSignal from "../../components/CartSignal.astro";
+import EtsyReview from "../../components/EtsyReview.astro";
+import StockSignal from "../../components/StockSignal.astro";
+import { products, getProduct, nextProduct, productCopy, productTitle } from "../../data/products";
+import { listingLine } from "../../data/site";
+
+export function getStaticPaths() {
+  return products.map((product) => ({ params: { slug: product.slug } }));
+}
+
+const product = getProduct(Astro.params.slug ?? "");
+if (!product) {
+  return Astro.redirect("/tools");
+}
+const title = productTitle(product);
+const about = productCopy(product.description);
+const next = nextProduct(product.slug);
+const nextTitle = next ? productTitle(next) : "";
+---
+
+<Layout title={title} description={product.short}>
+  <article class="wrap product-detail">
+    <div class="gallery">
+      <div class="product-back">
+        <a class="back-link" href="/tools" data-back>← Back</a>
+        {
+          next && (
+            <a class="back-link" href={`/tools/${next.slug}`} aria-label={`Next part: ${nextTitle}`}>
+              Next Part →
+            </a>
+          )
+        }
+      </div>
+      <div class="gallery-main">
+        <img src={product.images[0]} alt={title} data-main-image />
+      </div>
+      {
+        product.images.length > 1 && (
+          <div class="thumbs">
+            {product.images.map((image, index) => (
+              <button type="button" data-thumb={image} aria-current={index === 0 ? "true" : "false"}>
+                <img src={image} alt={`${title} view ${index + 1}`} />
+              </button>
+            ))}
+          </div>
+        )
+      }
+    </div>
+    <div class="product-panel">
+      <h1>{title}</h1>
+      <BuyOptions product={product}>
+        <StockSignal quantity={product.etsyQuantity} />
+        <CartSignal carts={product.etsyCarts} favorers={product.etsyFavorers} />
+        <p class="lede">{product.short}</p>
+      </BuyOptions>
+    </div>
+    <section class="product-body">
+      <p class="product-body-label">About this tool</p>
+      <p class="muted">{about}</p>
+      <p class="muted listing-line">{listingLine}</p>
+      <p class="muted"><a href="/custom">Want a different size or a new profile? Ask for a custom quote.</a></p>
+      <EtsyReview product={product} />
+    </section>
+  </article>
+</Layout>
+
+<script>
+  const back = document.querySelector("[data-back]");
+  back?.addEventListener("click", (event) => {
+    let fromHere = false;
+    try {
+      fromHere = Boolean(document.referrer) && new URL(document.referrer).origin === location.origin;
+    } catch (_err) {}
+    if (fromHere && window.history.length > 1) {
+      event.preventDefault();
+      window.history.back();
+    }
+  });
+
+  const main = document.querySelector("[data-main-image]");
+  document.querySelectorAll("[data-thumb]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const src = button.getAttribute("data-thumb");
+      if (src && main instanceof HTMLImageElement) main.src = src;
+      document.querySelectorAll("[data-thumb]").forEach((item) => {
+        item.setAttribute("aria-current", item === button ? "true" : "false");
+      });
+    });
+  });
+</script>

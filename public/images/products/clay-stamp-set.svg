@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="Studio stamp set">
+  <rect width="800" height="800" fill="#d7efe9"/>
+  <rect x="140" y="180" width="520" height="440" rx="36" fill="#fffaf3"/>
+  <g>
+    <rect x="180" y="230" width="180" height="160" rx="24" fill="#1f8a7a"/>
+    <circle cx="270" cy="310" r="28" fill="#fffaf3"/>
+    <rect x="400" y="230" width="180" height="160" rx="24" fill="#1e4d8c"/>
+    <path d="M490 270c20 0 36 28 36 48s-16 48-36 48-36-28-36-48 16-48 36-48z" fill="#b7d1c4"/>
+    <rect x="180" y="420" width="180" height="160" rx="24" fill="#e06c4f"/>
+    <path d="M238 500h64M270 468v64" stroke="#fffaf3" stroke-width="12" stroke-linecap="round"/>
+    <rect x="400" y="420" width="180" height="160" rx="24" fill="#c9a227"/>
+    <rect x="436" y="468" width="108" height="18" rx="8" fill="#fffaf3"/>
+    <rect x="436" y="504" width="72" height="18" rx="8" fill="#fffaf3"/>
+  </g>
+</svg>

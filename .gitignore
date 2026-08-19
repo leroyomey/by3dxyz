@@ -1,0 +1,21 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+.astro/
+
+# env
+.env
+.env.*
+!.env.example
+
+# This PC only. Delete _private, .cursor, and .env before sharing the project folder.
+_private/
+.cursor/
+
+# logs and OS
+npm-debug.log*
+catalog/*.log
+.DS_Store
+Thumbs.db

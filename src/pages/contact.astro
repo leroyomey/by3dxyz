@@ -1,0 +1,27 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { site } from "../data/site";
+---
+
+<Layout title="Contact" description="Contact by3DXYZ about an order or a shop question.">
+  <section class="wrap page-hero">
+    <p class="kicker">Contact</p>
+    <h1>Get in touch</h1>
+    <p class="lede">
+      Questions about an order or a tool in the shop? Send a message. For a new rib or studio tool, use
+      <a href="/custom">custom work</a>.
+    </p>
+  </section>
+  <section class="wrap section">
+    <form class="form" action={`mailto:${site.email}`} method="get">
+      <label for="name">Name</label>
+      <input id="name" name="name" required />
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required />
+      <label for="message">Message</label>
+      <textarea id="message" name="body" rows="6" required></textarea>
+      <button class="btn btn-teal" type="submit">Open email</button>
+    </form>
+    <p class="muted">Or email {site.email} directly.</p>
+  </section>
+</Layout>

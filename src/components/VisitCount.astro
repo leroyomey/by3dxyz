@@ -1,0 +1,51 @@
+<p class="visit-count" data-visit-count hidden>
+  <span data-visit-n></span> visits
+</p>
+
+<script is:inline>
+  (function () {
+    const key = "by3dxyz-shop-visits";
+    const base = "https://countapi.mileshilliard.com/api/v1";
+    const flag = "by3dxyz-visit-counted";
+    const box = document.querySelector("[data-visit-count]");
+    const nEl = document.querySelector("[data-visit-n]");
+    if (!box || !nEl) return;
+
+    function paint(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n) || n < 0) return;
+      nEl.textContent = new Intl.NumberFormat("en-US").format(n);
+      box.removeAttribute("hidden");
+    }
+
+    function read(path) {
+      return fetch(base + "/" + path + "/" + encodeURIComponent(key)).then(function (res) {
+        if (!res.ok) throw new Error(String(res.status));
+        return res.json();
+      }).then(function (data) {
+        return data && data.value;
+      });
+    }
+
+    function refresh(increment) {
+      return read(increment ? "hit" : "get")
+        .then(paint)
+        .catch(function () {
+          if (!increment) return;
+          return read("get").then(paint).catch(function () {});
+        });
+    }
+
+    let first = false;
+    try {
+      first = !sessionStorage.getItem(flag);
+      if (first) sessionStorage.setItem(flag, "1");
+    } catch (_err) {
+      first = true;
+    }
+    refresh(first);
+    window.setInterval(function () {
+      refresh(false);
+    }, 6 * 60 * 1000);
+  })();
+</script>

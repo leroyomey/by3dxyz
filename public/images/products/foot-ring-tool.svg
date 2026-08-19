@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="Foot ring tool">
+  <rect width="800" height="800" fill="#ead9b8"/>
+  <ellipse cx="400" cy="430" rx="230" ry="90" fill="#fffaf3" stroke="#1c2430" stroke-width="10"/>
+  <ellipse cx="400" cy="430" rx="120" ry="46" fill="none" stroke="#1f8a7a" stroke-width="14"/>
+  <rect x="372" y="200" width="56" height="200" rx="16" fill="#e06c4f"/>
+  <rect x="340" y="170" width="120" height="50" rx="16" fill="#1e4d8c"/>
+</svg>

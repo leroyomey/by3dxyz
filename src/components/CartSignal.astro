@@ -1,0 +1,14 @@
+---
+import { etsyDemandLabel } from "../data/products";
+
+interface Props {
+  carts?: number;
+  favorers?: number;
+  scope?: "item" | "shop";
+}
+
+const { carts, favorers, scope = "item" } = Astro.props;
+const label = etsyDemandLabel(carts, favorers, scope);
+---
+
+{label ? <p class:list={["cart-signal", scope === "shop" && "is-shop"]}>{label}</p> : null}

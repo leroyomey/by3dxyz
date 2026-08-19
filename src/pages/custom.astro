@@ -1,0 +1,67 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CustomRequest from "../components/CustomRequest.astro";
+import { customWork, formatUsd } from "../data/custom-work";
+---
+
+<Layout
+  title="Custom tools"
+  description="Ask for a custom pottery rib or studio tool from by3DXYZ. You get the 3D-printed part in the mail. Quote by email, 50% deposit."
+>
+  <section class="wrap page-hero">
+    <p class="kicker">Custom</p>
+    <h1>Need a tool that is not in the shop?</h1>
+    <p class="lede">
+      Describe the rib or studio tool. You get a fixed quote, then the 3D-printed part packed and mailed. Work starts
+      after a {customWork.depositPercent}% PayPal deposit. Prices on this page are {customWork.year} starting rates.
+    </p>
+  </section>
+
+  <section class="wrap custom-steps">
+    <ol>
+      <li>
+        <strong>Request</strong>
+        <span class="muted">Send the form on this page. A sketch and sizes help the quote.</span>
+      </li>
+      <li>
+        <strong>Quote</strong>
+        <span class="muted">A fixed price within {customWork.quoteWindow}, or a no if it is not a fit. The quote stays open for {customWork.quoteDaysValid} days.</span>
+      </li>
+      <li>
+        <strong>Deposit</strong>
+        <span class="muted">{customWork.depositPercent}% by PayPal invoice. Then we start the drawing and print.</span>
+      </li>
+      <li>
+        <strong>Print and ship</strong>
+        <span class="muted">You get the 3D-printed tool in the mail. Remainder plus postage before it ships. Typical {customWork.leadTime}.</span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="wrap custom-packages">
+    {
+      customWork.packages.map((item) => (
+        <article>
+          <p class="cat">{item.name}</p>
+          <p class="price">from {formatUsd(item.from)}</p>
+          <p class="muted">{item.blurb}</p>
+        </article>
+      ))
+    }
+  </section>
+
+  <section class="wrap section custom-request">
+    <div class="custom-quote">
+      <h2>Ask for a quote</h2>
+      <p class="muted">{customWork.quoteLead}</p>
+      <p class="muted">{customWork.quotePricing}</p>
+      <ul class="muted">
+        <li>{customWork.quoteCopies}</li>
+        <li>{customWork.quoteRevisions}</li>
+      </ul>
+      <p class="muted custom-quote-limit">{customWork.maxPieceCopy}</p>
+      <p class="muted custom-quote-later">{customWork.shopLaterCopy}</p>
+    </div>
+    <CustomRequest />
+  </section>
+</Layout>

@@ -1,0 +1,45 @@
+---
+import type { Product } from "../data/products";
+import { formatPrice } from "../data/products";
+import { site } from "../data/site";
+
+interface Props {
+  product: Product;
+  compact?: boolean;
+}
+
+const { product, compact = false } = Astro.props;
+const etsyUrl = product.etsyUrl || site.etsyUrl;
+const paypalUrl = product.paypalUrl?.trim();
+const paypalClient = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID ?? "";
+const hasPaypal = Boolean(paypalUrl || paypalClient);
+const productUrl = `/tools/${product.slug}#buy`;
+const buyLabel = compact
+  ? "Buy now"
+  : `Buy now · ${formatPrice(product.price, product.currency)}`;
+---
+
+<div class="card-actions">
+  {
+    compact && hasPaypal ? (
+      <a class="btn btn-primary" href={productUrl}>
+        {buyLabel}
+      </a>
+    ) : compact ? (
+      <a class="btn btn-primary" href={etsyUrl} target="_blank" rel="noopener noreferrer">
+        Buy on Etsy
+      </a>
+    ) : paypalUrl ? (
+      <a class="btn btn-primary" href={paypalUrl} target="_blank" rel="noopener noreferrer">
+        {buyLabel}
+      </a>
+    ) : !paypalClient ? (
+      <a class="btn btn-primary" href={etsyUrl} target="_blank" rel="noopener noreferrer">
+        Buy on Etsy · {formatPrice(product.price, product.currency)}
+      </a>
+    ) : null
+  }
+  <a class="btn btn-ghost" href={etsyUrl} target="_blank" rel="noopener noreferrer">
+    View on Etsy
+  </a>
+</div>

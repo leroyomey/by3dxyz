@@ -1,0 +1,182 @@
+---
+import { products, productTitle } from "../data/products";
+import { site } from "../data/site";
+
+const reel = products.map((product) => ({
+  slug: product.slug,
+  name: productTitle(product),
+  sku: product.sku,
+  image: product.images[0],
+}));
+const first = reel[0];
+---
+
+<section class="home">
+  <div class="wrap home-top">
+    <div class="home-copy">
+      <h1>Pottery tools.</h1>
+      <p class="lede">3D-printed parts for the studio. Buy here or on <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy</a>. Want a rib that is not in the shop? <a href="/custom">Ask for a custom quote</a>.</p>
+      <div class="hero-actions">
+        <a class="btn btn-teal" href="/tools">Shop</a>
+        <a class="btn btn-ghost" href="/custom">Custom</a>
+        <a class="btn btn-ghost" href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy</a>
+      </div>
+    </div>
+
+    <figure class="home-stage">
+      <a class="home-shot" data-main-link href={first ? `/tools/${first.slug}` : "/tools"}>
+        <img data-layer="a" src={first?.image} alt={first?.name ?? "Tool"} />
+        <img data-layer="b" alt="" />
+      </a>
+      <figcaption>
+        <span data-caption-name>{first?.name}</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="home-strip-wrap">
+    <div class="wrap home-strip-bar">
+      <button type="button" class="strip-arrow" data-strip-prev aria-label="Previous tool">
+        &lt;
+      </button>
+      <div class="home-strip" data-strip>
+        <div class="home-strip-track" data-strip-track role="list">
+        {
+          reel.map((item, index) => (
+            <button
+              type="button"
+              role="listitem"
+              data-reel-i={index}
+              class:list={["strip-item", index === 0 && "is-on"]}
+              aria-label={item.name}
+            >
+              <img src={item.image} alt="" />
+            </button>
+          ))
+        }
+        </div>
+      </div>
+      <button type="button" class="strip-arrow" data-strip-next aria-label="Next tool">
+        &gt;
+      </button>
+    </div>
+  </div>
+</section>
+
+<script type="application/json" data-home-reel set:html={JSON.stringify(reel)}></script>
+
+<script is:inline>
+  (function () {
+    const raw = document.querySelector("[data-home-reel]");
+    const strip = document.querySelector("[data-strip]");
+    const link = document.querySelector("[data-main-link]");
+    const layerA = document.querySelector("[data-layer='a']");
+    const layerB = document.querySelector("[data-layer='b']");
+    const nameEl = document.querySelector("[data-caption-name]");
+    let reel = [];
+    try {
+      reel = JSON.parse(raw && raw.textContent ? raw.textContent : "[]");
+    } catch (_err) {
+      reel = [];
+    }
+    if (
+      !(strip instanceof HTMLElement) ||
+      !(link instanceof HTMLAnchorElement) ||
+      !(layerA instanceof HTMLImageElement) ||
+      !(layerB instanceof HTMLImageElement) ||
+      !Array.isArray(reel) ||
+      !reel.length
+    ) {
+      return;
+    }
+
+    const thumbs = [...strip.querySelectorAll("[data-reel-i]")];
+    const track = strip.querySelector("[data-strip-track]");
+    const prevBtn = document.querySelector("[data-strip-prev]");
+    const nextBtn = document.querySelector("[data-strip-next]");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const hold = reduce ? 10000 : 7000;
+    let viewIndex = 0;
+    let front = "a";
+    let timer = 0;
+
+    function wrap(i) {
+      const n = reel.length;
+      return ((i % n) + n) % n;
+    }
+
+    function item(i) {
+      return reel[wrap(i)];
+    }
+
+    function centerStrip(instant) {
+      const el = thumbs[viewIndex];
+      if (!(el instanceof HTMLElement) || !(track instanceof HTMLElement)) return;
+      const x = strip.clientWidth / 2 - (el.offsetLeft + el.offsetWidth / 2);
+      if (instant) {
+        track.style.transition = "none";
+        track.style.transform = `translate3d(${x}px, 0, 0)`;
+        void track.offsetWidth;
+        track.style.removeProperty("transition");
+        return;
+      }
+      track.style.transform = `translate3d(${x}px, 0, 0)`;
+    }
+
+    function paintStrip(instant) {
+      thumbs.forEach((thumb, i) => {
+        thumb.classList.toggle("is-on", i === viewIndex);
+      });
+      centerStrip(instant);
+    }
+
+    function show(i) {
+      const from = viewIndex;
+      const next = item(i);
+      viewIndex = wrap(i);
+      if (!next) return;
+      const incoming = front === "a" ? layerB : layerA;
+      const outgoing = front === "a" ? layerA : layerB;
+      incoming.src = next.image;
+      incoming.alt = next.name;
+      incoming.classList.add("is-in");
+      outgoing.classList.remove("is-in");
+      front = front === "a" ? "b" : "a";
+      link.href = "/tools/" + next.slug;
+      if (nameEl) nameEl.textContent = next.name;
+      paintStrip(Math.abs(viewIndex - from) > 1);
+      const preload = new Image();
+      preload.src = item(viewIndex + 1).image;
+    }
+
+    function arm() {
+      window.clearInterval(timer);
+      if (document.hidden) return;
+      timer = window.setInterval(function () {
+        show(viewIndex + 1);
+      }, hold);
+    }
+
+    function selectAt(i) {
+      show(i);
+      arm();
+    }
+
+    thumbs.forEach(function (thumb) {
+      thumb.addEventListener("click", function () {
+        selectAt(Number(thumb.getAttribute("data-reel-i")));
+      });
+    });
+    if (prevBtn) prevBtn.addEventListener("click", function () { selectAt(viewIndex - 1); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { selectAt(viewIndex + 1); });
+    window.addEventListener("resize", function () { centerStrip(false); });
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) window.clearInterval(timer);
+      else arm();
+    });
+
+    layerA.classList.add("is-in");
+    paintStrip();
+    arm();
+  })();
+</script>

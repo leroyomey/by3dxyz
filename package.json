@@ -1,0 +1,21 @@
+{
+  "name": "by3dxyz",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "catalog:list": "node scripts/catalog.mjs list",
+    "catalog:add": "node scripts/catalog.mjs add",
+    "catalog:import": "node scripts/catalog.mjs import",
+    "catalog:etsy": "node scripts/catalog.mjs etsy-diff",
+    "catalog:sync": "node scripts/catalog.mjs etsy-sync",
+    "catalog:auth": "node scripts/catalog.mjs etsy-auth"
+  },
+  "dependencies": {
+    "astro": "^5.13.2"
+  }
+}

@@ -1,0 +1,26 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { site } from "../data/site";
+---
+
+<Layout title="About" description="by3DXYZ is built around thoughtful design and reliable 3D printing.">
+  <section class="wrap page-hero prose">
+    <p class="kicker">About</p>
+    <h1>by3DXYZ</h1>
+    <p>
+      by3DXYZ is built around thoughtful design and reliable 3D printing. Every item starts as an original model and
+      is printed in small batches to maintain quality and consistency. I focus on clean details, solid construction,
+      and practical designs - no shortcuts, no mass production. What you get is something made with care, tested, and
+      finished to a standard I'd expect for myself.
+    </p>
+    <p>
+      You can buy on this site with PayPal, or on
+      <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy</a>. Need a custom rib or studio tool?
+      <a href="/custom">Ask for a quote</a>.
+    </p>
+    <p class="hero-actions">
+      <a class="btn btn-teal" href="/tools">Shop</a>
+      <a class="btn btn-ghost" href="/custom">Custom</a>
+    </p>
+  </section>
+</Layout>

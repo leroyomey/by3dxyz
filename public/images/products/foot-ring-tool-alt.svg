@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="Foot ring tool mark">
+  <rect width="800" height="800" fill="#c9a227"/>
+  <ellipse cx="400" cy="400" rx="260" ry="110" fill="#fffaf3"/>
+  <ellipse cx="400" cy="400" rx="140" ry="58" fill="none" stroke="#1c2430" stroke-width="16"/>
+  <ellipse cx="400" cy="400" rx="70" ry="28" fill="#e06c4f"/>
+</svg>

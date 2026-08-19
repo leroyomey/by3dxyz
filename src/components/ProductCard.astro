@@ -1,0 +1,34 @@
+---
+import type { Product } from "../data/products";
+import { displayPrice, productTitle } from "../data/products";
+import { listingLine } from "../data/site";
+import BuyButtons from "./BuyButtons.astro";
+import CartSignal from "./CartSignal.astro";
+import StockSignal from "./StockSignal.astro";
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const pageUrl = `/tools/${product.slug}`;
+const title = productTitle(product);
+---
+
+<article class="product-card" data-category={product.category} data-name={`${title}`.toLowerCase()}>
+  <a class="thumb" href={pageUrl}>
+    <img src={product.images[0]} alt={title} />
+  </a>
+  <div class="body">
+    <h3><a href={pageUrl}>{title}</a></h3>
+    <p class="muted card-short">{product.short}</p>
+    <p class="muted listing-line">{listingLine}</p>
+    <div class="price-row">
+      <div class="price">{displayPrice(product)}</div>
+      <span class="ship-free">FREE shipping</span>
+    </div>
+    <StockSignal quantity={product.etsyQuantity} />
+    <CartSignal carts={product.etsyCarts} favorers={product.etsyFavorers} />
+    <BuyButtons product={product} compact />
+  </div>
+</article>

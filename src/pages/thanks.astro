@@ -1,0 +1,57 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { site } from "../data/site";
+---
+
+<Layout title="Thank you" description="Your by3DXYZ order was received.">
+  <section class="wrap page-hero prose">
+    <p class="kicker">Order</p>
+    <h1>Thank you</h1>
+    <div data-order-summary hidden>
+      <p>We received:</p>
+      <ul>
+        <li><strong>SKU</strong> <span data-order-sku></span></li>
+        <li><strong>Tool</strong> <span data-order-name></span></li>
+        <li data-order-options-row hidden><strong>Options</strong> <span data-order-options></span></li>
+        <li><strong>Quantity</strong> <span data-order-qty></span></li>
+        <li><strong>Total</strong> <span data-order-total></span></li>
+      </ul>
+    </div>
+    <p>
+      PayPal has your payment. The shop will print and mail your order using the SKU, color, size, quantity, and
+      ship-to address. Questions: {site.email}
+    </p>
+    <p>
+      <a class="btn btn-teal" href="/tools">Back to the shop</a>
+    </p>
+  </section>
+</Layout>
+
+<script>
+  try {
+    const raw = sessionStorage.getItem("by3dxyz-order");
+    const order = raw ? JSON.parse(raw) : null;
+    const box = document.querySelector("[data-order-summary]");
+    if (order && box) {
+      const sku = box.querySelector("[data-order-sku]");
+      const name = box.querySelector("[data-order-name]");
+      const options = box.querySelector("[data-order-options]");
+      const optionsRow = box.querySelector("[data-order-options-row]");
+      const qty = box.querySelector("[data-order-qty]");
+      const total = box.querySelector("[data-order-total]");
+      if (sku) sku.textContent = order.sku || "";
+      if (name) name.textContent = order.name || "";
+      if (options && order.optionLine) {
+        options.textContent = order.optionLine;
+        optionsRow?.removeAttribute("hidden");
+      }
+      if (qty) qty.textContent = String(order.qty || "");
+      if (total) {
+        total.textContent = order.total
+          ? `${order.currency === "USD" ? "$" : ""}${order.total} ${order.currency || ""}`.trim()
+          : "";
+      }
+      box.removeAttribute("hidden");
+    }
+  } catch (_err) {}
+</script>

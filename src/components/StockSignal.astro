@@ -1,0 +1,13 @@
+---
+import { etsyStockLabel } from "../data/products";
+
+interface Props {
+  quantity?: number;
+}
+
+const { quantity } = Astro.props;
+const label = etsyStockLabel(quantity);
+const soldOut = typeof quantity === "number" && quantity <= 0;
+---
+
+{label ? <p class:list={["stock-signal", soldOut && "is-out"]}>{label}</p> : null}

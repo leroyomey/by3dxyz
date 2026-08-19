@@ -1,0 +1,78 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ProductGrid from "../../components/ProductGrid.astro";
+import { products, categories, etsyCartsTotal, etsyFavorersTotal } from "../../data/products";
+import CartSignal from "../../components/CartSignal.astro";
+import { site } from "../../data/site";
+
+const inCarts = etsyCartsTotal(products);
+const favorers = etsyFavorersTotal(products);
+---
+
+<Layout title="Pottery tools" description="Throwing ribs, rim shapers, and paddles from by3DXYZ.">
+  <section class="wrap page-hero">
+    <p class="kicker">Shop</p>
+    <h1>Pottery tools</h1>
+    <p class="lede">
+      Filter by type, then buy here or on{" "}
+      <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy</a>.
+    </p>
+    <CartSignal carts={inCarts} favorers={favorers} scope="shop" />
+  </section>
+
+  <section class="wrap section" data-catalog>
+    <div class="catalog-tools">
+      <div class="search-field">
+        <label class="search-label muted" for="tool-search">Search</label>
+        <input class="search" id="tool-search" type="search" placeholder="Search rib, paddle, BO-014…" data-search />
+      </div>
+      <div class="filters" role="group" aria-label="Filter by type">
+        {
+          categories.map((category, index) => (
+            <button class="chip" type="button" data-filter={category} aria-pressed={index === 0 ? "true" : "false"}>
+              {category}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+    <ProductGrid products={products} />
+  </section>
+</Layout>
+
+<script>
+  const root = document.querySelector("[data-catalog]");
+  if (root) {
+    const chips = [...root.querySelectorAll("[data-filter]")];
+    const cards = [...root.querySelectorAll("[data-category]")];
+    const empty = root.querySelector("[data-empty]");
+    const search = root.querySelector("[data-search]");
+    let active = "All";
+
+    function apply() {
+      const query = (search instanceof HTMLInputElement ? search.value : "").trim().toLowerCase();
+      let visible = 0;
+      cards.forEach((card) => {
+        if (!(card instanceof HTMLElement)) return;
+        const category = card.dataset.category ?? "";
+        const name = card.dataset.name ?? "";
+        const matchCategory = active === "All" || category === active;
+        const matchSearch = !query || name.includes(query) || category.toLowerCase().includes(query);
+        const show = matchCategory && matchSearch;
+        card.classList.toggle("hidden", !show);
+        if (show) visible += 1;
+      });
+      empty?.classList.toggle("hidden", visible !== 0);
+    }
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        active = chip.getAttribute("data-filter") ?? "All";
+        chips.forEach((item) => item.setAttribute("aria-pressed", item === chip ? "true" : "false"));
+        apply();
+      });
+    });
+
+    search?.addEventListener("input", apply);
+  }
+</script>
