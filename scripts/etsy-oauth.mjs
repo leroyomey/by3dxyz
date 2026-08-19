@@ -45,7 +45,8 @@ function pkce() {
 
 function openBrowser(url) {
   if (process.platform === "win32") {
-    spawn("cmd", ["/c", "start", "", url], { detached: true, stdio: "ignore" }).unref();
+    // cmd `start` splits on & in the OAuth query string and Etsy shows error.php.
+    spawn("rundll32", ["url.dll,FileProtocolHandler", url], { detached: true, stdio: "ignore" }).unref();
   } else {
     spawn(process.platform === "darwin" ? "open" : "xdg-open", [url], {
       detached: true,
@@ -196,6 +197,8 @@ export async function cmdEtsyAuth() {
   console.log(`   ${callback}`);
   console.log("3. A browser window will open. Log in as the by3DXYZ shop and allow listings access.");
   console.log("   Keep this terminal open. Etsy sends you to by3dxyz.com, which hands the login back to this PC.");
+  console.log("If the tab says Uh oh, paste this full URL into the address bar:");
+  console.log(connect.toString());
   openBrowser(connect.toString());
   const code = await waitForCode(state);
   const json = await requestToken({
