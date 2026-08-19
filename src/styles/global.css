@@ -1426,6 +1426,14 @@ a.btn-primary[href*="etsy.com"]:hover {
   padding-top: 4px;
 }
 
+.form-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .custom-board {
   display: grid;
   gap: 22px;
@@ -1454,6 +1462,7 @@ a.btn-primary[href*="etsy.com"]:hover {
 
 .custom-form {
   max-width: none;
+  position: relative;
 }
 
 .custom-sku-field {

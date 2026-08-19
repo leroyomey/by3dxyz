@@ -76,7 +76,10 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
     <label for="custom-photo">Link to a sketch (a photo of it is fine)</label>
     <input id="custom-photo" name="photo" type="url" placeholder="https://" />
 
-    <input type="text" name="_gotcha" class="hidden" tabindex="-1" autocomplete="off" />
+    <div class="form-trap" aria-hidden="true">
+      <label for="custom-company">Company website</label>
+      <input id="custom-company" name="_honey" type="text" tabindex="-1" autocomplete="off" />
+    </div>
     <input type="hidden" name="estimate" data-estimate-field value={first.label} />
 
     <p class="muted" data-custom-status></p>
@@ -186,6 +189,7 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
       }
     }
 
+    const openedAt = Date.now();
     root.addEventListener("change", paint);
     paint();
 
@@ -194,12 +198,25 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
       const status = root.querySelector("[data-custom-status]");
       const button = root.querySelector("[data-custom-submit]");
       const data = new FormData(form);
-      if (data.get("_gotcha")) return;
+      const honey = String(data.get("_honey") || "").trim();
+      if (honey) return;
+      if (Date.now() - openedAt < 4000) {
+        if (status) status.textContent = "Take a second, then send again.";
+        return;
+      }
+      try {
+        const last = Number(sessionStorage.getItem("custom-sent") || 0);
+        if (last && Date.now() - last < 30000) {
+          if (status) status.textContent = "Request already sent. Wait a moment before another.";
+          return;
+        }
+      } catch (_err) {}
       const job = String(data.get("job") || "");
       const payload = {
         _subject: "by3DXYZ custom request",
         _template: "table",
         _captcha: "false",
+        _honey: honey,
         name: String(data.get("name") || ""),
         email: String(data.get("email") || ""),
         job: job,
@@ -233,7 +250,12 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
               ? "Request sent. Watch for a quote in a few days."
               : "Could not send. Email hello@by3dxyz.com instead.";
           }
-          if (result.ok) form.reset();
+          if (result.ok) {
+            form.reset();
+            try {
+              sessionStorage.setItem("custom-sent", String(Date.now()));
+            } catch (_err) {}
+          }
           paint();
         })
         .catch(function () {
