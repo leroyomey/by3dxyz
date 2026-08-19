@@ -16,7 +16,9 @@
     "etsyListingId": "4444267661",
     "paypalUrl": "",
     "featured": true,
-    "variantSet": "rib"
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 1
   },
   {
     "id": "throwing-rib-bo-002",
@@ -35,520 +37,9 @@
     "etsyListingId": "4555158994",
     "paypalUrl": "",
     "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-004",
-    "sku": "BO-004",
-    "slug": "throwing-rib-bo-004",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-004",
-    "images": [
-      "/images/products/throwing-rib-bo-004.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4444493753",
-    "etsyListingId": "4444493753",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-005",
-    "sku": "BO-005",
-    "slug": "throwing-rib-bo-005",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-005",
-    "images": [
-      "/images/products/throwing-rib-bo-005.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4444510659",
-    "etsyListingId": "4444510659",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-006",
-    "sku": "BO-006",
-    "slug": "throwing-rib-bo-006",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-006",
-    "images": [
-      "/images/products/throwing-rib-bo-006.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4444955862",
-    "etsyListingId": "4444955862",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-007",
-    "sku": "BO-007",
-    "slug": "throwing-rib-bo-007",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-007",
-    "images": [
-      "/images/products/throwing-rib-bo-007.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4445607076",
-    "etsyListingId": "4445607076",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-008",
-    "sku": "BO-008",
-    "slug": "throwing-rib-bo-008",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-008",
-    "images": [
-      "/images/products/throwing-rib-bo-008.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4445601911",
-    "etsyListingId": "4445601911",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-009",
-    "sku": "BO-009",
-    "slug": "throwing-rib-bo-009",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-009",
-    "images": [
-      "/images/products/throwing-rib-bo-009.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4447827517",
-    "etsyListingId": "4447827517",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-010",
-    "sku": "BO-010",
-    "slug": "throwing-rib-bo-010",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-010",
-    "images": [
-      "/images/products/throwing-rib-bo-010.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4447832054",
-    "etsyListingId": "4447832054",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-011",
-    "sku": "BO-011",
-    "slug": "throwing-rib-bo-011",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-011",
-    "images": [
-      "/images/products/throwing-rib-bo-011.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4449940130",
-    "etsyListingId": "4449940130",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-012",
-    "sku": "BO-012",
-    "slug": "throwing-rib-bo-012",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-012",
-    "images": [
-      "/images/products/throwing-rib-bo-012.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4554581875",
-    "etsyListingId": "4554581875",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-013",
-    "sku": "BO-013",
-    "slug": "throwing-rib-bo-013",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-013",
-    "images": [
-      "/images/products/throwing-rib-bo-013.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555762119",
-    "etsyListingId": "4555762119",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-014",
-    "sku": "BO-014",
-    "slug": "throwing-rib-bo-014",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-014",
-    "images": [
-      "/images/products/throwing-rib-bo-014.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4451384524",
-    "etsyListingId": "4451384524",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-015",
-    "sku": "BO-015",
-    "slug": "throwing-rib-bo-015",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-015",
-    "images": [
-      "/images/products/throwing-rib-bo-015.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4452450542",
-    "etsyListingId": "4452450542",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-016",
-    "sku": "BO-016",
-    "slug": "throwing-rib-bo-016",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-016",
-    "images": [
-      "/images/products/throwing-rib-bo-016.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4452450816",
-    "etsyListingId": "4452450816",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-017",
-    "sku": "BO-017",
-    "slug": "throwing-rib-bo-017",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-017",
-    "images": [
-      "/images/products/throwing-rib-bo-017.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4452445419",
-    "etsyListingId": "4452445419",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-018",
-    "sku": "BO-018",
-    "slug": "throwing-rib-bo-018",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-018",
-    "images": [
-      "/images/products/throwing-rib-bo-018.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4456735938",
-    "etsyListingId": "4456735938",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-021",
-    "sku": "BO-021",
-    "slug": "throwing-rib-bo-021",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-021",
-    "images": [
-      "/images/products/throwing-rib-bo-021.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555146997",
-    "etsyListingId": "4555146997",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-022",
-    "sku": "BO-022",
-    "slug": "throwing-rib-bo-022",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-022",
-    "images": [
-      "/images/products/throwing-rib-bo-022.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555160110",
-    "etsyListingId": "4555160110",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-023",
-    "sku": "BO-023",
-    "slug": "throwing-rib-bo-023",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-023",
-    "images": [
-      "/images/products/throwing-rib-bo-023.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555160618",
-    "etsyListingId": "4555160618",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-024",
-    "sku": "BO-024",
-    "slug": "throwing-rib-bo-024",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-024",
-    "images": [
-      "/images/products/throwing-rib-bo-024.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555762503",
-    "etsyListingId": "4555762503",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-025",
-    "sku": "BO-025",
-    "slug": "throwing-rib-bo-025",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-025",
-    "images": [
-      "/images/products/throwing-rib-bo-025.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555762875",
-    "etsyListingId": "4555762875",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-026",
-    "sku": "BO-026",
-    "slug": "throwing-rib-bo-026",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-026",
-    "images": [
-      "/images/products/throwing-rib-bo-026.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555763201",
-    "etsyListingId": "4555763201",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-027",
-    "sku": "BO-027",
-    "slug": "throwing-rib-bo-027",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-027",
-    "images": [
-      "/images/products/throwing-rib-bo-027.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555763653",
-    "etsyListingId": "4555763653",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-028",
-    "sku": "BO-028",
-    "slug": "throwing-rib-bo-028",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-028",
-    "images": [
-      "/images/products/throwing-rib-bo-028.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555764075",
-    "etsyListingId": "4555764075",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-029",
-    "sku": "BO-029",
-    "slug": "throwing-rib-bo-029",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-029",
-    "images": [
-      "/images/products/throwing-rib-bo-029.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555775492",
-    "etsyListingId": "4555775492",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-030",
-    "sku": "BO-030",
-    "slug": "throwing-rib-bo-030",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-030",
-    "images": [
-      "/images/products/throwing-rib-bo-030.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555764877",
-    "etsyListingId": "4555764877",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-031",
-    "sku": "BO-031",
-    "slug": "throwing-rib-bo-031",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-031",
-    "images": [
-      "/images/products/throwing-rib-bo-031.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555776116",
-    "etsyListingId": "4555776116",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
-  },
-  {
-    "id": "throwing-rib-bo-032",
-    "sku": "BO-032",
-    "slug": "throwing-rib-bo-032",
-    "name": "Throwing Rib",
-    "price": 11.5,
-    "currency": "USD",
-    "category": "Ribs",
-    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
-    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-032",
-    "images": [
-      "/images/products/throwing-rib-bo-032.jpg"
-    ],
-    "etsyUrl": "https://www.etsy.com/listing/4555776478",
-    "etsyListingId": "4555776478",
-    "paypalUrl": "",
-    "featured": false,
-    "variantSet": "rib"
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
   },
   {
     "id": "rib-rim-shaper-small",
@@ -567,26 +58,324 @@
     "etsyListingId": "4435653526",
     "paypalUrl": "",
     "featured": true,
-    "variantSet": ""
+    "variantSet": "",
+    "etsyQuantity": 11,
+    "etsyFavorers": 46
   },
   {
-    "id": "rib-rim-shaper-large",
-    "sku": "BO-020",
-    "slug": "rib-rim-shaper-large",
-    "name": "Rib & Rim Shaper (Large)",
-    "price": 14.5,
+    "id": "throwing-rib-bo-004",
+    "sku": "BO-004",
+    "slug": "throwing-rib-bo-004",
+    "name": "Throwing Rib",
+    "price": 11.5,
     "currency": "USD",
     "category": "Ribs",
-    "short": "Shapes rims and compresses clay on the wheel.",
-    "description": "Precision 3D-printed part designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-020",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-004",
     "images": [
-      "/images/products/rib-rim-shaper-large.jpg"
+      "/images/products/throwing-rib-bo-004.jpg"
     ],
-    "etsyUrl": "https://www.etsy.com/listing/4534000777",
-    "etsyListingId": "4534000777",
+    "etsyUrl": "https://www.etsy.com/listing/4444493753",
+    "etsyListingId": "4444493753",
     "paypalUrl": "",
-    "featured": true,
-    "variantSet": ""
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 8,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-005",
+    "sku": "BO-005",
+    "slug": "throwing-rib-bo-005",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-005",
+    "images": [
+      "/images/products/throwing-rib-bo-005.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4444510659",
+    "etsyListingId": "4444510659",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 9,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-006",
+    "sku": "BO-006",
+    "slug": "throwing-rib-bo-006",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-006",
+    "images": [
+      "/images/products/throwing-rib-bo-006.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4444955862",
+    "etsyListingId": "4444955862",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-007",
+    "sku": "BO-007",
+    "slug": "throwing-rib-bo-007",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-007",
+    "images": [
+      "/images/products/throwing-rib-bo-007.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4445607076",
+    "etsyListingId": "4445607076",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 2
+  },
+  {
+    "id": "throwing-rib-bo-008",
+    "sku": "BO-008",
+    "slug": "throwing-rib-bo-008",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-008",
+    "images": [
+      "/images/products/throwing-rib-bo-008.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4445601911",
+    "etsyListingId": "4445601911",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-009",
+    "sku": "BO-009",
+    "slug": "throwing-rib-bo-009",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-009",
+    "images": [
+      "/images/products/throwing-rib-bo-009.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4447827517",
+    "etsyListingId": "4447827517",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 1
+  },
+  {
+    "id": "throwing-rib-bo-010",
+    "sku": "BO-010",
+    "slug": "throwing-rib-bo-010",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-010",
+    "images": [
+      "/images/products/throwing-rib-bo-010.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4447832054",
+    "etsyListingId": "4447832054",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 1
+  },
+  {
+    "id": "throwing-rib-bo-011",
+    "sku": "BO-011",
+    "slug": "throwing-rib-bo-011",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-011",
+    "images": [
+      "/images/products/throwing-rib-bo-011.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4449940130",
+    "etsyListingId": "4449940130",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-012",
+    "sku": "BO-012",
+    "slug": "throwing-rib-bo-012",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-012",
+    "images": [
+      "/images/products/throwing-rib-bo-012.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4554581875",
+    "etsyListingId": "4554581875",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-013",
+    "sku": "BO-013",
+    "slug": "throwing-rib-bo-013",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-013",
+    "images": [
+      "/images/products/throwing-rib-bo-013.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555762119",
+    "etsyListingId": "4555762119",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-014",
+    "sku": "BO-014",
+    "slug": "throwing-rib-bo-014",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-014",
+    "images": [
+      "/images/products/throwing-rib-bo-014.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4451384524",
+    "etsyListingId": "4451384524",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-015",
+    "sku": "BO-015",
+    "slug": "throwing-rib-bo-015",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-015",
+    "images": [
+      "/images/products/throwing-rib-bo-015.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4452450542",
+    "etsyListingId": "4452450542",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-016",
+    "sku": "BO-016",
+    "slug": "throwing-rib-bo-016",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-016",
+    "images": [
+      "/images/products/throwing-rib-bo-016.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4452450816",
+    "etsyListingId": "4452450816",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 1
+  },
+  {
+    "id": "throwing-rib-bo-017",
+    "sku": "BO-017",
+    "slug": "throwing-rib-bo-017",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-017",
+    "images": [
+      "/images/products/throwing-rib-bo-017.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4452445419",
+    "etsyListingId": "4452445419",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-018",
+    "sku": "BO-018",
+    "slug": "throwing-rib-bo-018",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-018",
+    "images": [
+      "/images/products/throwing-rib-bo-018.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4456735938",
+    "etsyListingId": "4456735938",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
   },
   {
     "id": "smooth-surface-paddle",
@@ -605,7 +394,9 @@
     "etsyListingId": "4458615968",
     "paypalUrl": "",
     "featured": true,
-    "variantSet": ""
+    "variantSet": "",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
   },
   {
     "id": "hole-punch-paddle",
@@ -624,6 +415,281 @@
     "etsyListingId": "4458617218",
     "paypalUrl": "",
     "featured": true,
-    "variantSet": ""
+    "variantSet": "",
+    "etsyQuantity": 10,
+    "etsyFavorers": 1
+  },
+  {
+    "id": "rib-rim-shaper-large",
+    "sku": "BO-020",
+    "slug": "rib-rim-shaper-large",
+    "name": "Rib & Rim Shaper (Large)",
+    "price": 14.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Shapes rims and compresses clay on the wheel.",
+    "description": "Precision 3D-printed part designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-020",
+    "images": [
+      "/images/products/rib-rim-shaper-large.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4534000777",
+    "etsyListingId": "4534000777",
+    "paypalUrl": "",
+    "featured": true,
+    "variantSet": "",
+    "etsyQuantity": 12,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-021",
+    "sku": "BO-021",
+    "slug": "throwing-rib-bo-021",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-021",
+    "images": [
+      "/images/products/throwing-rib-bo-021.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555146997",
+    "etsyListingId": "4555146997",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-022",
+    "sku": "BO-022",
+    "slug": "throwing-rib-bo-022",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-022",
+    "images": [
+      "/images/products/throwing-rib-bo-022.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555160110",
+    "etsyListingId": "4555160110",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-023",
+    "sku": "BO-023",
+    "slug": "throwing-rib-bo-023",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-023",
+    "images": [
+      "/images/products/throwing-rib-bo-023.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555160618",
+    "etsyListingId": "4555160618",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-024",
+    "sku": "BO-024",
+    "slug": "throwing-rib-bo-024",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-024",
+    "images": [
+      "/images/products/throwing-rib-bo-024.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555762503",
+    "etsyListingId": "4555762503",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-025",
+    "sku": "BO-025",
+    "slug": "throwing-rib-bo-025",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-025",
+    "images": [
+      "/images/products/throwing-rib-bo-025.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555762875",
+    "etsyListingId": "4555762875",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-026",
+    "sku": "BO-026",
+    "slug": "throwing-rib-bo-026",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-026",
+    "images": [
+      "/images/products/throwing-rib-bo-026.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555763201",
+    "etsyListingId": "4555763201",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-027",
+    "sku": "BO-027",
+    "slug": "throwing-rib-bo-027",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-027",
+    "images": [
+      "/images/products/throwing-rib-bo-027.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555763653",
+    "etsyListingId": "4555763653",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-028",
+    "sku": "BO-028",
+    "slug": "throwing-rib-bo-028",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-028",
+    "images": [
+      "/images/products/throwing-rib-bo-028.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555764075",
+    "etsyListingId": "4555764075",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-029",
+    "sku": "BO-029",
+    "slug": "throwing-rib-bo-029",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-029",
+    "images": [
+      "/images/products/throwing-rib-bo-029.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555775492",
+    "etsyListingId": "4555775492",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-030",
+    "sku": "BO-030",
+    "slug": "throwing-rib-bo-030",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-030",
+    "images": [
+      "/images/products/throwing-rib-bo-030.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555764877",
+    "etsyListingId": "4555764877",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-031",
+    "sku": "BO-031",
+    "slug": "throwing-rib-bo-031",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-031",
+    "images": [
+      "/images/products/throwing-rib-bo-031.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555776116",
+    "etsyListingId": "4555776116",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
+  },
+  {
+    "id": "throwing-rib-bo-032",
+    "sku": "BO-032",
+    "slug": "throwing-rib-bo-032",
+    "name": "Throwing Rib",
+    "price": 11.5,
+    "currency": "USD",
+    "category": "Ribs",
+    "short": "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.",
+    "description": "Precision 3D-printed part featuring a 1.22 mm beveled throwing edge, designed for a clean, consistent edge profile. Made to order with attention to dimensional accuracy and finish. Item #: BO-032",
+    "images": [
+      "/images/products/throwing-rib-bo-032.jpg"
+    ],
+    "etsyUrl": "https://www.etsy.com/listing/4555776478",
+    "etsyListingId": "4555776478",
+    "paypalUrl": "",
+    "featured": false,
+    "variantSet": "rib",
+    "etsyQuantity": 10,
+    "etsyFavorers": 0
   }
 ]
