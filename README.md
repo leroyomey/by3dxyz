@@ -66,7 +66,7 @@ The live site is a static snapshot. Etsy login still happens **once on this PC**
 2. Push the project and add the secrets listed in that note (Etsy + PayPal Client ID + order email on the **Pages build**).
 3. Turn on Pages. `.github/workflows/etsy-sync.yml` runs every 8 hours, updates `products.json` and photos, and commits.
 
-If option-level stock stops updating, run `catalog:auth` on the PC again and paste the new `ETSY_REFRESH_TOKEN` into GitHub secrets. Turn off the Windows task `by3DXYZ-Etsy-sync` once Pages is live.
+If option-level stock stops updating, run `catalog:auth` on the PC again and paste the new `ETSY_REFRESH_TOKEN` into GitHub secrets.
 
 Shop cards show listing totals. On a tool page, choosing color and size shows that option’s stock after a successful auth + sync.
 

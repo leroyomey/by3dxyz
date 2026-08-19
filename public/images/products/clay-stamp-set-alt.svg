@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="Studio stamp impressions">
-  <rect width="800" height="800" fill="#ece3d3"/>
-  <circle cx="280" cy="300" r="90" fill="#1f8a7a"/>
-  <path d="M500 230c40 0 70 50 70 90s-30 90-70 90-70-50-70-90 30-90 70-90z" fill="#1e4d8c"/>
-  <rect x="210" y="470" width="160" height="160" rx="28" fill="#e06c4f"/>
-  <rect x="430" y="490" width="180" height="36" rx="12" fill="#c9a227"/>
-  <rect x="430" y="546" width="120" height="36" rx="12" fill="#c9a227"/>
-</svg>

@@ -18,7 +18,7 @@ jobs:
           ETSY_REFRESH_TOKEN: ${{ secrets.ETSY_REFRESH_TOKEN }}
         run: |
           if [ -z "$ETSY_REFRESH_TOKEN" ]; then
-            echo "ETSY_REFRESH_TOKEN is not set. Skipping catalog sync until catalog:auth is finished. Local Windows task by3DXYZ-Etsy-sync still owns stock updates."
+            echo "ETSY_REFRESH_TOKEN is not set. Skipping catalog sync until catalog:auth is finished."
             echo "proceed=false" >> "$GITHUB_OUTPUT"
           else
             echo "proceed=true" >> "$GITHUB_OUTPUT"
