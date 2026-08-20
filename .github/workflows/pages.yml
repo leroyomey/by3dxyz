@@ -25,7 +25,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          # workflow_run.head_sha is the Etsy job's starting commit, before it
+          # pushes the catalog. github.sha is current main, which has the new tools.
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
