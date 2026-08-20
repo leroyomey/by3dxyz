@@ -21,7 +21,7 @@ const next = nextProduct(product.slug);
 const nextTitle = next ? productTitle(next) : "";
 ---
 
-<Layout title={title} description={product.short}>
+<Layout title={title} description={product.short} image={product.images[0]} imageAlt={title}>
   <article class="wrap product-detail">
     <div class="gallery">
       <div class="product-back">

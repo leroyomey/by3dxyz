@@ -8,13 +8,21 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
 }
 
-const { title, description = site.description, image = "/images/share.jpg" } = Astro.props;
+const brandShare = "/images/share.jpg";
+const {
+  title,
+  description = site.description,
+  image = brandShare,
+  imageAlt = `${site.name} pottery tools`,
+} = Astro.props;
 const pageTitle = title ? `${title} · ${site.name}` : `${site.name} · ${site.tabTitle}`;
 const origin = Astro.site ?? Astro.url;
 const canonical = new URL(Astro.url.pathname, origin).href;
 const shareImage = new URL(image, origin).href;
+const isBrandShare = image === brandShare;
 ---
 
 <!doctype html>
@@ -33,14 +41,21 @@ const shareImage = new URL(image, origin).href;
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={shareImage} />
-    <meta property="og:image:alt" content={`${site.name} pottery tools`} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    {
+      isBrandShare && (
+        <>
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+        </>
+      )
+    }
     <meta property="og:image:type" content="image/jpeg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={shareImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
