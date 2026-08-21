@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "share:images": "node scripts/share-images.mjs",
+    "build": "node scripts/share-images.mjs && astro build",
     "preview": "astro preview",
     "catalog:list": "node scripts/catalog.mjs list",
     "catalog:add": "node scripts/catalog.mjs add",
@@ -16,6 +17,7 @@
     "catalog:auth": "node scripts/catalog.mjs etsy-auth"
   },
   "dependencies": {
-    "astro": "^5.13.2"
+    "astro": "^5.13.2",
+    "sharp": "^0.35.3"
   }
 }
