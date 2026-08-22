@@ -7,7 +7,6 @@
       "placeholder": "Select a color",
       "values": [
         { "name": "Black" },
-        { "name": "White" },
         { "name": "Green" },
         { "name": "Orange" },
         { "name": "Burnt Orange" },
