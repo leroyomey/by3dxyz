@@ -1,4 +1,5 @@
 import catalog from "./products.json";
+import colorVariantSet from "./color-variants.json";
 import ribVariantSet from "./rib-variants.json";
 
 export type VariantValue = {
@@ -38,6 +39,7 @@ export type Product = {
 
 const variantSets: Record<string, VariantGroup[]> = {
   rib: ribVariantSet.groups as VariantGroup[],
+  color: colorVariantSet.groups as VariantGroup[],
 };
 
 export function skuSortKey(sku: string) {

@@ -302,7 +302,7 @@
     "etsyListingId": "4435653526",
     "paypalUrl": "",
     "featured": true,
-    "variantSet": "",
+    "variantSet": "color",
     "etsyQuantity": 10,
     "etsyFavorers": 47,
     "etsyStock": {
@@ -2482,7 +2482,7 @@
     "etsyListingId": "4458615968",
     "paypalUrl": "",
     "featured": true,
-    "variantSet": "",
+    "variantSet": "color",
     "etsyQuantity": 10,
     "etsyFavorers": 0,
     "etsyStock": {
@@ -2517,7 +2517,7 @@
     "etsyListingId": "4458617218",
     "paypalUrl": "",
     "featured": true,
-    "variantSet": "",
+    "variantSet": "color",
     "etsyQuantity": 10,
     "etsyFavorers": 1,
     "etsyStock": {
@@ -2552,7 +2552,7 @@
     "etsyListingId": "4534000777",
     "paypalUrl": "",
     "featured": true,
-    "variantSet": "",
+    "variantSet": "color",
     "etsyQuantity": 12,
     "etsyFavorers": 0,
     "etsyStock": {
