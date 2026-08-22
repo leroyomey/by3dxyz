@@ -7,6 +7,7 @@
       "placeholder": "Select a color",
       "values": [
         { "name": "Black" },
+        { "name": "White" },
         { "name": "Green" },
         { "name": "Orange" },
         { "name": "Burnt Orange" },
@@ -24,10 +25,16 @@
       "label": "Size",
       "placeholder": "Select an option",
       "values": [
-        { "name": "4in/10.16cm", "price": 11.5 },
-        { "name": "5in/12.7cm", "price": 12.5 },
-        { "name": "6in/15.24cm", "price": 13.5 },
-        { "name": "Set of 3 - 4/5/6in", "price": 30 }
+        { "name": "2in/5.08cm", "price": 10 },
+        { "name": "3in/7.62cm", "price": 11 },
+        { "name": "4in/10.16cm", "price": 12 },
+        { "name": "5in/12.7cm", "price": 13 },
+        { "name": "6in/15.24cm", "price": 14 },
+        { "name": "7in/17.78cm", "price": 16.5 },
+        { "name": "8in/20.32cm", "price": 18.5 },
+        { "name": "Set of 3 - 2/3/4in", "price": 28 },
+        { "name": "Set of 3 - 4/5/6in", "price": 32 },
+        { "name": "Set of 3 - 6/7/8in", "price": 40 }
       ]
     }
   ]
