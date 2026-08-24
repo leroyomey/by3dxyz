@@ -140,7 +140,8 @@
       "yellow|setof3-6/7/8in": 10,
       "vintagerose|setof3-6/7/8in": 10,
       "newarmygreen|setof3-6/7/8in": 10
-    }
+    },
+    "etsyCarts": 0
   },
   {
     "id": "throwing-rib-bo-002",
@@ -283,7 +284,8 @@
       "newarmygreen|setof3-2/3/4in": 10,
       "newarmygreen|setof3-4/5/6in": 10,
       "newarmygreen|setof3-6/7/8in": 10
-    }
+    },
+    "etsyCarts": 0
   },
   {
     "id": "rib-rim-shaper-small",
@@ -318,7 +320,8 @@
       "yellow": 10,
       "vintagerose": 10,
       "newarmygreen": 10
-    }
+    },
+    "etsyCarts": 3
   },
   {
     "id": "throwing-rib-bo-004",
