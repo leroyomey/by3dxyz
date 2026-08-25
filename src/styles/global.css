@@ -2,7 +2,7 @@
   --void: #050208;
   --page: #07050e;
   --paper: #0c0a16;
-  --header: rgba(6, 4, 12, 0.86);
+  --header: #06040c;
   --header-ink: #eaf2ff;
   --ink: #eaf2ff;
   --ink-soft: #9aa6c4;
@@ -118,9 +118,12 @@ main {
   top: 0;
   z-index: 40;
   height: var(--header-h);
-  background: rgba(6, 4, 12, 0.62);
+  background: var(--header);
+  background-color: var(--header);
   color: var(--header-ink);
   border-bottom: 0;
+  backdrop-filter: none;
+  isolation: isolate;
 }
 
 .header-line {
@@ -518,6 +521,7 @@ a.btn-primary[href*="etsy.com"]:hover {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .cyber-fog {
@@ -1959,12 +1963,14 @@ a.btn-primary[href*="etsy.com"]:hover {
 }
 
 .site-footer {
-  margin-top: 24px;
+  margin-top: 0;
   padding: 40px 0 40px;
   border-top: 1px solid var(--line);
-  background: rgba(6, 4, 12, 0.9);
+  background: var(--header);
+  background-color: var(--header);
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  isolation: isolate;
 }
 
 .site-footer::before {
