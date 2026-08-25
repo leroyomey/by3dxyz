@@ -19,9 +19,35 @@ const title = productTitle(product);
 const about = productCopy(product.description);
 const next = nextProduct(product.slug);
 const nextTitle = next ? productTitle(next) : "";
+const origin = Astro.site ?? Astro.url;
+const pageUrl = new URL(`/tools/${product.slug}`, origin).href;
+const soldOut = typeof product.etsyQuantity === "number" && product.etsyQuantity <= 0;
+const jsonLd = {
+  "@type": "Product",
+  name: title,
+  description: product.short,
+  sku: product.sku,
+  image: product.images.map((src) => new URL(src, origin).href),
+  brand: { "@type": "Brand", name: "by3DXYZ" },
+  offers: {
+    "@type": "Offer",
+    url: pageUrl,
+    priceCurrency: product.currency || "USD",
+    price: Number(product.price).toFixed(2),
+    availability: soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+    itemCondition: "https://schema.org/NewCondition",
+  },
+};
 ---
 
-<Layout title={title} description={product.short} image={product.images[0]} imageAlt={title}>
+<Layout
+  title={title}
+  description={product.short}
+  image={product.images[0]}
+  imageAlt={title}
+  ogType="product"
+  jsonLd={jsonLd}
+>
   <article class="wrap product-detail">
     <div class="gallery">
       <div class="product-back">

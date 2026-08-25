@@ -40,7 +40,6 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
-  overflow-x: hidden;
   color-scheme: dark;
 }
 
@@ -50,15 +49,13 @@ body {
   background-color: var(--page);
   background-image:
     radial-gradient(ellipse 80% 50% at 12% -8%, rgba(255, 43, 214, 0.16), transparent 55%),
-    radial-gradient(ellipse 70% 42% at 92% 0%, rgba(0, 240, 255, 0.1), transparent 50%),
-    linear-gradient(rgba(0, 240, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.035) 1px, transparent 1px);
-  background-size: auto, auto, 56px 56px, 56px 56px;
+    radial-gradient(ellipse 70% 42% at 92% 0%, rgba(0, 240, 255, 0.1), transparent 50%);
   font-family: var(--font-body);
   font-size: 1.125rem;
   font-weight: 500;
   line-height: 1.55;
   min-height: 100vh;
+  overflow-x: clip;
 }
 
 img {
@@ -88,8 +85,13 @@ h3,
 }
 
 .wrap {
-  width: min(1120px, calc(100% - 40px));
+  width: min(1280px, calc(100% - 48px));
   margin-inline: auto;
+}
+
+main {
+  position: relative;
+  z-index: 1;
 }
 
 .hud,
@@ -116,10 +118,9 @@ h3,
   top: 0;
   z-index: 40;
   height: var(--header-h);
-  background: var(--header);
+  background: rgba(6, 4, 12, 0.62);
   color: var(--header-ink);
-  border-bottom: 1px solid rgba(0, 240, 255, 0.16);
-  backdrop-filter: blur(16px);
+  border-bottom: 0;
 }
 
 .header-line {
@@ -444,7 +445,8 @@ a.btn-primary[href*="etsy.com"]:hover {
 .lede {
   font-size: 1.2rem;
   color: var(--ink-soft);
-  max-width: 46ch;
+  max-width: 58ch;
+  overflow-wrap: break-word;
 }
 
 .page-hero .lede {
@@ -463,24 +465,7 @@ a.btn-primary[href*="etsy.com"]:hover {
   background: transparent;
   color: var(--header-ink);
   position: relative;
-  overflow: hidden;
-}
-
-.bleed-page::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 60% 80% at 88% 10%, rgba(255, 43, 214, 0.12), transparent 55%),
-    radial-gradient(ellipse 50% 60% at 8% 90%, rgba(0, 240, 255, 0.1), transparent 50%),
-    repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.18) 3px);
-}
-
-.bleed-page > .wrap {
-  position: relative;
-  z-index: 1;
+  overflow: visible;
 }
 
 .bleed-hero {
@@ -491,18 +476,18 @@ a.btn-primary[href*="etsy.com"]:hover {
 }
 
 .bleed-page {
-  padding: 48px 0 104px;
+  padding: 40px 0 28px;
 }
 
 .bleed-page-short {
-  padding: 36px 0 80px;
+  padding: 32px 0 16px;
 }
 
 .bleed-hero h1,
 .bleed-page h1 {
   color: var(--header-ink);
   font-size: clamp(2.4rem, 6vw, 4.35rem);
-  max-width: 14ch;
+  max-width: 18ch;
   margin: 10px 0 16px;
   letter-spacing: 0.01em;
   text-shadow:
@@ -513,7 +498,7 @@ a.btn-primary[href*="etsy.com"]:hover {
 .bleed-hero .lede,
 .bleed-page .lede {
   color: rgba(234, 242, 255, 0.72);
-  max-width: 42ch;
+  max-width: 58ch;
 }
 
 .bleed-hero .lede a,
@@ -528,8 +513,9 @@ a.btn-primary[href*="etsy.com"]:hover {
 }
 
 .cyber-stage {
-  position: absolute;
+  position: fixed;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
   overflow: hidden;
 }
@@ -546,24 +532,17 @@ a.btn-primary[href*="etsy.com"]:hover {
 
 .cyber-grid {
   position: absolute;
-  left: -8%;
-  right: -8%;
-  top: 28%;
-  height: 120%;
+  inset: 0;
   background-image:
-    linear-gradient(to top, rgba(5, 2, 8, 0.15), transparent 42%),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.22) 1px, transparent 1px),
-    linear-gradient(rgba(0, 240, 255, 0.18) 1px, transparent 1px);
-  background-size: 100% 100%, 44px 44px, 44px 44px;
-  transform: perspective(520px) rotateX(64deg);
-  transform-origin: center top;
-  animation: grid-drift 18s linear infinite;
-  mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 70%, transparent);
+    linear-gradient(rgba(0, 240, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.07) 1px, transparent 1px);
+  background-size: 56px 56px;
 }
 
 .cyber-scan {
   position: absolute;
   inset: 0;
+  opacity: 0.35;
   background: repeating-linear-gradient(
     to bottom,
     transparent 0 2px,
@@ -592,9 +571,7 @@ a.btn-primary[href*="etsy.com"]:hover {
 .cyber-vignette {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(90deg, rgba(5, 2, 8, 0.55) 0%, transparent 42%),
-    radial-gradient(ellipse at center, transparent 40%, rgba(5, 2, 8, 0.55) 100%);
+  background: radial-gradient(ellipse at center, transparent 48%, rgba(5, 2, 8, 0.42) 100%);
 }
 
 .path-overlap {
@@ -683,7 +660,7 @@ a.btn-primary[href*="etsy.com"]:hover {
   padding: 22px 0;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  background: rgba(8, 8, 18, 0.72);
+  background: rgba(8, 8, 18, 0.28);
   position: relative;
 }
 
@@ -781,14 +758,14 @@ a.btn-primary[href*="etsy.com"]:hover {
 }
 
 .quote-stage {
-  margin-top: -56px;
+  margin-top: 0;
   padding-bottom: 28px;
 }
 
 .custom-stage {
-  margin-top: -56px;
-  padding: 12px 28px 28px;
-  background: linear-gradient(180deg, rgba(12, 14, 28, 0.94), rgba(8, 8, 18, 0.96));
+  margin-top: 0;
+  padding: 24px 28px 28px;
+  background: linear-gradient(180deg, rgba(12, 14, 28, 0.88), rgba(8, 8, 18, 0.9));
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
 }
@@ -974,54 +951,66 @@ a.btn-primary[href*="etsy.com"]:hover {
   max-width: 72ch;
 }
 
-.shop-hero {
+.shop-page {
+  padding: 36px 0 72px;
+}
+
+.shop-head {
+  display: grid;
+  gap: 0;
+}
+
+.shop-head h1 {
+  margin: 8px 0 12px;
+  font-size: clamp(2.1rem, 4.5vw, 3.25rem);
+  max-width: none;
+}
+
+.shop-head .lede {
+  margin: 0;
+  max-width: 62ch;
+}
+
+.shop-toolbar {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
   align-items: end;
-  gap: 24px;
-  position: relative;
-  z-index: 1;
+  gap: 16px 20px;
+  margin: 28px 0 24px;
 }
 
-.shop-hero .cart-signal {
+.shop-toolbar .search-field {
+  flex: 1 1 16rem;
+  max-width: 22rem;
+}
+
+.shop-toolbar .cart-signal {
   color: #ffb089;
-}
-
-.shop-shell {
-  display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 32px;
-  align-items: start;
-  margin-top: -40px;
-  position: relative;
-  z-index: 2;
-  padding: 28px 8px 64px;
-  background: var(--page);
-}
-
-.shop-rail {
-  position: sticky;
-  top: calc(var(--header-h) + 16px);
-  display: grid;
-  gap: 18px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  background: rgba(8, 8, 18, 0.72);
+  margin-left: auto;
 }
 
 .shop-filters {
-  display: grid;
-  gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1 1 20rem;
+}
+
+.shop-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1 1 20rem;
 }
 
 .shop-filters .chip {
-  flex: none;
-  width: 100%;
-  justify-content: flex-start;
+  flex: 0 0 auto;
+  width: auto;
+  justify-content: center;
 }
 
 .shop-results .product-grid {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .section {
@@ -1087,7 +1076,7 @@ a.btn-primary[href*="etsy.com"]:hover {
 }
 
 .product-card {
-  background: var(--paper);
+  background: rgba(12, 10, 22, 0.78);
   overflow: hidden;
   border: 1px solid var(--line);
   display: flex;
@@ -1975,6 +1964,7 @@ a.btn-primary[href*="etsy.com"]:hover {
   border-top: 1px solid var(--line);
   background: rgba(6, 4, 12, 0.9);
   position: relative;
+  z-index: 1;
 }
 
 .site-footer::before {
@@ -2106,30 +2096,20 @@ a.btn-primary[href*="etsy.com"]:hover {
   to { transform: translateX(120%); opacity: 0; }
 }
 
+@media (max-width: 1100px) {
+  .shop-results .product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 980px) {
-  .shop-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .shop-rail {
-    position: static;
-  }
-
-  .shop-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .shop-filters .chip {
-    width: auto;
-    flex: 1 1 auto;
-    justify-content: center;
+  .shop-toolbar .search-field {
+    max-width: none;
   }
 
   .shop-results .product-grid,
   .catalog-band .product-grid-band {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -2156,7 +2136,7 @@ a.btn-primary[href*="etsy.com"]:hover {
 
   .bleed-hero h1,
   .bleed-page h1 {
-    max-width: 12ch;
+    max-width: 16ch;
   }
 
   .path-overlap {
@@ -2205,15 +2185,9 @@ a.btn-primary[href*="etsy.com"]:hover {
 
   .etsy-band,
   .section-head,
-  .shop-hero {
+  .shop-head {
     flex-direction: column;
     align-items: start;
-  }
-
-  .cyber-vignette {
-    background:
-      linear-gradient(180deg, rgba(5, 2, 8, 0.15) 0%, transparent 30%),
-      radial-gradient(ellipse at center, transparent 30%, rgba(5, 2, 8, 0.55) 100%);
   }
 }
 
@@ -2289,7 +2263,11 @@ a.btn-primary[href*="etsy.com"]:hover {
   .bleed-hero h1,
   .bleed-page h1 {
     font-size: 2.05rem;
-    max-width: 11ch;
+    max-width: 14ch;
+  }
+
+  .shop-head h1 {
+    font-size: 2.05rem;
   }
 
   .hero-actions {

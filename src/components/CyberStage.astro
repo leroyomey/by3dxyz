@@ -15,6 +15,7 @@
       const particles = [];
       const count = window.innerWidth < 720 ? 18 : 52;
       const start = performance.now();
+      const isHome = location.pathname === "/";
 
       function resize() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -108,7 +109,7 @@
           ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
           ctx.fill();
         });
-        drawGizmo(w * 0.72, h * 0.42, reduced ? 0 : now - start);
+        if (isHome) drawGizmo(w * 0.72, h * 0.42, reduced ? 0 : now - start);
         if (!reduced) requestAnimationFrame(frame);
       }
 

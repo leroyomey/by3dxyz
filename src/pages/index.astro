@@ -1,8 +1,29 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import HomeField from "../components/HomeField.astro";
+import { site } from "../data/site";
+
+const origin = Astro.site ?? Astro.url;
+const homeUrl = new URL("/", origin).href;
 ---
 
-<Layout>
+<Layout
+  jsonLd={[
+    {
+      "@type": "Organization",
+      name: site.name,
+      url: homeUrl,
+      email: site.email,
+      sameAs: [site.etsyUrl],
+      description: site.description,
+    },
+    {
+      "@type": "WebSite",
+      name: site.name,
+      url: homeUrl,
+      description: site.description,
+    },
+  ]}
+>
   <HomeField />
 </Layout>

@@ -2,7 +2,6 @@
 import { featuredProducts, products, type Product } from "../data/products";
 import { site } from "../data/site";
 import { printFile } from "../data/print-file";
-import CyberStage from "./CyberStage.astro";
 
 const picked: Product[] = [];
 for (const product of [...featuredProducts(), ...products]) {
@@ -12,7 +11,6 @@ for (const product of [...featuredProducts(), ...products]) {
 ---
 
 <section class="bleed-hero">
-  <CyberStage />
   <div class="wrap hero-copy">
     <p class="kicker kicker-on-dark kicker-live">3D printing service</p>
     <h1>Print your file. Or pick a part we already make.</h1>

@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /callback
 
 Sitemap: https://by3dxyz.com/sitemap.xml

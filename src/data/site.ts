@@ -5,7 +5,7 @@ export const site = {
   tabTitle: "3D printing service",
   tagline: "3D printing service. Print a file, custom work, or shop parts we already make.",
   description:
-    "by3DXYZ is a 3D printing service. Print my STL, ask for a custom 3D print, or shop parts we already make. Firm price by email. Printed in durable PLA.",
+    "by3DXYZ is a 3D printing service. Print an STL, 3MF, or OBJ, ask for a custom 3D print, or shop catalog parts we already make. Firm price by email. Printed in durable PLA.",
   etsyUrl: "https://by3dxyz.etsy.com",
   email: "itsbman97@gmail.com",
 };

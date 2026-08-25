@@ -9,26 +9,23 @@ const inCarts = etsyCartsTotal(products);
 const favorers = etsyFavorersTotal(products);
 ---
 
-<Layout title="Shop" description="Shop 3D printed parts from by3DXYZ. Catalog items in PLA. Buy here with PayPal.">
-  <section class="bleed-page bleed-page-short">
-    <div class="wrap shop-hero">
-      <div>
-        <p class="kicker kicker-on-dark">Shop</p>
-        <h1>Shop</h1>
-        <p class="lede">
-          Parts we already print. Filter by type, then buy here with PayPal. Also on{" "}
-          <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy</a>.
-        </p>
-      </div>
-      <CartSignal carts={inCarts} favorers={favorers} scope="shop" />
-    </div>
-  </section>
-
-  <section class="wrap shop-shell" data-catalog>
-    <aside class="shop-rail">
+<Layout
+  title="Shop"
+  description="Shop 3D printed parts from by3DXYZ. Throwing ribs, paddles, and guitar picks in PLA. Filter the catalog and buy here with PayPal."
+>
+  <section class="wrap shop-page" data-catalog>
+    <header class="shop-head">
+      <p class="kicker kicker-on-dark">Catalog</p>
+      <h1>Shop</h1>
+      <p class="lede">
+        Parts we already print. Filter by type, then buy here with PayPal. Also on{" "}
+        <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy</a>.
+      </p>
+    </header>
+    <div class="shop-toolbar">
       <div class="search-field">
         <label class="search-label muted" for="tool-search">Search</label>
-        <input class="search" id="tool-search" type="search" placeholder="Search rib, pick, BO-014…" data-search />
+        <input class="search" id="tool-search" type="search" placeholder="Name or SKU" data-search />
       </div>
       <div class="shop-filters" role="group" aria-label="Filter by type">
         {
@@ -39,7 +36,8 @@ const favorers = etsyFavorersTotal(products);
           ))
         }
       </div>
-    </aside>
+      <CartSignal carts={inCarts} favorers={favorers} scope="shop" />
+    </div>
     <div class="shop-results">
       <ProductGrid products={products} />
     </div>
