@@ -21,7 +21,6 @@ export const printFile = {
   sliceCopy:
     "The estimate comes by email after we slice the file. Price depends on size, color, and how the part sits on the plate.",
   payCopy: "Pay by PayPal invoice if you want us to print it. There is no PayPal button on this page.",
-  colorCopy: "Pick one of the 11 shop colors. We do not offer White.",
   linkCopy: printFileLinkHelp,
   get maxPieceCopy() {
     return customWork.maxPieceCopy;
