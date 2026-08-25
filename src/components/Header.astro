@@ -18,12 +18,11 @@ const path = Astro.url.pathname;
       <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false">Menu</button>
       <div class="nav-links" data-nav-links>
         <a href="/" aria-current={path === "/" ? "page" : undefined}>Home</a>
-        <a href="/tools" aria-current={path.startsWith("/tools") ? "page" : undefined}>Tools</a>
         <a href="/custom" aria-current={path.startsWith("/custom") ? "page" : undefined}>Custom</a>
         <a href="/about" aria-current={path === "/about" ? "page" : undefined}>About</a>
         <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy</a>
       </div>
-      <a class="cart-btn" href="/tools">Shop</a>
+      <a class="cart-btn" href="/tools" aria-current={path.startsWith("/tools") ? "page" : undefined}>Shop</a>
     </nav>
   </div>
 </header>
