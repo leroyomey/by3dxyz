@@ -67,10 +67,6 @@ export const printFileLinkHelp = `${trustedFileLinkHelp} Do not email the file.`
 
 export const optionalFileLinkHelp = `Optional. ${trustedFileLinkHelp}`;
 
-export const licenseProofError = trustedFileLinkError;
-export const licenseProofTooLong = "Keep it to a link or a few words.";
-export const licenseProofMax = 200;
-
 function hostMatches(hostname: string, allowed: string): boolean {
   const host = hostname.toLowerCase();
   const needle = allowed.toLowerCase();
@@ -104,20 +100,4 @@ export function isTrustedFileLink(raw: string): boolean {
   if (!host || isIpHostname(host)) return false;
   if (blockedFileLinkShorteners.some((item) => hostMatches(host, item))) return false;
   return trustedFileHosts.some((item) => hostMatches(host, item));
-}
-
-export function looksLikeFileLink(raw: string): boolean {
-  const value = normalizeFileLink(raw);
-  if (!value) return false;
-  return /^https?:\/\//i.test(value) || /^www\./i.test(value);
-}
-
-export function isLicenseProof(raw: string): boolean {
-  const value = normalizeFileLink(raw);
-  if (!value) return false;
-  if (looksLikeFileLink(value)) {
-    const href = /^https?:\/\//i.test(value) ? value : `https://${value}`;
-    return isTrustedFileLink(href);
-  }
-  return value.length <= licenseProofMax;
 }

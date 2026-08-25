@@ -1,5 +1,4 @@
 ---
-import DesignRights from "./DesignRights.astro";
 import {
   customQuoteSubject,
   customWork,
@@ -8,7 +7,6 @@ import {
   estimateCustom,
   formatUsd,
 } from "../data/custom-work";
-import { designRights } from "../data/design-rights";
 import { site } from "../data/site";
 import { optionalFileLinkHelp, trustedFileLinkError } from "../data/trusted-file-links";
 
@@ -22,8 +20,9 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
     <p class="kicker">Custom request</p>
     <h2>Thank you</h2>
     <p>{customWork.thanksCopy}</p>
-    <p>
-      <a class="btn btn-teal" href="/tools">Back to the shop</a>
+    <p class="request-thanks-actions">
+      <a class="btn btn-teal" href="/">Home</a>
+      <a class="btn btn-ghost" href="/tools">Shop</a>
     </p>
   </div>
 
@@ -132,8 +131,6 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
     <p class="form-error" id="custom-photo-error" data-trusted-file-link-error hidden></p>
     <p class="muted form-help" id="custom-photo-help">{optionalFileLinkHelp}</p>
 
-    <DesignRights idPrefix="custom" when="file-link" />
-
     <div class="form-trap" aria-hidden="true">
       <label for="custom-company">Company website</label>
       <input id="custom-company" name="_honey" type="text" tabindex="-1" autocomplete="off" />
@@ -145,7 +142,7 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
   </form>
 </div>
 
-<script is:inline define:vars={{ notifyEmail, contactEmail: site.email, rate: customWork.hourlyRate, jobFloor: customWork.jobFloor, packages: customWork.packages, complexities: customWork.complexities, defaultJob: defaultCustomPackageId, defaultComplexity: defaultCustomComplexityId, fileLinkError: trustedFileLinkError, missingWarrant: designRights.missingWarrant, missingSource: designRights.missingSource, licenseRequiredCopy: designRights.licenseRequiredCopy }}>
+<script is:inline define:vars={{ notifyEmail, contactEmail: site.email, rate: customWork.hourlyRate, jobFloor: customWork.jobFloor, packages: customWork.packages, complexities: customWork.complexities, defaultJob: defaultCustomPackageId, defaultComplexity: defaultCustomComplexityId, fileLinkError: trustedFileLinkError }}>
   (function () {
     const root = document.querySelector("[data-custom]");
     const form = document.querySelector("[data-custom-form]");
@@ -336,29 +333,6 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
           return;
         }
       }
-      const source = String(data.get("design_source") || "");
-      const proof = String(data.get("license_or_permission") || "").trim();
-      if (fileHref) {
-        if (String(data.get("warrant") || "") !== "yes") {
-          if (status) status.textContent = missingWarrant;
-          return;
-        }
-        if (!source) {
-          if (status) status.textContent = missingSource;
-          return;
-        }
-        if (source !== "own" && !proof) {
-          if (status) status.textContent = licenseRequiredCopy;
-          return;
-        }
-        if (proof && typeof window.by3dxyzIsLicenseProof === "function" && !window.by3dxyzIsLicenseProof(proof)) {
-          const license = form.querySelector("[data-license-proof]");
-          if (license instanceof HTMLInputElement) {
-            license.reportValidity();
-            return;
-          }
-        }
-      }
       const job = String(data.get("job") || "");
       const chosen = pack(job);
       const payload = {
@@ -377,16 +351,6 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
         photo: String(data.get("photo") || "").trim(),
         estimate: String(data.get("estimate") || ""),
       };
-      if (fileHref) {
-        payload.design_rights = "yes";
-        payload.design_source = source;
-        payload.license_or_permission = proof;
-        payload.attestation =
-          "Customer attests they have the right to have this part printed (" +
-          (source === "own" ? "made the design" : source === "license" ? "purchased license" : "owner permission") +
-          ")." +
-          (proof ? " License or permission: " + proof : "");
-      }
       if (isTweakJob(job)) payload.sku = String(data.get("sku") || "");
       if (!notifyEmail) {
         if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";

@@ -1,6 +1,4 @@
 ---
-import DesignRights from "./DesignRights.astro";
-import { designRights } from "../data/design-rights";
 import { printColors, printFile } from "../data/print-file";
 import { site } from "../data/site";
 import { trustedFileLinkError } from "../data/trusted-file-links";
@@ -14,8 +12,9 @@ const notifyEmail =
     <p class="kicker">Print request</p>
     <h2>Thank you</h2>
     <p>{printFile.thanksCopy}</p>
-    <p>
-      <a class="btn btn-teal" href="/tools">Back to the shop</a>
+    <p class="request-thanks-actions">
+      <a class="btn btn-teal" href="/">Home</a>
+      <a class="btn btn-ghost" href="/tools">Shop</a>
     </p>
   </div>
 
@@ -87,7 +86,6 @@ const notifyEmail =
         <span class="muted">{printFile.quoteLead}</span>
         <span class="muted">{printFile.maxPieceCopy}</span>
         <span class="muted">{printFile.colorCopy}</span>
-        <DesignRights idPrefix="print" />
         <div class="form-trap" aria-hidden="true">
           <label for="print-company">Company website</label>
           <input id="print-company" name="_honey" type="text" tabindex="-1" autocomplete="off" />
@@ -99,7 +97,7 @@ const notifyEmail =
   </form>
 </div>
 
-<script is:inline define:vars={{ notifyEmail, contactEmail: site.email, fileLinkError: trustedFileLinkError, missingWarrant: designRights.missingWarrant, missingSource: designRights.missingSource, licenseRequiredCopy: designRights.licenseRequiredCopy }}>
+<script is:inline define:vars={{ notifyEmail, contactEmail: site.email, fileLinkError: trustedFileLinkError }}>
   (function () {
     const root = document.querySelector("[data-print]");
     const form = document.querySelector("[data-print-form]");
@@ -131,27 +129,6 @@ const notifyEmail =
           return;
         }
       } catch (_err) {}
-      if (String(data.get("warrant") || "") !== "yes") {
-        if (status) status.textContent = missingWarrant;
-        return;
-      }
-      const source = String(data.get("design_source") || "");
-      if (!source) {
-        if (status) status.textContent = missingSource;
-        return;
-      }
-      const proof = String(data.get("license_or_permission") || "").trim();
-      if (source !== "own" && !proof) {
-        if (status) status.textContent = licenseRequiredCopy;
-        return;
-      }
-      if (proof && typeof window.by3dxyzIsLicenseProof === "function" && !window.by3dxyzIsLicenseProof(proof)) {
-        const license = form.querySelector("[data-license-proof]");
-        if (license instanceof HTMLInputElement) {
-          license.reportValidity();
-          return;
-        }
-      }
       const fileLink = form.querySelector("[data-trusted-file-link]");
       if (fileLink instanceof HTMLInputElement) {
         const link = fileLink.value.trim();
@@ -174,14 +151,6 @@ const notifyEmail =
         color: String(data.get("color") || ""),
         quantity: String(data.get("qty") || "1"),
         notes: String(data.get("notes") || ""),
-        design_rights: "yes",
-        design_source: source,
-        license_or_permission: proof,
-        attestation:
-          "Customer attests they have the right to have this part printed (" +
-          (source === "own" ? "made the design" : source === "license" ? "purchased license" : "owner permission") +
-          ")." +
-          (proof ? " License or permission: " + proof : ""),
       };
       if (!notifyEmail) {
         if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";

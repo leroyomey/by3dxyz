@@ -11,5 +11,4 @@ interface ImportMeta {
 
 interface Window {
   by3dxyzIsTrustedFileLink?: (raw: string) => boolean;
-  by3dxyzIsLicenseProof?: (raw: string) => boolean;
 }

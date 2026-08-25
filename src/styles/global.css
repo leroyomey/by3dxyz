@@ -1700,41 +1700,6 @@ a.btn-primary[href*="etsy.com"]:hover {
   box-shadow: 0 0 12px rgba(255, 93, 122, 0.22);
 }
 
-.form-check {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  font-weight: 500;
-  margin: 8px 0 4px;
-}
-
-.form-check input {
-  margin-top: 3px;
-  width: 18px;
-  height: 18px;
-  flex: 0 0 18px;
-  accent-color: var(--accent);
-}
-
-.design-rights {
-  display: grid;
-  gap: 10px;
-  margin: 8px 0 4px;
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  background: var(--void);
-}
-
-.design-rights legend {
-  padding: 0 6px;
-  color: var(--accent);
-}
-
-.design-sources {
-  display: grid;
-  gap: 6px;
-}
-
 .custom-work,
 .print-work,
 .print-follow {
@@ -1845,6 +1810,13 @@ a.btn-primary[href*="etsy.com"]:hover {
 .request-thanks p {
   margin: 0;
   color: var(--ink-soft);
+}
+
+.request-thanks-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .print-track {
