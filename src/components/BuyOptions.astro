@@ -13,9 +13,12 @@ const notifyEmail =
   import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
 const variants = productVariants(product);
 const needsOptions = variants.length > 0;
-const hasSize = variants.some((group) => group.id === "size");
-const optionHint = hasSize ? "Please choose a color and size." : "Please choose a color.";
-const optionOutHint = hasSize ? "That color and size is currently sold out." : "That color is currently sold out.";
+const extraGroup = variants.find((group) => group.id !== "color");
+const extraWord = extraGroup ? extraGroup.label.trim().toLowerCase() : "";
+const optionHint = extraWord ? `Please choose a color and ${extraWord}.` : "Please choose a color.";
+const optionOutHint = extraWord
+  ? `That color and ${extraWord} is currently sold out.`
+  : "That color is currently sold out.";
 const stock = typeof product.etsyQuantity === "number" ? product.etsyQuantity : null;
 const stockMap = product.etsyStock || {};
 const hasOptionStock = Object.keys(stockMap).length > 0;
