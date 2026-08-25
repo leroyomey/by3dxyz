@@ -16,7 +16,7 @@ const {
   title,
   description = site.description,
   image = brandShare,
-  imageAlt = `${site.name} pottery tools`,
+  imageAlt = `${site.name} 3D printing`,
 } = Astro.props;
 const pageTitle = title ? `${title} · ${site.name}` : `${site.name} · ${site.tabTitle}`;
 const origin = Astro.site ?? Astro.url;
@@ -38,7 +38,7 @@ const ogImageHeight = productShare ? "1200" : isBrandShare ? "630" : "";
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0b0a10" />
+    <meta name="theme-color" content="#06040c" />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
@@ -60,33 +60,15 @@ const ogImageHeight = productShare ? "1200" : isBrandShare ? "630" : "";
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@600;700;800&family=Outfit:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600;700;800&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
-    <div class="space-fx" aria-hidden="true">
-      <div class="grid-xy"></div>
-      <div class="ao-vignette"></div>
-      <div class="pointer-glow" data-pointer-glow></div>
-    </div>
     <Header />
     <main>
       <slot />
     </main>
     <Footer />
-    <script>
-      const glow = document.querySelector("[data-pointer-glow]");
-      if (glow instanceof HTMLElement) {
-        window.addEventListener(
-          "pointermove",
-          (event) => {
-            glow.style.setProperty("--px", `${event.clientX}px`);
-            glow.style.setProperty("--py", `${event.clientY}px`);
-          },
-          { passive: true },
-        );
-      }
-    </script>
   </body>
 </html>

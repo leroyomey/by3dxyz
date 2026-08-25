@@ -1,27 +1,30 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import CustomRequest from "../components/CustomRequest.astro";
-import { customWork, formatUsd } from "../data/custom-work";
+import { customWork, defaultCustomPackageId, formatUsd } from "../data/custom-work";
 ---
 
 <Layout
-  title="Custom Tools"
-  description="Ask for a custom pottery rib or studio tool from by3DXYZ. You get the 3D-printed part in the mail. Quote by email, 50% deposit."
+  title="Custom 3D print"
+  description="Custom 3D print from a sketch or idea. by3DXYZ emails a fixed quote, then prints the part. 50% PayPal deposit."
 >
-  <section class="wrap page-hero">
-    <p class="kicker">Custom</p>
-    <h1>Need a tool that is not in the shop?</h1>
-    <p class="lede">
-      Describe the rib or studio tool. You get a fixed quote, then the 3D-printed part packed and mailed. Work starts
-      after a {customWork.depositPercent}% PayPal deposit. Prices on this page are {customWork.year} starting rates.
-    </p>
+  <section class="bleed-page">
+    <div class="wrap">
+      <p class="kicker kicker-on-dark">Custom</p>
+      <h1>Custom 3D print</h1>
+      <p class="lede">
+        Need a part that is not in the shop? Send a sketch or an idea. You get a fixed quote, then the printed part
+        packed and mailed. Work starts after a {customWork.depositPercent}% PayPal deposit. Prices on this page are{" "}
+        {customWork.year} starting rates.
+      </p>
+    </div>
   </section>
 
-  <section class="wrap custom-steps">
-    <ol>
+  <section class="wrap custom-stage">
+    <ol class="process-stepper">
       <li>
         <strong>Request</strong>
-        <span class="muted">Send the form on this page. A sketch and sizes help the quote.</span>
+        <span class="muted">Use Request a quote below. A sketch and sizes help the quote.</span>
       </li>
       <li>
         <strong>Quote</strong>
@@ -33,35 +36,200 @@ import { customWork, formatUsd } from "../data/custom-work";
       </li>
       <li>
         <strong>Print and ship</strong>
-        <span class="muted">You get the 3D-printed tool in the mail. Remainder plus postage before it ships. Typical {customWork.leadTime}.</span>
+        <span class="muted">You get the printed part in the mail. Remainder plus postage before it ships. Typical {customWork.leadTime}.</span>
       </li>
     </ol>
-  </section>
 
-  <section class="wrap custom-packages">
-    {
-      customWork.packages.map((item) => (
-        <article>
-          <p class="cat">{item.name}</p>
-          <p class="price">from {formatUsd(item.from)}</p>
-          <p class="muted">{item.blurb}</p>
-        </article>
-      ))
-    }
-  </section>
-
-  <section class="wrap section custom-request">
-    <div class="custom-quote">
-      <h2>Ask for a quote</h2>
-      <p class="muted">{customWork.quoteLead}</p>
-      <p class="muted">{customWork.quotePricing}</p>
-      <ul class="muted">
-        <li>{customWork.quoteCopies}</li>
-        <li>{customWork.quoteRevisions}</li>
-      </ul>
-      <p class="muted custom-quote-limit">{customWork.maxPieceCopy}</p>
-      <p class="muted custom-quote-later">{customWork.shopLaterCopy}</p>
+    <div class="price-table" data-packages role="radiogroup" aria-label="Job type">
+      {
+        customWork.packages.map((item) => (
+          <button
+            class="price-col"
+            type="button"
+            role="radio"
+            data-package={item.id}
+            data-package-hint={item.hint}
+            aria-checked={item.id === defaultCustomPackageId ? "true" : "false"}
+            aria-pressed={item.id === defaultCustomPackageId ? "true" : "false"}
+            tabindex={item.id === defaultCustomPackageId ? 0 : -1}
+          >
+            <p class="cat">{item.name}</p>
+            <p class="price">from {formatUsd(item.from)}</p>
+            <p class="muted">{item.blurb}</p>
+          </button>
+        ))
+      }
     </div>
-    <CustomRequest />
+    <p class="muted package-hint" data-package-hint-text>
+      {customWork.packages.find((item) => item.id === defaultCustomPackageId)?.hint}
+    </p>
+  </section>
+
+  <section class="wrap custom-request" data-quote id="quote">
+    <div class="quote-well">
+      <div class="hud-bar" aria-hidden="true">
+        <span>SYS://CUSTOM</span>
+        <span class="hud-bar-meta">QUOTE · PRINTED PART</span>
+      </div>
+      <div class="custom-quote">
+        <h2>Ask for a quote</h2>
+        <p class="muted">{customWork.quoteLead}</p>
+        <p class="muted">{customWork.maxPieceCopy}</p>
+        <p class="muted">{customWork.quotePricing}</p>
+        <ul class="muted">
+          <li>{customWork.quoteCopies}</li>
+          <li>{customWork.quoteRevisions}</li>
+        </ul>
+        <p class="muted custom-quote-later">{customWork.shopLaterCopy}</p>
+        <p class="custom-quote-actions">
+          <button
+            class="btn btn-teal btn-lg"
+            type="button"
+            data-quote-toggle
+            aria-expanded="false"
+            aria-controls="custom-quote-panel"
+          >
+            Request a quote
+          </button>
+        </p>
+      </div>
+      <div id="custom-quote-panel" class="custom-quote-panel" hidden>
+        <CustomRequest />
+      </div>
+    </div>
   </section>
 </Layout>
+
+<script>
+  const root = document.querySelector("[data-quote]");
+  const toggle = document.querySelector("[data-quote-toggle]");
+  const panel = document.getElementById("custom-quote-panel");
+  const table = document.querySelector("[data-packages]");
+  const subjects = document.querySelector("[data-quote-subjects]");
+  const hint = document.querySelector("[data-package-hint-text]");
+  const picks = [...document.querySelectorAll("[data-packages] [data-package]")];
+  const chips = [...document.querySelectorAll("[data-quote-subjects] [data-package]")];
+
+  function selectedId() {
+    return (
+      picks.find((item) => item.getAttribute("aria-checked") === "true")?.getAttribute("data-package") ||
+      chips.find((item) => item.getAttribute("aria-checked") === "true")?.getAttribute("data-package") ||
+      ""
+    );
+  }
+
+  function markGroup(list, id) {
+    list.forEach((item) => {
+      const on = item.getAttribute("data-package") === id;
+      item.setAttribute("aria-checked", on ? "true" : "false");
+      item.setAttribute("aria-pressed", on ? "true" : "false");
+      item.tabIndex = on ? 0 : -1;
+    });
+  }
+
+  function setPackage(id, syncForm = true) {
+    if (!id) return;
+    markGroup(picks, id);
+    markGroup(chips, id);
+    const chosen = picks.find((item) => item.getAttribute("data-package") === id);
+    if (hint) hint.textContent = chosen?.getAttribute("data-package-hint") || "";
+    if (!syncForm) return;
+    const job = document.querySelector("[data-estimate-job]");
+    if (job instanceof HTMLSelectElement) {
+      job.value = id;
+      job.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
+
+  function focusQuoteField() {
+    const sku = document.getElementById("custom-sku");
+    const skuWrap = document.querySelector("[data-sku-field]");
+    const skuOpen =
+      sku instanceof HTMLInputElement && skuWrap && !skuWrap.classList.contains("hidden") && !sku.disabled;
+    const name = document.getElementById("custom-name");
+    const job = document.getElementById("custom-job");
+    const target = skuOpen ? sku : name instanceof HTMLElement ? name : job;
+    if (target instanceof HTMLElement) target.focus({ preventScroll: true });
+  }
+
+  function setOpen(open, packageId, focusForm) {
+    if (!(toggle instanceof HTMLButtonElement) || !panel) return;
+    if (root?.classList.contains("is-sent")) return;
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    toggle.textContent = open ? "Hide the form" : "Request a quote";
+    panel.hidden = !open;
+    root?.classList.toggle("is-open", open);
+    if (!open) return;
+    const keep = packageId || selectedId();
+    if (keep) setPackage(keep);
+    root?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (focusForm !== false) window.setTimeout(focusQuoteField, 80);
+  }
+
+  function choosePackage(id, focusForm) {
+    if (!id || root?.classList.contains("is-sent")) return;
+    setPackage(id);
+    setOpen(true, id, focusForm);
+  }
+
+  table?.addEventListener("click", (event) => {
+    const pick = event.target instanceof Element ? event.target.closest("[data-package]") : null;
+    if (!pick || !table.contains(pick)) return;
+    choosePackage(pick.getAttribute("data-package") ?? "", true);
+  });
+
+  table?.addEventListener("keydown", (event) => {
+    if (!(event instanceof KeyboardEvent)) return;
+    const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"];
+    if (!keys.includes(event.key)) return;
+    event.preventDefault();
+    const current = picks.findIndex((item) => item.getAttribute("aria-checked") === "true");
+    let next = current < 0 ? 0 : current;
+    if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = picks.length - 1;
+    else if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (current + 1) % picks.length;
+    else next = (current - 1 + picks.length) % picks.length;
+    const id = picks[next]?.getAttribute("data-package") ?? "";
+    choosePackage(id, false);
+    picks[next]?.focus();
+  });
+
+  subjects?.addEventListener("click", (event) => {
+    const pick = event.target instanceof Element ? event.target.closest("[data-package]") : null;
+    if (!pick || !subjects.contains(pick)) return;
+    setPackage(pick.getAttribute("data-package") ?? "");
+  });
+
+  subjects?.addEventListener("keydown", (event) => {
+    if (!(event instanceof KeyboardEvent)) return;
+    const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"];
+    if (!keys.includes(event.key)) return;
+    event.preventDefault();
+    const current = chips.findIndex((item) => item.getAttribute("aria-checked") === "true");
+    let next = current < 0 ? 0 : current;
+    if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = chips.length - 1;
+    else if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (current + 1) % chips.length;
+    else next = (current - 1 + chips.length) % chips.length;
+    const id = chips[next]?.getAttribute("data-package") ?? "";
+    setPackage(id);
+    chips[next]?.focus();
+  });
+
+  toggle?.addEventListener("click", () => {
+    const open = toggle.getAttribute("aria-expanded") !== "true";
+    setOpen(open);
+  });
+
+  const job = document.querySelector("[data-estimate-job]");
+  job?.addEventListener("change", () => {
+    if (job instanceof HTMLSelectElement && job.value) setPackage(job.value, false);
+  });
+
+  try {
+    const sku = String(new URLSearchParams(location.search).get("sku") || "").trim();
+    if (sku) setPackage("tweak");
+  } catch (_err) {}
+
+  if (location.hash === "#quote") setOpen(true);
+</script>

@@ -4,13 +4,16 @@ import { site } from "../data/site";
 ---
 
 <Layout title="Contact" description="Contact by3DXYZ about an order or a shop question.">
-  <section class="wrap page-hero">
-    <p class="kicker">Contact</p>
-    <h1>Get in touch</h1>
-    <p class="lede">
-      Questions about an order or a tool in the shop? Send a message. For a new rib or studio tool, use
-      <a href="/custom">custom work</a>.
-    </p>
+  <section class="bleed-page bleed-page-short">
+    <div class="wrap">
+      <p class="kicker kicker-on-dark">Contact</p>
+      <h1>Get in touch</h1>
+      <p class="lede">
+        Questions about an order or a part in the shop? Send a message. To print a file you already have, use
+        <a href="/print">Print a file</a>. For a new design, use
+        <a href="/custom">custom work</a>.
+      </p>
+    </div>
   </section>
   <section class="wrap section">
     <form class="form" action={`mailto:${site.email}`} method="get">

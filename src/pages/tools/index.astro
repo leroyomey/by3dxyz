@@ -9,24 +9,28 @@ const inCarts = etsyCartsTotal(products);
 const favorers = etsyFavorersTotal(products);
 ---
 
-<Layout title="Pottery Tools" description="Throwing ribs, rim shapers, and paddles from by3DXYZ.">
-  <section class="wrap page-hero">
-    <p class="kicker">Shop</p>
-    <h1>Pottery Tools</h1>
-    <p class="lede">
-      Filter by type, then buy here or on{" "}
-      <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy</a>.
-    </p>
-    <CartSignal carts={inCarts} favorers={favorers} scope="shop" />
+<Layout title="Shop" description="Shop 3D printed parts from by3DXYZ. Catalog items in PLA. Buy here with PayPal.">
+  <section class="bleed-page bleed-page-short">
+    <div class="wrap shop-hero">
+      <div>
+        <p class="kicker kicker-on-dark">Shop</p>
+        <h1>Shop</h1>
+        <p class="lede">
+          Parts we already print. Filter by type, then buy here with PayPal. Also on{" "}
+          <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy</a>.
+        </p>
+      </div>
+      <CartSignal carts={inCarts} favorers={favorers} scope="shop" />
+    </div>
   </section>
 
-  <section class="wrap section" data-catalog>
-    <div class="catalog-tools">
+  <section class="wrap shop-shell" data-catalog>
+    <aside class="shop-rail">
       <div class="search-field">
         <label class="search-label muted" for="tool-search">Search</label>
-        <input class="search" id="tool-search" type="search" placeholder="Search rib, paddle, BO-014…" data-search />
+        <input class="search" id="tool-search" type="search" placeholder="Search rib, pick, BO-014…" data-search />
       </div>
-      <div class="filters" role="group" aria-label="Filter by type">
+      <div class="shop-filters" role="group" aria-label="Filter by type">
         {
           categories.map((category, index) => (
             <button class="chip" type="button" data-filter={category} aria-pressed={index === 0 ? "true" : "false"}>
@@ -35,8 +39,10 @@ const favorers = etsyFavorersTotal(products);
           ))
         }
       </div>
+    </aside>
+    <div class="shop-results">
+      <ProductGrid products={products} />
     </div>
-    <ProductGrid products={products} />
   </section>
 </Layout>
 

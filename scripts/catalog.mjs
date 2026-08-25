@@ -72,7 +72,15 @@ function skuFromTitle(title = "") {
 }
 
 function skuFromListing(item) {
-  return skuFromTitle(item.title) || skuFromText(item.description || "");
+  return skuFromTitle(item.title) || skuFromText(item.description || "") || pickShopSku(item.title || "");
+}
+
+function uniqueSku(wanted, listingId, products) {
+  const id = String(listingId);
+  const clash = products.find(
+    (p) => p.sku && p.sku.toUpperCase() === wanted.toUpperCase() && String(p.etsyListingId) !== id,
+  );
+  return clash ? `GP-${id}` : wanted;
 }
 
 function nameWithoutSku(title = "") {
@@ -81,11 +89,25 @@ function nameWithoutSku(title = "") {
     .trim();
 }
 
-function skipListing(title = "") {
+function isGuitarPick(title = "") {
   return /guitar\s*pick/i.test(title);
 }
 
+function pickShopSku(title = "") {
+  if (/griptonite/i.test(title)) return "GP-GRIP";
+  if (/plain\s*jane/i.test(title)) return "GP-PLAIN";
+  return "";
+}
+
+function pickShopName(title = "") {
+  if (/griptonite/i.test(title)) return "Griptonite Guitar Picks";
+  if (/plain\s*jane/i.test(title)) return "Plain Jane Guitar Picks";
+  const pack = String(title).match(/(\d+)\s*pack/i);
+  return pack ? `Guitar Picks ${pack[1]} Pack` : "Guitar Picks";
+}
+
 function shopName(title = "") {
+  if (isGuitarPick(title)) return pickShopName(title);
   const sku = skuFromTitle(title);
   let name = nameWithoutSku(title).replace(/^by3DXYZ\s+/i, "");
   if (/pottery throwing rib/i.test(name) && sku) return "Throwing Rib";
@@ -94,6 +116,7 @@ function shopName(title = "") {
 }
 
 function categoryFor(name) {
+  if (/guitar\s*pick/i.test(name)) return "Picks";
   if (/paddle/i.test(name)) return "Paddles";
   if (/rib/i.test(name)) return "Ribs";
   return "Tools";
@@ -129,6 +152,26 @@ function listingCopy(item, name, sku) {
   if (/Hole Punch Paddle/i.test(name)) {
     const short = "A paddle with holes for lighter paddling and texture.";
     return { short, description: fromEtsy || short };
+  }
+  if (/guitar\s*pick/i.test(name)) {
+    if (/griptonite/i.test(name)) {
+      const short = "A 50 pack of textured Griptonite picks, printed in PLA.";
+      return {
+        short,
+        description:
+          "A 50 pack of Griptonite guitar picks, 351 style, with a textured face. Choose color and thickness. Printed in PLA.",
+      };
+    }
+    if (/plain\s*jane/i.test(name)) {
+      const short = "A 50 pack of Plain Jane picks, printed in PLA.";
+      return {
+        short,
+        description:
+          "A 50 pack of Plain Jane guitar picks, 351 style. A simple, reliable pick. Choose color and thickness. Printed in PLA.",
+      };
+    }
+    const short = "A pack of guitar picks, printed in PLA.";
+    return { short, description: short };
   }
   const short = fromEtsy.slice(0, 140) || name;
   return { short, description: fromEtsy || name };
@@ -230,7 +273,7 @@ function toProduct(row, products) {
     etsyListingId,
     paypalUrl: row.paypalUrl || "",
     featured: String(row.featured).toLowerCase() === "true",
-    variantSet: row.variantSet || (name === "Throwing Rib" ? "rib" : ""),
+    variantSet: row.variantSet || (name === "Throwing Rib" ? "rib" : /guitar\s*pick/i.test(name) ? "pick" : ""),
   };
 }
 
@@ -484,9 +527,9 @@ function cmdImport(filePath = incomingCsv) {
   console.log(`\nDone. added ${added}, linked ${linked}, skipped ${skipped}`);
 }
 
-async function listingToProduct(item, apiKey, featured) {
+async function listingToProduct(item, apiKey, featured, existing = []) {
   const id = String(item.listing_id);
-  const sku = skuFromListing(item);
+  const sku = uniqueSku(skuFromListing(item) || (isGuitarPick(item.title) ? `GP-${id}` : ""), id, existing);
   const name = shopName(item.title || "Untitled");
   const slug = sku ? slugify(`${name} ${sku}`) : slugify(name);
   const { short, description } = listingCopy(item, name, sku);
@@ -506,7 +549,7 @@ async function listingToProduct(item, apiKey, featured) {
     etsyListingId: id,
     paypalUrl: "",
     featured,
-    variantSet: name === "Throwing Rib" ? "rib" : "",
+    variantSet: name === "Throwing Rib" ? "rib" : isGuitarPick(item.title) || /guitar\s*pick/i.test(name) ? "pick" : "",
     etsyQuantity: typeof item.quantity === "number" ? item.quantity : undefined,
   };
 }
@@ -533,8 +576,7 @@ async function cmdEtsyDiff(replace = false) {
     process.exitCode = 1;
     return;
   }
-  const usable = listings.filter((item) => !skipListing(item.title));
-  const skipped = listings.length - usable.length;
+  const usable = listings;
 
   if (replace) {
     const featuredNames = new Set([
@@ -551,13 +593,12 @@ async function cmdEtsyDiff(replace = false) {
       const featured =
         (name === "Throwing Rib" && sku === "BO-001") ||
         (name !== "Throwing Rib" && featuredNames.has(name));
-      const product = await listingToProduct(item, apiKey, featured);
+      const product = await listingToProduct(item, apiKey, featured, products);
       products.push(product);
       console.log(`Add ${product.sku || "—"}  ${product.name}`);
     }
     saveProducts(sortCatalog(products));
     console.log(`\nEtsy active: ${listings.length}`);
-    console.log(`Skipped (guitar picks): ${skipped}`);
     console.log(`On website now: ${products.length}`);
     return;
   }
@@ -575,7 +616,6 @@ async function cmdEtsyDiff(replace = false) {
     missing.push(item);
   }
   console.log(`Etsy active: ${listings.length}`);
-  console.log(`Skipped (guitar picks): ${skipped}`);
   console.log(`On website: ${products.length}`);
   console.log(`New listings (not on site): ${missing.length}\n`);
   for (const item of missing) {
@@ -634,7 +674,7 @@ async function cmdEtsySync() {
     process.exitCode = 1;
     return;
   }
-  const usable = listings.filter((item) => !skipListing(item.title));
+  const usable = listings;
   const activeIds = new Set(usable.map((item) => String(item.listing_id)));
   let products = loadProducts();
   let added = 0;
@@ -683,7 +723,7 @@ async function cmdEtsySync() {
       }
       continue;
     }
-    const product = await listingToProduct(item, apiKey, false);
+    const product = await listingToProduct(item, apiKey, false, products);
     products.push(product);
     added += 1;
     notes.push(`Add ${product.sku || "—"}  ${product.name}`);
@@ -704,7 +744,6 @@ async function cmdEtsySync() {
   saveProducts(sortCatalog(products));
   const summary = [
     `Etsy active: ${listings.length}`,
-    `Skipped guitar picks: ${listings.length - usable.length}`,
     `Added: ${added}`,
     `Updated: ${updated}`,
     `Removed: ${removed}`,
@@ -734,6 +773,8 @@ else if (command === "apply-variants") {
     if (product.name === "Throwing Rib") {
       product.variantSet = "rib";
       n += 1;
+    } else if (/guitar\s*pick/i.test(product.name)) {
+      product.variantSet = "pick";
     } else if (!product.variantSet) {
       product.variantSet = "";
     }

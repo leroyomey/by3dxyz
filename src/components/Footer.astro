@@ -4,18 +4,28 @@ import VisitCount from "./VisitCount.astro";
 ---
 
 <footer class="site-footer">
-  <div class="wrap footer-inner">
+  <div class="wrap footer-grid">
     <div class="footer-brand">
       <strong class="logo-type">
         <span class="logo-by">by</span>3D<span class="axis-x">X</span><span class="axis-y">Y</span><span class="axis-z">Z</span>
       </strong>
-      <p class="muted">3D-printed pottery tools and other printed goods.</p>
+      <p class="muted">{site.tagline}</p>
       <VisitCount />
     </div>
-    <div class="footer-links">
-      <a href="/tools">All tools</a>
-      <a href="/custom">Custom</a>
+    <div class="footer-col">
+      <p class="footer-head">Shop</p>
+      <a href="/tools">Shop</a>
       <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy shop</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-head">Print a file</p>
+      <a href="/print">Send a file link</a>
+      <a href="/print#estimate">Ask for an estimate</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-head">Custom</p>
+      <a href="/custom">Custom printing</a>
+      <a href="/custom#quote">Request a quote</a>
       <a href="/about">About</a>
       <a href="/contact">Contact</a>
       <a href="/privacy">Privacy</a>

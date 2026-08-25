@@ -1,0 +1,28 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PrintRequest from "../components/PrintRequest.astro";
+import { printFile } from "../data/print-file";
+---
+
+<Layout
+  title="Print a file"
+  description="Print my STL, 3MF, or OBJ with by3DXYZ. A 3D printing service: send a share link, get a firm price by email, then a PayPal invoice."
+>
+  <section class="bleed-page">
+    <div class="wrap">
+      <p class="kicker kicker-on-dark">{printFile.kicker}</p>
+      <h1>{printFile.title}</h1>
+      <p class="lede">{printFile.lede}</p>
+    </div>
+  </section>
+
+  <section class="wrap quote-stage" id="estimate">
+    <div class="quote-well">
+      <div class="hud-bar" aria-hidden="true">
+        <span>SYS://PRINT</span>
+        <span class="hud-bar-meta">STL · 3MF · OBJ</span>
+      </div>
+      <PrintRequest />
+    </div>
+  </section>
+</Layout>

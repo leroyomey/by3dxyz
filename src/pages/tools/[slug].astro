@@ -49,7 +49,8 @@ const nextTitle = next ? productTitle(next) : "";
         )
       }
     </div>
-    <div class="product-panel">
+    <div class="product-panel" data-product-panel>
+      <span class="buy-stick-sentinel" data-buy-sentinel aria-hidden="true"></span>
       <h1>{title}</h1>
       <BuyOptions product={product}>
         <StockSignal quantity={product.etsyQuantity} />
@@ -58,10 +59,9 @@ const nextTitle = next ? productTitle(next) : "";
       </BuyOptions>
     </div>
     <section class="product-body">
-      <p class="product-body-label">About this tool</p>
+      <p class="product-body-label">About this part</p>
       <p class="muted">{about}</p>
       <p class="muted listing-line">{listingLine}</p>
-      <p class="muted"><a href="/custom">Want a different size or a new profile? Ask for a custom quote.</a></p>
       <EtsyReview product={product} />
     </section>
   </article>
@@ -79,6 +79,19 @@ const nextTitle = next ? productTitle(next) : "";
       window.history.back();
     }
   });
+
+  const panel = document.querySelector("[data-product-panel]");
+  const sentinel = document.querySelector("[data-buy-sentinel]");
+  if (panel instanceof HTMLElement && sentinel && "IntersectionObserver" in window) {
+    const headerPx = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 64;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        panel.classList.toggle("is-compact", Boolean(entry) && !entry.isIntersecting);
+      },
+      { rootMargin: `-${headerPx}px 0px 0px 0px`, threshold: 0 },
+    );
+    observer.observe(sentinel);
+  }
 
   const main = document.querySelector("[data-main-image]");
   document.querySelectorAll("[data-thumb]").forEach((button) => {

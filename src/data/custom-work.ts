@@ -4,6 +4,7 @@ export type CustomPackage = {
   id: CustomPackageId;
   name: string;
   blurb: string;
+  hint: string;
   hours: number;
   print: number;
   from: number;
@@ -39,14 +40,17 @@ export const customWork = {
   /** Practical one-piece max on the P1S. Print limit, not a default size (shop ribs are 4/5/6 in). Official volume is 256³ mm; do not quote that as a part size. */
   maxPieceIn: 9,
   maxPieceMm: 230,
-  quoteLead: "You get the printed tool in the mail.",
+  quoteLead: "You get the printed part in the mail.",
+  get thanksCopy() {
+    return `Quote in ${this.quoteWindow}. ${this.depositPercent}% to start. ${this.quoteLead} The shop emails you.`;
+  },
   quotePricing:
-    "Custom work is priced by the job: a small AutoCAD change to a shop SKU, modeling from a drawing or sketch, or a new profile from an idea.",
+    "Custom work is priced by the job: a small AutoCAD change to a shop item, modeling from a drawing or sketch, or a new design from an idea.",
   quoteFitCopy:
     "More detail and harder shapes take more time, so they cost more. Some requests are not a fit.",
-  quoteCopies: "Extra copies of the same tool are charged at print cost.",
+  quoteCopies: "Extra copies of the same part are charged at print cost.",
   shopLaterCopy:
-    "The order is the printed tool that ships. The same or a similar tool may appear in the shop later.",
+    "The order is the printed part that ships. The same or a similar design may appear in the shop later.",
   get maxPieceCopy() {
     return `The largest piece we can print right now is about ${this.maxPieceIn} × ${this.maxPieceIn} × ${this.maxPieceIn} in (${this.maxPieceMm} mm wide, deep, and tall).`;
   },
@@ -56,8 +60,9 @@ export const customWork = {
   packages: [
     {
       id: "tweak",
-      name: "Change a shop tool",
-      blurb: "A small AutoCAD change to a shop SKU, then we print it.",
+      name: "Change a shop item",
+      blurb: "A small AutoCAD change to something already in the shop, then we print it. A rib, a studio tool, or another part.",
+      hint: "Send the shop SKU, like BO-001, and what you want changed. You get the printed part in the mail.",
       hours: 1,
       print: 15,
       from: 55,
@@ -67,7 +72,8 @@ export const customWork = {
     {
       id: "reference",
       name: "From a drawing or sketch",
-      blurb: "You have a drawing or sketch. We model it in AutoCAD and print it.",
+      blurb: "You have a drawing or sketch. We model it in AutoCAD and print the part.",
+      hint: "Send a drawing or a photo of your sketch, plus sizes. We model it in AutoCAD and print the part.",
       hours: 1.5,
       print: 18,
       from: 85,
@@ -76,8 +82,9 @@ export const customWork = {
     },
     {
       id: "original",
-      name: "Original profile",
-      blurb: "No drawing, only an idea. We design the profile in AutoCAD, then print it.",
+      name: "Original design",
+      blurb: "No drawing, only an idea. We design it in AutoCAD, then print the part.",
+      hint: "Describe the idea and any sizes you know. We design it in AutoCAD, then print the part.",
       hours: 3,
       print: 22,
       from: 140,
@@ -89,15 +96,15 @@ export const customWork = {
     {
       id: "simple",
       name: "Simple",
-      blurb: "A small change, a clear drawing, or one profile.",
-      option: "small change, clear drawing, one profile",
+      blurb: "A small change, a clear drawing, or one part.",
+      option: "small change, clear drawing, one part",
       hoursMul: 0.75,
     },
     {
       id: "typical",
       name: "Typical",
-      blurb: "A normal custom rib or tool from a decent sketch.",
-      option: "a normal custom tool from a sketch",
+      blurb: "A normal custom part from a decent sketch.",
+      option: "a normal custom part from a sketch",
       hoursMul: 1,
     },
     {
@@ -116,6 +123,10 @@ export function customPackage(id: string) {
     customWork.packages.find((item) => item.id === defaultCustomPackageId) ??
     customWork.packages[0]
   );
+}
+
+export function customQuoteSubject(id: string) {
+  return `Custom quote: ${customPackage(id).name}`;
 }
 
 export function customComplexity(id: string) {

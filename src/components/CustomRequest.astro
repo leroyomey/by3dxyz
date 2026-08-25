@@ -1,12 +1,16 @@
 ---
+import DesignRights from "./DesignRights.astro";
 import {
+  customQuoteSubject,
   customWork,
   defaultCustomComplexityId,
   defaultCustomPackageId,
   estimateCustom,
   formatUsd,
 } from "../data/custom-work";
+import { designRights } from "../data/design-rights";
 import { site } from "../data/site";
+import { optionalFileLinkHelp, trustedFileLinkError } from "../data/trusted-file-links";
 
 const notifyEmail =
   import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
@@ -14,6 +18,15 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
 ---
 
 <div class="custom-board" data-custom>
+  <div class="request-thanks" data-custom-thanks hidden>
+    <p class="kicker">Custom request</p>
+    <h2>Thank you</h2>
+    <p>{customWork.thanksCopy}</p>
+    <p>
+      <a class="btn btn-teal" href="/tools">Back to the shop</a>
+    </p>
+  </div>
+
   <div class="custom-estimate">
     <p class="kicker">Starting range</p>
     <p class="custom-range" data-estimate-label>{first.label}</p>
@@ -27,13 +40,45 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
   </div>
 
   <form class="form custom-form" data-custom-form>
+    <div class="quote-subject-block">
+      <p class="cat" id="quote-subject-label">Quote subject</p>
+      <div
+        class="quote-subjects"
+        data-quote-subjects
+        role="radiogroup"
+        aria-labelledby="quote-subject-label"
+      >
+        {
+          customWork.packages.map((item) => (
+            <button
+              class="quote-subject"
+              type="button"
+              role="radio"
+              data-package={item.id}
+              data-package-name={item.name}
+              aria-checked={item.id === defaultCustomPackageId ? "true" : "false"}
+              aria-pressed={item.id === defaultCustomPackageId ? "true" : "false"}
+              tabindex={item.id === defaultCustomPackageId ? 0 : -1}
+            >
+              <span class="cat">{item.name}</span>
+              <span class="price">from {formatUsd(item.from)}</span>
+            </button>
+          ))
+        }
+      </div>
+      <p class="muted quote-subject-live">
+        Email subject: <span data-quote-subject-live>{customQuoteSubject(defaultCustomPackageId)}</span>
+      </p>
+    </div>
+    <input type="hidden" name="_subject" data-quote-subject value={customQuoteSubject(defaultCustomPackageId)} />
+
     <label for="custom-name">Name</label>
     <input id="custom-name" name="name" autocomplete="name" required />
 
     <label for="custom-email">Email</label>
     <input id="custom-email" name="email" type="email" autocomplete="email" required />
 
-    <label for="custom-job">What do you need?</label>
+    <label for="custom-job">Job type</label>
     <select id="custom-job" name="job" data-estimate-job required>
       {customWork.packages.map((item) => (
         <option value={item.id} selected={item.id === defaultCustomPackageId}>
@@ -70,11 +115,24 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
       </label>
     </div>
 
-    <label for="custom-notes">Describe the sketch, including measurements. Detail makes the quote easier.</label>
+    <label for="custom-notes">Describe the part, including measurements. A sketch helps. Detail makes the quote easier.</label>
     <textarea id="custom-notes" name="notes" rows="6" required></textarea>
 
     <label for="custom-photo">Link to a sketch (a photo of it is fine)</label>
-    <input id="custom-photo" name="photo" type="url" placeholder="https://" />
+    <input
+      id="custom-photo"
+      name="photo"
+      type="url"
+      inputmode="url"
+      placeholder="https://"
+      data-trusted-file-link
+      aria-describedby="custom-photo-help"
+      aria-errormessage="custom-photo-error"
+    />
+    <p class="form-error" id="custom-photo-error" data-trusted-file-link-error hidden></p>
+    <p class="muted form-help" id="custom-photo-help">{optionalFileLinkHelp}</p>
+
+    <DesignRights idPrefix="custom" when="file-link" />
 
     <div class="form-trap" aria-hidden="true">
       <label for="custom-company">Company website</label>
@@ -87,7 +145,7 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
   </form>
 </div>
 
-<script is:inline define:vars={{ notifyEmail, contactEmail: site.email, rate: customWork.hourlyRate, jobFloor: customWork.jobFloor, packages: customWork.packages, complexities: customWork.complexities, defaultJob: defaultCustomPackageId, defaultComplexity: defaultCustomComplexityId }}>
+<script is:inline define:vars={{ notifyEmail, contactEmail: site.email, rate: customWork.hourlyRate, jobFloor: customWork.jobFloor, packages: customWork.packages, complexities: customWork.complexities, defaultJob: defaultCustomPackageId, defaultComplexity: defaultCustomComplexityId, fileLinkError: trustedFileLinkError, missingWarrant: designRights.missingWarrant, missingSource: designRights.missingSource, licenseRequiredCopy: designRights.licenseRequiredCopy }}>
   (function () {
     const root = document.querySelector("[data-custom]");
     const form = document.querySelector("[data-custom-form]");
@@ -154,6 +212,24 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
       return id === "tweak";
     }
 
+    function incomingSku() {
+      try {
+        return String(new URLSearchParams(location.search).get("sku") || "")
+          .trim()
+          .toUpperCase();
+      } catch (_err) {
+        return "";
+      }
+    }
+
+    function showThanks() {
+      const thanks = root.querySelector("[data-custom-thanks]");
+      const quote = document.querySelector("[data-quote]");
+      root.classList.add("is-sent");
+      quote?.classList.add("is-sent");
+      if (thanks) thanks.removeAttribute("hidden");
+    }
+
     function syncSkuField() {
       const job = root.querySelector("[data-estimate-job]");
       const wrap = root.querySelector("[data-sku-field]");
@@ -163,8 +239,42 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
       if (sku instanceof HTMLInputElement) {
         sku.disabled = !show;
         sku.required = false;
-        if (!show) sku.value = "";
+        if (show && !sku.value) {
+          const preset = incomingSku();
+          if (preset) sku.value = preset;
+        }
       }
+    }
+
+    function applyIncomingSku() {
+      const preset = incomingSku();
+      if (!preset) return;
+      const job = root.querySelector("[data-estimate-job]");
+      if (job instanceof HTMLSelectElement) job.value = "tweak";
+      const sku = root.querySelector("#custom-sku");
+      if (sku instanceof HTMLInputElement) sku.value = preset;
+    }
+
+    function quoteSubjectLine(id) {
+      const chosen = pack(id);
+      return "Custom quote: " + (chosen && chosen.name ? chosen.name : "custom request");
+    }
+
+    function syncSubjectChips(id) {
+      root.querySelectorAll("[data-quote-subjects] [data-package]").forEach(function (item) {
+        const on = item.getAttribute("data-package") === id;
+        item.setAttribute("aria-checked", on ? "true" : "false");
+        item.setAttribute("aria-pressed", on ? "true" : "false");
+        item.tabIndex = on ? 0 : -1;
+      });
+    }
+
+    function syncSubjectField(id) {
+      const line = quoteSubjectLine(id);
+      const field = root.querySelector("[data-quote-subject]");
+      const live = root.querySelector("[data-quote-subject-live]");
+      if (field instanceof HTMLInputElement) field.value = line;
+      if (live) live.textContent = line;
     }
 
     function paint() {
@@ -173,6 +283,10 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
       const label = root.querySelector("[data-estimate-label]");
       const note = root.querySelector("[data-estimate-note]");
       const field = root.querySelector("[data-estimate-field]");
+      const job = root.querySelector("[data-estimate-job]");
+      const jobId = job instanceof HTMLSelectElement ? job.value : defaultJob;
+      syncSubjectChips(jobId);
+      syncSubjectField(jobId);
       if (!result) return;
       if (label) label.textContent = result.label;
       if (field instanceof HTMLInputElement) field.value = result.label;
@@ -190,6 +304,7 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
     }
 
     const openedAt = Date.now();
+    applyIncomingSku();
     root.addEventListener("change", paint);
     paint();
 
@@ -211,22 +326,67 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
           return;
         }
       } catch (_err) {}
+      const fileLink = form.querySelector("[data-trusted-file-link]");
+      const fileHref = fileLink instanceof HTMLInputElement ? fileLink.value.trim() : "";
+      if (fileLink instanceof HTMLInputElement) {
+        const trusted = typeof window.by3dxyzIsTrustedFileLink === "function" && window.by3dxyzIsTrustedFileLink(fileHref);
+        if (fileHref && !trusted) {
+          fileLink.setCustomValidity(fileLinkError);
+          fileLink.reportValidity();
+          return;
+        }
+      }
+      const source = String(data.get("design_source") || "");
+      const proof = String(data.get("license_or_permission") || "").trim();
+      if (fileHref) {
+        if (String(data.get("warrant") || "") !== "yes") {
+          if (status) status.textContent = missingWarrant;
+          return;
+        }
+        if (!source) {
+          if (status) status.textContent = missingSource;
+          return;
+        }
+        if (source !== "own" && !proof) {
+          if (status) status.textContent = licenseRequiredCopy;
+          return;
+        }
+        if (proof && typeof window.by3dxyzIsLicenseProof === "function" && !window.by3dxyzIsLicenseProof(proof)) {
+          const license = form.querySelector("[data-license-proof]");
+          if (license instanceof HTMLInputElement) {
+            license.reportValidity();
+            return;
+          }
+        }
+      }
       const job = String(data.get("job") || "");
+      const chosen = pack(job);
       const payload = {
-        _subject: "by3DXYZ custom request",
+        _subject: String(data.get("_subject") || quoteSubjectLine(job)),
         _template: "table",
         _captcha: "false",
         _honey: honey,
         name: String(data.get("name") || ""),
         email: String(data.get("email") || ""),
-        job: job,
+        job: chosen && chosen.name ? chosen.name : job,
+        job_id: job,
+        quote_subject: String(data.get("_subject") || quoteSubjectLine(job)),
         quantity: String(data.get("qty") || "1"),
         extra_sizes: String(data.get("extra_sizes") || "0"),
         notes: String(data.get("notes") || ""),
-        photo: String(data.get("photo") || ""),
+        photo: String(data.get("photo") || "").trim(),
         estimate: String(data.get("estimate") || ""),
-        hourly_rate: String(rate),
       };
+      if (fileHref) {
+        payload.design_rights = "yes";
+        payload.design_source = source;
+        payload.license_or_permission = proof;
+        payload.attestation =
+          "Customer attests they have the right to have this part printed (" +
+          (source === "own" ? "made the design" : source === "license" ? "purchased license" : "owner permission") +
+          ")." +
+          (proof ? " License or permission: " + proof : "");
+      }
       if (isTweakJob(job)) payload.sku = String(data.get("sku") || "");
       if (!notifyEmail) {
         if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";
@@ -245,25 +405,27 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
           });
         })
         .then(function (result) {
-          if (status) {
-            status.textContent = result.ok
-              ? "Request sent. Watch for a quote in a few days."
-              : "Could not send. Email " + contactEmail + " instead.";
-          }
           if (result.ok) {
-            form.reset();
             try {
               sessionStorage.setItem("custom-sent", String(Date.now()));
             } catch (_err) {}
+            showThanks();
+            return;
           }
-          paint();
+          if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";
         })
         .catch(function () {
           if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";
         })
         .finally(function () {
-          if (button instanceof HTMLButtonElement) button.disabled = false;
+          if (button instanceof HTMLButtonElement && !root.classList.contains("is-sent")) {
+            button.disabled = false;
+          }
         });
     });
   })();
+</script>
+
+<script>
+  import "../scripts/bind-trusted-file-link";
 </script>

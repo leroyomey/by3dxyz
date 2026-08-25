@@ -8,3 +8,8 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+interface Window {
+  by3dxyzIsTrustedFileLink?: (raw: string) => boolean;
+  by3dxyzIsLicenseProof?: (raw: string) => boolean;
+}

@@ -39,7 +39,11 @@ const buyLabel = compact
       </a>
     ) : null
   }
-  <a class="btn btn-ghost" href={etsyUrl} target="_blank" rel="noopener noreferrer">
-    View on Etsy
-  </a>
+  {
+    hasPaypal ? (
+      <a class="buy-alt" href={etsyUrl} target="_blank" rel="noopener noreferrer">
+        also on Etsy
+      </a>
+    ) : null
+  }
 </div>

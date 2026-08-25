@@ -13,6 +13,9 @@ const notifyEmail =
   import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
 const variants = productVariants(product);
 const needsOptions = variants.length > 0;
+const hasSize = variants.some((group) => group.id === "size");
+const optionHint = hasSize ? "Please choose a color and size." : "Please choose a color.";
+const optionOutHint = hasSize ? "That color and size is currently sold out." : "That color is currently sold out.";
 const stock = typeof product.etsyQuantity === "number" ? product.etsyQuantity : null;
 const stockMap = product.etsyStock || {};
 const hasOptionStock = Object.keys(stockMap).length > 0;
@@ -67,7 +70,12 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
     </label>
   </div>
   <p class="stock-signal" data-variant-stock></p>
-  <p class="muted buy-hint" data-need-options={needsOptions ? "true" : "false"}>
+  <p
+    class="muted buy-hint"
+    data-need-options={needsOptions ? "true" : "false"}
+    data-option-hint={optionHint}
+    data-option-out={optionOutHint}
+  >
       {
         soldOut ? (
           <>
@@ -78,7 +86,7 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
             or check back after a restock.
           </>
         ) : needsOptions ? (
-          "Please choose a color and size."
+          optionHint
         ) : (
           ""
         )
@@ -94,7 +102,10 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
       </div>
     ) : null
   }
-  <a class="buy-alt" href={etsyUrl} target="_blank" rel="noopener noreferrer">View on Etsy</a>
+  <a class="buy-alt" href={etsyUrl} target="_blank" rel="noopener noreferrer">also on Etsy</a>
+  <p class="buy-custom muted">
+    <a href={`/custom?sku=${encodeURIComponent(product.sku)}`}>Need this changed?</a>
+  </p>
 </div>
 
 {
@@ -155,7 +166,7 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
         }
 
         function selected() {
-          const name = root.getAttribute("data-name") || "by3DXYZ tool";
+          const name = root.getAttribute("data-name") || "by3DXYZ part";
           const sku = (root.getAttribute("data-sku") || "").toUpperCase();
           const base = Number(root.getAttribute("data-base-price") || "0");
           const qty = Number(root.querySelector("[data-qty]")?.value || "1");
@@ -231,9 +242,10 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
             stockEl.classList.toggle("is-out", Boolean(complete && left === 0));
           }
           if (hint && needs) {
-            if (!complete) hint.textContent = "Please choose a color and size.";
-            else if (Number.isFinite(left) && left <= 0) hint.textContent = "That color and size is currently sold out.";
-            else hint.textContent = "";
+            if (!complete) hint.textContent = hint.getAttribute("data-option-hint") || "Please choose a color.";
+            else if (Number.isFinite(left) && left <= 0) {
+              hint.textContent = hint.getAttribute("data-option-out") || "That option is currently sold out.";
+            } else hint.textContent = "";
           }
           container.classList.toggle("is-disabled", !state.ready);
         }

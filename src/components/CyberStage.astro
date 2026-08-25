@@ -1,0 +1,125 @@
+<div class="cyber-stage" aria-hidden="true">
+  <div class="cyber-fog"></div>
+  <div class="cyber-grid"></div>
+  <div class="cyber-scan"></div>
+  <canvas class="cyber-canvas" data-cyber-canvas></canvas>
+  <div class="cyber-vignette"></div>
+</div>
+
+<script>
+  const canvas = document.querySelector("[data-cyber-canvas]");
+  if (canvas instanceof HTMLCanvasElement) {
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const particles = [];
+      const count = window.innerWidth < 720 ? 18 : 52;
+      const start = performance.now();
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        canvas.width = Math.max(1, Math.floor(w * dpr));
+        canvas.height = Math.max(1, Math.floor(h * dpr));
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function seed() {
+        particles.length = 0;
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        for (let i = 0; i < count; i += 1) {
+          particles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            z: Math.random(),
+            s: 0.6 + Math.random() * 1.8,
+            vx: (Math.random() - 0.5) * 0.18,
+            vy: -0.08 - Math.random() * 0.22,
+            hue: Math.random() > 0.55 ? "y" : Math.random() > 0.4 ? "x" : "z",
+          });
+        }
+      }
+
+      function color(hue, a) {
+        if (hue === "x") return `rgba(255,43,214,${a})`;
+        if (hue === "y") return `rgba(0,240,255,${a})`;
+        return `rgba(255,193,74,${a})`;
+      }
+
+      function project(x, y, z, ay) {
+        const c = Math.cos(ay);
+        const s = Math.sin(ay);
+        const rx = x * c - z * s;
+        const rz = x * s + z * c;
+        const f = 260 / (260 + rz);
+        return [rx * f, y * f, f];
+      }
+
+      function drawGizmo(cx, cy, t) {
+        const ay = t * 0.00045;
+        const len = Math.min(canvas.clientWidth, canvas.clientHeight) * 0.16;
+        const axes = [
+          { v: [len, 0, 0], hue: "x", label: "X" },
+          { v: [0, -len, 0], hue: "y", label: "Y" },
+          { v: [0, 0, len], hue: "z", label: "Z" },
+        ];
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.lineCap = "round";
+        axes.forEach((axis) => {
+          const [x, y, f] = project(axis.v[0], axis.v[1], axis.v[2], ay);
+          ctx.strokeStyle = color(axis.hue, 0.35 + 0.45 * f);
+          ctx.lineWidth = 2.2;
+          ctx.shadowColor = color(axis.hue, 0.8);
+          ctx.shadowBlur = 12;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(x, y);
+          ctx.stroke();
+          ctx.font = "600 11px 'Share Tech Mono', monospace";
+          ctx.fillStyle = color(axis.hue, 0.95);
+          ctx.shadowBlur = 8;
+          ctx.fillText(axis.label, x + 6, y + 4);
+        });
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = "rgba(232,240,255,0.95)";
+        ctx.beginPath();
+        ctx.arc(0, 0, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function frame(now) {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        ctx.clearRect(0, 0, w, h);
+        particles.forEach((p) => {
+          if (!reduced) {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.y < -8) p.y = h + 8;
+            if (p.x < -8) p.x = w + 8;
+            if (p.x > w + 8) p.x = -8;
+          }
+          ctx.fillStyle = color(p.hue, 0.18 + p.z * 0.55);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        drawGizmo(w * 0.72, h * 0.42, reduced ? 0 : now - start);
+        if (!reduced) requestAnimationFrame(frame);
+      }
+
+      resize();
+      seed();
+      frame(performance.now());
+      window.addEventListener("resize", () => {
+        resize();
+        seed();
+        if (reduced) frame(performance.now());
+      });
+    }
+  }
+</script>

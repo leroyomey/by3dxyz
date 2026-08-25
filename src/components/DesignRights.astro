@@ -1,0 +1,99 @@
+---
+import { designRights } from "../data/design-rights";
+
+interface Props {
+  idPrefix: string;
+  when?: "always" | "file-link";
+}
+
+const { idPrefix, when = "always" } = Astro.props;
+const htmlRequired = when === "always";
+---
+
+<fieldset class="design-rights" data-design-rights data-design-rights-when={when}>
+  <legend class="cat">{designRights.legend}</legend>
+  <p class="muted">{designRights.refuseCopy}</p>
+  <label class="form-check">
+    <input
+      id={`${idPrefix}-warrant`}
+      name="warrant"
+      type="checkbox"
+      value="yes"
+      required={htmlRequired}
+      data-design-warrant
+    />
+    <span>{designRights.warrantCopy}</span>
+  </label>
+  <p class="cat" id={`${idPrefix}-source-label`}>{designRights.sourceLabel}</p>
+  <div class="design-sources" role="radiogroup" aria-labelledby={`${idPrefix}-source-label`}>
+    {
+      designRights.sources.map((item) => (
+        <label class="form-check">
+          <input
+            type="radio"
+            name="design_source"
+            value={item.id}
+            required={htmlRequired}
+            data-design-source
+          />
+          <span>{item.label}</span>
+        </label>
+      ))
+    }
+  </div>
+  <label for={`${idPrefix}-license`}>{designRights.licenseLabel}</label>
+  <input
+    id={`${idPrefix}-license`}
+    name="license_or_permission"
+    type="text"
+    maxlength="200"
+    placeholder="Cults personal license"
+    data-license-proof
+    aria-describedby={`${idPrefix}-license-help`}
+    aria-errormessage={`${idPrefix}-license-error`}
+  />
+  <p class="form-error" id={`${idPrefix}-license-error`} data-license-proof-error hidden></p>
+  <p class="muted form-help" id={`${idPrefix}-license-help`}>{designRights.licenseHelp}</p>
+</fieldset>
+
+<script>
+  function needsRights(box: HTMLElement) {
+    if (box.getAttribute("data-design-rights-when") !== "file-link") return true;
+    const form = box.closest("form");
+    const file = form?.querySelector("[data-trusted-file-link]");
+    return file instanceof HTMLInputElement && Boolean(file.value.trim());
+  }
+
+  function selectedSource(box: HTMLElement) {
+    const on = box.querySelector("[data-design-source]:checked");
+    return on instanceof HTMLInputElement ? on.value : "";
+  }
+
+  function syncRights(box: HTMLElement) {
+    const required = needsRights(box);
+    const warrant = box.querySelector("[data-design-warrant]");
+    const sources = box.querySelectorAll("[data-design-source]");
+    const proof = box.querySelector("[data-license-proof]");
+    if (warrant instanceof HTMLInputElement) warrant.required = required;
+    sources.forEach((item) => {
+      if (item instanceof HTMLInputElement) item.required = required;
+    });
+    if (proof instanceof HTMLInputElement) {
+      const source = selectedSource(box);
+      proof.required = required && source !== "" && source !== "own";
+    }
+  }
+
+  function bindBox(box: HTMLElement) {
+    const form = box.closest("form");
+    const file = form?.querySelector("[data-trusted-file-link]");
+    box.addEventListener("change", () => syncRights(box));
+    file?.addEventListener("input", () => syncRights(box));
+    file?.addEventListener("change", () => syncRights(box));
+    syncRights(box);
+  }
+
+  document.querySelectorAll("[data-design-rights]").forEach((box) => {
+    if (box instanceof HTMLElement) bindBox(box);
+  });
+</script>
