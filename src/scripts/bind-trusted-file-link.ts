@@ -89,4 +89,5 @@ export function bindTrustedFileLinks(root: ParentNode = document) {
 if (typeof window !== "undefined") {
   window.by3dxyzIsTrustedFileLink = isTrustedFileLink;
   bindTrustedFileLinks();
+  document.addEventListener("astro:page-load", () => bindTrustedFileLinks());
 }

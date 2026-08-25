@@ -11,4 +11,5 @@ interface ImportMeta {
 
 interface Window {
   by3dxyzIsTrustedFileLink?: (raw: string) => boolean;
+  by3dxyzVisitTimer?: number;
 }

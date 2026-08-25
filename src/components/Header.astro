@@ -39,9 +39,10 @@ const path = Astro.url.pathname;
 </header>
 
 <script>
-  const toggle = document.querySelector("[data-menu-toggle]");
-  const links = document.querySelector("[data-nav-links]");
-  toggle?.addEventListener("click", () => {
+  document.addEventListener("click", (event) => {
+    const toggle = event.target instanceof Element ? event.target.closest("[data-menu-toggle]") : null;
+    if (!toggle) return;
+    const links = document.querySelector("[data-nav-links]");
     const open = links?.classList.toggle("open");
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
   });

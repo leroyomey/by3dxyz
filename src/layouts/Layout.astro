@@ -1,4 +1,5 @@
 ---
+import { ClientRouter, fade } from "astro:transitions";
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
@@ -44,7 +45,7 @@ const ogImageHeight = productShare ? "1200" : isBrandShare ? "630" : "";
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" transition:name="root" transition:animate="none">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -72,6 +73,7 @@ const ogImageHeight = productShare ? "1200" : isBrandShare ? "630" : "";
     <meta name="twitter:image" content={shareImage} />
     <meta name="twitter:image:alt" content={imageAlt} />
     {jsonLdDocument && <script type="application/ld+json" set:html={JSON.stringify(jsonLdDocument)} />}
+    <ClientRouter />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -82,7 +84,7 @@ const ogImageHeight = productShare ? "1200" : isBrandShare ? "630" : "";
   <body>
     <CyberStage />
     <Header />
-    <main>
+    <main transition:animate={fade({ duration: "220ms" })}>
       <slot />
     </main>
     <Footer />

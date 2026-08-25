@@ -101,14 +101,17 @@ import { customWork, defaultCustomPackageId, formatUsd } from "../data/custom-wo
 </Layout>
 
 <script>
-  const root = document.querySelector("[data-quote]");
-  const toggle = document.querySelector("[data-quote-toggle]");
-  const panel = document.getElementById("custom-quote-panel");
-  const table = document.querySelector("[data-packages]");
-  const subjects = document.querySelector("[data-quote-subjects]");
-  const hint = document.querySelector("[data-package-hint-text]");
-  const picks = [...document.querySelectorAll("[data-packages] [data-package]")];
-  const chips = [...document.querySelectorAll("[data-quote-subjects] [data-package]")];
+  function bindQuote() {
+    const root = document.querySelector("[data-quote]");
+    if (!(root instanceof HTMLElement) || root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
+    const toggle = document.querySelector("[data-quote-toggle]");
+    const panel = document.getElementById("custom-quote-panel");
+    const table = document.querySelector("[data-packages]");
+    const subjects = document.querySelector("[data-quote-subjects]");
+    const hint = document.querySelector("[data-package-hint-text]");
+    const picks = [...document.querySelectorAll("[data-packages] [data-package]")];
+    const chips = [...document.querySelectorAll("[data-quote-subjects] [data-package]")];
 
   function selectedId() {
     return (
@@ -231,5 +234,9 @@ import { customWork, defaultCustomPackageId, formatUsd } from "../data/custom-wo
     if (sku) setPackage("tweak");
   } catch (_err) {}
 
-  if (location.hash === "#quote") setOpen(true);
+    if (location.hash === "#quote") setOpen(true);
+  }
+
+  bindQuote();
+  document.addEventListener("astro:page-load", bindQuote);
 </script>

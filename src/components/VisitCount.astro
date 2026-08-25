@@ -44,8 +44,10 @@
       first = true;
     }
     refresh(first);
-    window.setInterval(function () {
-      refresh(false);
-    }, 6 * 60 * 1000);
+    if (!window.by3dxyzVisitTimer) {
+      window.by3dxyzVisitTimer = window.setInterval(function () {
+        refresh(false);
+      }, 6 * 60 * 1000);
+    }
   })();
 </script>

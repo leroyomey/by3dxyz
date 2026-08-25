@@ -94,39 +94,47 @@ const jsonLd = {
 </Layout>
 
 <script>
-  const back = document.querySelector("[data-back]");
-  back?.addEventListener("click", (event) => {
-    let fromHere = false;
-    try {
-      fromHere = Boolean(document.referrer) && new URL(document.referrer).origin === location.origin;
-    } catch (_err) {}
-    if (fromHere && window.history.length > 1) {
-      event.preventDefault();
-      window.history.back();
+  function bindProduct() {
+    const panel = document.querySelector("[data-product-panel]");
+    if (!(panel instanceof HTMLElement) || panel.dataset.bound === "1") return;
+    panel.dataset.bound = "1";
+
+    const back = document.querySelector("[data-back]");
+    back?.addEventListener("click", (event) => {
+      let fromHere = false;
+      try {
+        fromHere = Boolean(document.referrer) && new URL(document.referrer).origin === location.origin;
+      } catch (_err) {}
+      if (fromHere && window.history.length > 1) {
+        event.preventDefault();
+        window.history.back();
+      }
+    });
+
+    const sentinel = document.querySelector("[data-buy-sentinel]");
+    if (sentinel && "IntersectionObserver" in window) {
+      const headerPx = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 64;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          panel.classList.toggle("is-compact", Boolean(entry) && !entry.isIntersecting);
+        },
+        { rootMargin: `-${headerPx}px 0px 0px 0px`, threshold: 0 },
+      );
+      observer.observe(sentinel);
     }
-  });
 
-  const panel = document.querySelector("[data-product-panel]");
-  const sentinel = document.querySelector("[data-buy-sentinel]");
-  if (panel instanceof HTMLElement && sentinel && "IntersectionObserver" in window) {
-    const headerPx = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 64;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        panel.classList.toggle("is-compact", Boolean(entry) && !entry.isIntersecting);
-      },
-      { rootMargin: `-${headerPx}px 0px 0px 0px`, threshold: 0 },
-    );
-    observer.observe(sentinel);
-  }
-
-  const main = document.querySelector("[data-main-image]");
-  document.querySelectorAll("[data-thumb]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const src = button.getAttribute("data-thumb");
-      if (src && main instanceof HTMLImageElement) main.src = src;
-      document.querySelectorAll("[data-thumb]").forEach((item) => {
-        item.setAttribute("aria-current", item === button ? "true" : "false");
+    const main = document.querySelector("[data-main-image]");
+    document.querySelectorAll("[data-thumb]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const src = button.getAttribute("data-thumb");
+        if (src && main instanceof HTMLImageElement) main.src = src;
+        document.querySelectorAll("[data-thumb]").forEach((item) => {
+          item.setAttribute("aria-current", item === button ? "true" : "false");
+        });
       });
     });
-  });
+  }
+
+  bindProduct();
+  document.addEventListener("astro:page-load", bindProduct);
 </script>

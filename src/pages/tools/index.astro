@@ -45,8 +45,10 @@ const favorers = etsyFavorersTotal(products);
 </Layout>
 
 <script>
-  const root = document.querySelector("[data-catalog]");
-  if (root) {
+  function bindCatalog() {
+    const root = document.querySelector("[data-catalog]");
+    if (!(root instanceof HTMLElement) || root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
     const chips = [...root.querySelectorAll("[data-filter]")];
     const cards = [...root.querySelectorAll("[data-category]")];
     const empty = root.querySelector("[data-empty]");
@@ -79,4 +81,7 @@ const favorers = etsyFavorersTotal(products);
 
     search?.addEventListener("input", apply);
   }
+
+  bindCatalog();
+  document.addEventListener("astro:page-load", bindCatalog);
 </script>
