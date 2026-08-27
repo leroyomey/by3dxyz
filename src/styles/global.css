@@ -2379,6 +2379,11 @@ a.btn-primary[href*="etsy.com"]:hover {
     padding: 12px 0 20px;
   }
 
+  .process-stepper {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
   .product-panel {
     padding: 16px;
   }
