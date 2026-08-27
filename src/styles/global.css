@@ -41,6 +41,8 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   color-scheme: dark;
+  overflow-x: clip;
+  scroll-padding-top: calc(var(--header-h) + 12px);
 }
 
 body {
@@ -56,6 +58,7 @@ body {
   line-height: 1.55;
   min-height: 100vh;
   overflow-x: clip;
+  max-width: 100%;
 }
 
 img {
@@ -151,6 +154,7 @@ main {
   align-items: center;
   gap: 10px;
   margin-right: auto;
+  min-height: 44px;
   text-decoration: none;
   color: var(--header-ink);
 }
@@ -267,6 +271,7 @@ main {
   background: var(--accent);
   color: var(--accent-ink);
   padding: 8px 14px;
+  min-height: 44px;
   font-weight: 700;
   font-size: 0.875rem;
   letter-spacing: 0.08em;
@@ -309,6 +314,7 @@ main {
   gap: 8px;
   text-decoration: none;
   padding: 11px 16px;
+  min-height: 44px;
   font-weight: 700;
   font-size: 0.9375rem;
   letter-spacing: 0.08em;
@@ -450,6 +456,7 @@ a.btn-primary[href*="etsy.com"]:hover {
   color: var(--ink-soft);
   max-width: 58ch;
   overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .page-hero .lede {
@@ -809,7 +816,8 @@ a.btn-primary[href*="etsy.com"]:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px 12px;
   margin: 0 -32px 24px;
   padding: 10px 32px;
   border-bottom: 1px solid var(--line);
@@ -1246,7 +1254,7 @@ a.btn-primary[href*="etsy.com"]:hover {
   background: transparent;
   color: var(--ink-soft);
   padding: 10px 14px;
-  min-height: 42px;
+  min-height: 44px;
   box-shadow: inset 0 0 0 1px var(--line);
   font-weight: 700;
   font-size: 0.875rem;
@@ -1283,6 +1291,7 @@ a.btn-primary[href*="etsy.com"]:hover {
   background: var(--void);
   color: var(--ink);
   padding: 12px 14px;
+  min-height: 44px;
   font: inherit;
   font-size: 1rem;
   margin: 0;
@@ -1310,6 +1319,7 @@ a.btn-primary[href*="etsy.com"]:hover {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: 44px;
   color: var(--ink-soft);
   text-decoration: none;
   font-weight: 700;
@@ -1372,6 +1382,8 @@ a.btn-primary[href*="etsy.com"]:hover {
 .product-panel h1 {
   margin: 0 0 6px;
   font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .product-panel .lede {
@@ -1469,11 +1481,15 @@ a.btn-primary[href*="etsy.com"]:hover {
 .thumbs {
   display: flex;
   gap: 8px;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .thumbs button {
   width: 72px;
   height: 72px;
+  flex: 0 0 auto;
   padding: 0;
   border: 0;
   overflow: hidden;
@@ -1518,6 +1534,14 @@ a.btn-primary[href*="etsy.com"]:hover {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-top: 4px;
+  min-width: 0;
+}
+
+.buy-options,
+.option-field,
+.paypal-box,
+.price-row {
+  min-width: 0;
 }
 
 .buy-qty {
@@ -1582,6 +1606,10 @@ a.btn-primary[href*="etsy.com"]:hover {
   background: var(--void);
   border: 1px solid var(--line);
   padding: 11px 14px;
+  min-height: 44px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, var(--accent) 50%),
     linear-gradient(135deg, var(--accent) 50%, transparent 50%);
@@ -1654,6 +1682,11 @@ a.btn-primary[href*="etsy.com"]:hover {
   padding: 12px 14px;
   background: var(--void);
   caret-color: var(--accent);
+}
+
+.form input,
+.form select {
+  min-height: 44px;
 }
 
 .form select {
@@ -2004,6 +2037,9 @@ a.btn-primary[href*="etsy.com"]:hover {
 }
 
 .footer-col a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--ink-soft);
   text-decoration: none;
   font-size: 0.9375rem;
@@ -2175,18 +2211,10 @@ a.btn-primary[href*="etsy.com"]:hover {
 
   .product-panel {
     max-width: none;
-    top: var(--header-h);
-    max-height: calc(100dvh - var(--header-h));
-  }
-
-  .product-panel.is-compact {
-    padding-top: 12px;
-    padding-bottom: 12px;
-  }
-
-  .product-panel.is-compact h1,
-  .product-panel.is-compact .buy-proof {
-    display: none;
+    position: static;
+    top: auto;
+    max-height: none;
+    overflow: visible;
   }
 
   .etsy-band,
@@ -2198,25 +2226,42 @@ a.btn-primary[href*="etsy.com"]:hover {
 }
 
 @media (max-width: 720px) {
-  .buy-fields {
-    grid-template-columns: 1fr 1fr;
+  .buy-fields,
+  .quote-subjects,
+  .custom-qty-row,
+  .print-qty-row {
+    grid-template-columns: 1fr;
   }
 
   .paypal-box {
     max-width: none;
   }
 
+  .buy-qty {
+    max-width: none;
+  }
+
   .quote-well {
-    padding: 0 18px 24px;
+    padding: 0 16px 24px;
   }
 
   .hud-bar {
-    margin: 0 -18px 20px;
-    padding: 10px 18px;
+    margin: 0 -16px 20px;
+    padding: 10px 16px;
+    letter-spacing: 0.1em;
+  }
+
+  .price-col {
+    padding: 18px 16px 20px;
   }
 }
 
 @media (max-width: 640px) {
+  .wrap,
+  .site-header .wrap {
+    width: calc(100% - 32px);
+  }
+
   .product-grid,
   .shop-results .product-grid,
   .catalog-band .product-grid-band {
@@ -2229,18 +2274,25 @@ a.btn-primary[href*="etsy.com"]:hover {
 
   .nav-links.open {
     display: flex;
-    position: absolute;
+    position: fixed;
     top: var(--header-h);
     left: 0;
     right: 0;
+    z-index: 45;
     background: #06040c;
     flex-direction: column;
-    padding: 8px 20px 16px;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 16px 16px;
     border-bottom: 1px solid var(--line);
+    max-height: calc(100dvh - var(--header-h));
+    overflow-y: auto;
   }
 
-  .site-header .wrap {
-    width: calc(100% - 24px);
+  .nav-links.open a::after {
+    left: 8px;
+    right: auto;
+    width: 2.75em;
   }
 
   .header-inner {
@@ -2254,7 +2306,7 @@ a.btn-primary[href*="etsy.com"]:hover {
   .nav-cta {
     flex-shrink: 0;
     white-space: nowrap;
-    padding: 7px 11px;
+    padding: 8px 12px;
     font-size: 0.8125rem;
   }
 
@@ -2266,14 +2318,32 @@ a.btn-primary[href*="etsy.com"]:hover {
     display: inline;
   }
 
+  .bleed-hero {
+    padding: 28px 0 72px;
+  }
+
+  .bleed-page {
+    padding: 24px 0 16px;
+  }
+
   .bleed-hero h1,
   .bleed-page h1 {
-    font-size: 2.05rem;
-    max-width: 14ch;
+    font-size: 1.85rem;
+    max-width: none;
+    overflow-wrap: break-word;
   }
 
   .shop-head h1 {
     font-size: 2.05rem;
+    max-width: none;
+  }
+
+  .path-overlap {
+    margin-top: -40px;
+  }
+
+  .path-card {
+    padding: 22px 18px 20px;
   }
 
   .hero-actions {
@@ -2291,6 +2361,11 @@ a.btn-primary[href*="etsy.com"]:hover {
 
   .menu-toggle {
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 10px 12px;
     background: transparent;
     border: 0;
     font: inherit;
@@ -2298,6 +2373,53 @@ a.btn-primary[href*="etsy.com"]:hover {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     cursor: pointer;
+  }
+
+  .custom-stage {
+    padding: 12px 0 20px;
+  }
+
+  .product-panel {
+    padding: 16px;
+  }
+
+  .product-detail {
+    padding: 16px 0 56px;
+    gap: 20px;
+  }
+
+  .section {
+    padding: 32px 0 48px;
+  }
+
+  .shop-page {
+    padding: 24px 0 56px;
+  }
+
+  .shop-toolbar {
+    margin: 20px 0 18px;
+  }
+
+  .shop-toolbar .cart-signal {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .lede {
+    font-size: 1.0625rem;
+  }
+
+  .sku-chip {
+    max-width: 100%;
+  }
+
+  .sku-name {
+    overflow-wrap: anywhere;
+  }
+
+  #quote,
+  #estimate {
+    scroll-margin-top: calc(var(--header-h) + 12px);
   }
 }
 

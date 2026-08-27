@@ -39,11 +39,26 @@ const path = Astro.url.pathname;
 </header>
 
 <script>
-  document.addEventListener("click", (event) => {
-    const toggle = event.target instanceof Element ? event.target.closest("[data-menu-toggle]") : null;
-    if (!toggle) return;
+  function setMenu(open) {
     const links = document.querySelector("[data-nav-links]");
-    const open = links?.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    const toggle = document.querySelector("[data-menu-toggle]");
+    links?.classList.toggle("open", open);
+    toggle?.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target) return;
+    const toggle = target.closest("[data-menu-toggle]");
+    if (toggle) {
+      const links = document.querySelector("[data-nav-links]");
+      setMenu(!links?.classList.contains("open"));
+      return;
+    }
+    if (target.closest("[data-nav-links] a")) {
+      setMenu(false);
+    }
   });
+
+  document.addEventListener("astro:after-swap", () => setMenu(false));
 </script>

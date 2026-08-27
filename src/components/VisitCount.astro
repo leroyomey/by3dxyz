@@ -1,4 +1,4 @@
-<p class="visit-count" data-visit-count hidden>
+<p class="visit-count" data-visit-count hidden transition:persist="visit-count">
   <span data-visit-n></span> visits
 </p>
 
@@ -86,9 +86,15 @@
       });
     }
 
+    function paintCached() {
+      const shown = cached();
+      if (shown != null) paint(shown);
+    }
+
     if (!window.by3dxyzVisitBound) {
       window.by3dxyzVisitBound = true;
       document.addEventListener("astro:page-load", onPageLoad);
+      document.addEventListener("astro:after-swap", paintCached);
       window.by3dxyzVisitTimer = window.setInterval(function () {
         if (window.by3dxyzVisitBusy) return;
         window.by3dxyzVisitBusy = true;
