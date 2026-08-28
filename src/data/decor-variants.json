@@ -1,0 +1,33 @@
+{
+  "id": "decor",
+  "groups": [
+    {
+      "id": "color",
+      "label": "Primary color",
+      "placeholder": "Select a color",
+      "values": [
+        { "name": "Black" },
+        { "name": "Green" },
+        { "name": "Orange" },
+        { "name": "Burnt Orange" },
+        { "name": "Red" },
+        { "name": "Candy Red" },
+        { "name": "Light Pink" },
+        { "name": "Fuchsia" },
+        { "name": "Yellow" },
+        { "name": "Vintage Rose" },
+        { "name": "New Army Green" }
+      ]
+    },
+    {
+      "id": "pack",
+      "label": "Pack size",
+      "placeholder": "Select a pack size",
+      "values": [
+        { "name": "2 Pack" },
+        { "name": "4 Pack" },
+        { "name": "6 Pack" }
+      ]
+    }
+  ]
+}
