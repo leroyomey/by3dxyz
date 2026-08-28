@@ -2522,7 +2522,7 @@
     "featured": true,
     "variantSet": "color",
     "etsyQuantity": 10,
-    "etsyFavorers": 1,
+    "etsyFavorers": 2,
     "etsyStock": {
       "black": 10,
       "white": 10,
@@ -7210,7 +7210,7 @@
   },
   {
     "id": "Griptonite Guitar Picks - 50 Pack Griptonite - 351 Style - Multiple Sizes",
-    "sku": "",
+    "sku": "GP-GRIP",
     "slug": "griptonite-guitar-picks-gp-grip",
     "name": "Griptonite Guitar Picks - 50 Pack Griptonite - 351 Style - Multiple Sizes",
     "price": 14.99,
@@ -7269,7 +7269,7 @@
   },
   {
     "id": "Plain Jane Guitar Picks - 50 Pack Griptonite - 351 Style - Multiple Sizes",
-    "sku": "",
+    "sku": "GP-PLAIN",
     "slug": "plain-jane-guitar-picks-gp-plain",
     "name": "Plain Jane Guitar Picks - 50 Pack Griptonite - 351 Style - Multiple Sizes",
     "price": 14.99,
