@@ -14,6 +14,7 @@
     "catalog:add": "node scripts/catalog.mjs add",
     "catalog:import": "node scripts/catalog.mjs import",
     "catalog:check": "node scripts/catalog-check.mjs",
+    "checkout:check": "node scripts/checkout-price-check.mjs",
     "catalog:etsy": "node scripts/catalog.mjs etsy-diff",
     "catalog:sync": "node scripts/catalog.mjs etsy-sync",
     "catalog:listed-at": "node scripts/catalog.mjs listed-at",

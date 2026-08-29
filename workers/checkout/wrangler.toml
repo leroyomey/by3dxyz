@@ -1,0 +1,12 @@
+name = "by3dxyz-checkout"
+main = "src/index.js"
+compatibility_date = "2026-08-29"
+
+# Secrets (wrangler secret put). Never commit values.
+# PAYPAL_CLIENT_ID
+# PAYPAL_SECRET
+# ORDER_NOTIFY_EMAIL
+
+[vars]
+PAYPAL_API = "https://api-m.paypal.com"
+ALLOWED_ORIGINS = "https://by3dxyz.com,https://www.by3dxyz.com,http://localhost:4321,http://127.0.0.1:4321"

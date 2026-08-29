@@ -7,6 +7,7 @@ interface Props {
 }
 
 const { clientId, currency, notifyEmail, mode = "buy" } = Astro.props;
+const checkoutUrl = import.meta.env.PUBLIC_CHECKOUT_URL?.trim() || "";
 ---
 
 <div
@@ -16,6 +17,7 @@ const { clientId, currency, notifyEmail, mode = "buy" } = Astro.props;
   data-paypal-client={clientId}
   data-paypal-currency={currency}
   data-paypal-notify={notifyEmail}
+  data-paypal-checkout={checkoutUrl}
 >
   <p class="muted buy-pay-label">Pay with PayPal or card</p>
   <div data-paypal-slot="paypal"></div>

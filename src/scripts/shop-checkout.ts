@@ -230,20 +230,41 @@ function loadSdk(clientId: string, currency: string): Promise<PayPalSdk | undefi
   });
 }
 
+function requestLines(lines: CartLine[]) {
+  return lines.map((line) => ({ sku: line.sku, qty: line.qty, options: line.options || {} }));
+}
+
+function checkoutEndpoint(raw: string) {
+  return raw.replace(/\/$/, "");
+}
+
 export function mountPayPal(opts: {
   container: HTMLElement;
   clientId: string;
   currency: string;
   notifyEmail: string;
+  checkoutUrl?: string;
   getLines: () => CartLine[] | null;
   clearOnPay?: boolean;
 }): void {
   const { container, clientId, currency, notifyEmail, getLines, clearOnPay } = opts;
+  const checkoutUrl = checkoutEndpoint(opts.checkoutUrl || "");
   if (!clientId || container.dataset.ready === "true") return;
   container.dataset.ready = "true";
 
   loadSdk(clientId, currency).then((paypal) => {
     if (!paypal) return;
+
+    function goThanks(snapshot: ReturnType<typeof orderSnapshot>) {
+      try {
+        sessionStorage.setItem("by3dxyz-order", JSON.stringify(snapshot));
+      } catch {
+        /* private mode */
+      }
+      if (clearOnPay) clearCart();
+      window.location.href = "/thanks";
+    }
+
     const shared = {
       onClick: function (_data: unknown, actions: { reject: () => unknown; resolve: () => unknown }) {
         const lines = getLines();
@@ -256,6 +277,17 @@ export function mountPayPal(opts: {
       ) {
         const lines = getLines();
         if (!lines || !lines.length) return Promise.reject(new Error("empty"));
+        if (checkoutUrl) {
+          return fetch(checkoutUrl + "/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lines: requestLines(lines) }),
+          }).then(async (res) => {
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok || !body.id) throw new Error(body.error || "Checkout failed.");
+            return body.id as string;
+          });
+        }
         return actions.order.create({
           application_context: {
             brand_name: "by3DXYZ",
@@ -266,27 +298,35 @@ export function mountPayPal(opts: {
         });
       },
       onApprove: function (
-        _data: unknown,
+        data: { orderID?: string },
         actions: { order: { capture: () => Promise<PayPalDetails> } },
       ) {
+        if (checkoutUrl) {
+          return fetch(checkoutUrl + "/capture", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderID: data.orderID || "" }),
+          }).then(async (res) => {
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(body.error || "Capture failed.");
+            const snapshot =
+              body.snapshot ||
+              orderSnapshot(getLines() || [], body.details, currency, Boolean(body.notifyOk));
+            snapshot.notifyOk = Boolean(body.notifyOk);
+            goThanks(snapshot);
+          });
+        }
         return actions.order.capture().then((details) => {
           const lines = getLines() || [];
-          function goThanks(ok: boolean) {
-            const snapshot = orderSnapshot(lines, details, currency, Boolean(ok));
-            try {
-              sessionStorage.setItem("by3dxyz-order", JSON.stringify(snapshot));
-            } catch {
-              /* private mode */
-            }
-            if (clearOnPay) clearCart();
-            window.location.href = "/thanks";
-          }
           return Promise.race([
             notifyShop(lines, details, currency, notifyEmail),
             new Promise<boolean>((resolve) => {
               setTimeout(() => resolve(false), 8000);
             }),
-          ]).then(goThanks, () => goThanks(false));
+          ]).then(
+            (ok) => goThanks(orderSnapshot(lines, details, currency, Boolean(ok))),
+            () => goThanks(orderSnapshot(lines, details, currency, false)),
+          );
         });
       },
     };
@@ -337,6 +377,7 @@ export function bootPayPalMounts(): void {
     const clientId = node.getAttribute("data-paypal-client") || "";
     const currency = node.getAttribute("data-paypal-currency") || "USD";
     const notifyEmail = node.getAttribute("data-paypal-notify") || "";
+    const checkoutUrl = node.getAttribute("data-paypal-checkout") || "";
     const mode = node.getAttribute("data-paypal-mode") || "buy";
     if (!clientId) continue;
     mountPayPal({
@@ -344,6 +385,7 @@ export function bootPayPalMounts(): void {
       clientId,
       currency,
       notifyEmail,
+      checkoutUrl,
       clearOnPay: mode === "cart",
       getLines: () => {
         if (mode === "cart") {

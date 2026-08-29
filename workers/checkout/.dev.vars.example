@@ -1,0 +1,4 @@
+# Local wrangler secrets. Copy to .dev.vars (gitignored). Never commit values.
+PAYPAL_CLIENT_ID=
+PAYPAL_SECRET=
+ORDER_NOTIFY_EMAIL=itsbman97@gmail.com

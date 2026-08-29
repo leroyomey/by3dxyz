@@ -3,6 +3,7 @@
 interface ImportMetaEnv {
   readonly PUBLIC_PAYPAL_CLIENT_ID?: string;
   readonly PUBLIC_ORDER_NOTIFY_EMAIL?: string;
+  readonly PUBLIC_CHECKOUT_URL?: string;
 }
 
 interface ImportMeta {
