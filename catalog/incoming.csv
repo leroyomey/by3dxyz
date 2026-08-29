@@ -1,4 +1,4 @@
-sku,name,price,category,short,description,etsyUrl,etsyListingId,images,featured
+sku,name,price,category,short,description,etsyUrl,etsyListingId,images,featured,variantSet
 # New tools go below. Part numbers are BO-001 … BO-052 (same as [BO-001] at the end of the Etsy title).
 # Example:
 # BO-009,Coil Gauge,14,Coil tools,Even coils,Full description,https://www.etsy.com/listing/123456789/coil-gauge,123456789,/images/products/coil-gauge.jpg,false
