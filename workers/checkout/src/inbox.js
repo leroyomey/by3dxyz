@@ -20,7 +20,8 @@ function qtyBetween(value, min, max, fallback) {
 
 function skuCode(value) {
   const sku = String(value || "").trim().toUpperCase();
-  return /^BO-\d{3}(?:-\d+)?$/.test(sku) ? sku : "";
+  // Catalog codes only. BO-001, BO-019-1, SW-001, GP-GRIP. Reject anything else.
+  return /^(BO-\d{3}(?:-\d+)?|SW-\d{3}|GP-[A-Z]+)$/.test(sku) ? sku : "";
 }
 
 export function buildInboxPayload(body) {

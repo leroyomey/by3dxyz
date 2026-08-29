@@ -48,7 +48,7 @@ for (const product of products) {
   if (!product.sku) {
     err(`${label}: no SKU`);
   } else {
-    if (!/^(BO-\d{3}(-\d+)?|GP-[A-Z]+)$/.test(product.sku)) warn(`${label}: unusual SKU format`);
+    if (!/^(BO-\d{3}(-\d+)?|SW-\d{3}|GP-[A-Z]+)$/.test(product.sku)) warn(`${label}: unusual SKU format`);
     if (seenSku.has(product.sku)) err(`Duplicate SKU ${product.sku}`);
     seenSku.set(product.sku, true);
   }

@@ -1,5 +1,7 @@
 export const listingLine = "Printed in durable PLA. Same shape every time.";
-export const shippingNote = "USA: free shipping. Other countries pay shipping at PayPal.";
+export const shippingLead = "USA ships free";
+export const shippingIntl = "Other countries pay shipping at PayPal.";
+export const shippingNote = `${shippingLead}. ${shippingIntl}`;
 
 export const site = {
   name: "by3DXYZ",
