@@ -171,8 +171,27 @@ async function notifyShop(env, lines, details, currency) {
   }
 }
 
-async function createOrder(env, request) {
+async function verifyTurnstile(env, token, ip) {
+  const secret = String(env.TURNSTILE_SECRET || "").trim();
+  if (!secret) throw new Error("Checkout is not configured.");
+  const proof = String(token || "").trim();
+  if (proof.length < 20) throw new Error("Checkout failed.");
+  const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      secret,
+      response: proof,
+      remoteip: ip,
+    }).toString(),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!data.success) throw new Error("Checkout failed.");
+}
+
+async function createOrder(env, request, ip) {
   const body = await request.json();
+  await verifyTurnstile(env, body.turnstile, ip);
   const lines = quoteLines(catalog, variantSets, body.lines || []);
   const currency = lines[0]?.currency || "USD";
   const created = await paypalFetch(env, "/v2/checkout/orders", {
@@ -323,14 +342,14 @@ export default {
         if (!env.ORDER_NOTIFY_EMAIL) return json(env, request, { error: "Could not send." }, 503);
         return json(env, request, await inboxOrder(env, request));
       }
-      if (!env.PAYPAL_CLIENT_ID || !env.PAYPAL_SECRET) {
+      if (!env.PAYPAL_CLIENT_ID || !env.PAYPAL_SECRET || !env.TURNSTILE_SECRET) {
         return json(env, request, { error: "Checkout is not configured." }, 503);
       }
       if (url.pathname === "/order") {
         if (tooMany(ip + ":order", 8, 15 * 60 * 1000)) {
           return json(env, request, { error: "Try checkout again in a few minutes." }, 429);
         }
-        return json(env, request, await createOrder(env, request));
+        return json(env, request, await createOrder(env, request, ip));
       }
       if (url.pathname === "/capture") {
         if (tooMany(ip + ":capture", 12, 15 * 60 * 1000)) {

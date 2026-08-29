@@ -6,6 +6,7 @@ compatibility_date = "2026-08-29"
 # PAYPAL_CLIENT_ID
 # PAYPAL_SECRET
 # ORDER_NOTIFY_EMAIL
+# TURNSTILE_SECRET
 
 [vars]
 PAYPAL_API = "https://api-m.paypal.com"

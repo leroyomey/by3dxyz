@@ -11,6 +11,11 @@ interface ImportMeta {
 }
 
 interface Window {
+  turnstile?: {
+    render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+    execute: (id: string) => void;
+    remove: (id: string) => void;
+  };
   by3dxyzIsTrustedFileLink?: (raw: string) => boolean;
   by3dxyzVisitTimer?: number;
   by3dxyzVisitBound?: boolean;

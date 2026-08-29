@@ -1,4 +1,6 @@
 ---
+import { turnstileSiteKey } from "../data/turnstile";
+
 interface Props {
   clientId: string;
   currency: string;
@@ -18,6 +20,7 @@ const checkoutUrl = import.meta.env.PUBLIC_CHECKOUT_URL?.trim() || "";
   data-paypal-currency={currency}
   data-paypal-notify={notifyEmail}
   data-paypal-checkout={checkoutUrl}
+  data-turnstile-site={turnstileSiteKey}
 >
   <p class="muted buy-pay-label">Pay with PayPal or card</p>
   <div data-paypal-slot="paypal"></div>

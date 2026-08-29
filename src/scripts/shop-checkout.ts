@@ -238,20 +238,88 @@ function checkoutEndpoint(raw: string) {
   return raw.replace(/\/$/, "");
 }
 
+function turnstileApi() {
+  return window.turnstile;
+}
+
+function loadTurnstile(): Promise<NonNullable<Window["turnstile"]> | undefined> {
+  const existing = turnstileApi();
+  if (existing) return Promise.resolve(existing);
+  const waiting = document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]');
+  return new Promise((resolve) => {
+    const done = () => resolve(turnstileApi());
+    if (waiting) {
+      waiting.addEventListener("load", done);
+      if (turnstileApi()) done();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.onload = done;
+    script.onerror = () => resolve(undefined);
+    document.head.appendChild(script);
+  });
+}
+
+function checkoutProof(siteKey: string): Promise<string> {
+  return loadTurnstile().then((turnstile) => {
+    if (!turnstile || !siteKey) return Promise.reject(new Error("Checkout failed."));
+    return new Promise((resolve, reject) => {
+      const box = document.createElement("div");
+      box.hidden = true;
+      document.body.appendChild(box);
+      const fail = () => {
+        try {
+          turnstile.remove(id);
+        } catch {
+          /* already gone */
+        }
+        box.remove();
+        reject(new Error("Checkout failed."));
+      };
+      const id = turnstile.render(box, {
+        sitekey: siteKey,
+        size: "invisible",
+        execution: "execute",
+        callback: (token: string) => {
+          try {
+            turnstile.remove(id);
+          } catch {
+            /* already gone */
+          }
+          box.remove();
+          if (!token) {
+            reject(new Error("Checkout failed."));
+            return;
+          }
+          resolve(token);
+        },
+        "error-callback": fail,
+        "timeout-callback": fail,
+      });
+      turnstile.execute(id);
+    });
+  });
+}
+
 export function mountPayPal(opts: {
   container: HTMLElement;
   clientId: string;
   currency: string;
   notifyEmail: string;
   checkoutUrl?: string;
+  siteKey?: string;
   getLines: () => CartLine[] | null;
   clearOnPay?: boolean;
 }): void {
   const { container, clientId, currency, getLines, clearOnPay } = opts;
   const checkoutUrl = checkoutEndpoint(opts.checkoutUrl || "");
-  if (!clientId || !checkoutUrl || container.dataset.ready === "true") return;
+  const siteKey = String(opts.siteKey || "").trim();
+  if (!clientId || !checkoutUrl || !siteKey || container.dataset.ready === "true") return;
   container.dataset.ready = "true";
 
+  loadTurnstile();
   loadSdk(clientId, currency).then((paypal) => {
     if (!paypal) return;
 
@@ -276,16 +344,18 @@ export function mountPayPal(opts: {
       createOrder: function () {
         const lines = getLines();
         if (!lines || !lines.length) return Promise.reject(new Error("empty"));
-        return fetch(checkoutUrl + "/order", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lines: requestLines(lines) }),
-        }).then(async (res) => {
-          const body = await res.json().catch(() => ({}));
-          if (!res.ok || !body.id || !body.ticket) throw new Error(body.error || "Checkout failed.");
-          captureTicket = String(body.ticket);
-          return body.id as string;
-        });
+        return checkoutProof(siteKey).then((turnstile) =>
+          fetch(checkoutUrl + "/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lines: requestLines(lines), turnstile }),
+          }).then(async (res) => {
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok || !body.id || !body.ticket) throw new Error(body.error || "Checkout failed.");
+            captureTicket = String(body.ticket);
+            return body.id as string;
+          }),
+        );
       },
       onApprove: function (data: { orderID?: string }) {
         return fetch(checkoutUrl + "/capture", {
@@ -347,14 +417,16 @@ export function bootPayPalMounts(): void {
     const currency = node.getAttribute("data-paypal-currency") || "USD";
     const notifyEmail = node.getAttribute("data-paypal-notify") || "";
     const checkoutUrl = node.getAttribute("data-paypal-checkout") || "";
+    const siteKey = node.getAttribute("data-turnstile-site") || "";
     const mode = node.getAttribute("data-paypal-mode") || "buy";
-    if (!clientId || !checkoutUrl) continue;
+    if (!clientId || !checkoutUrl || !siteKey) continue;
     mountPayPal({
       container: node,
       clientId,
       currency,
       notifyEmail,
       checkoutUrl,
+      siteKey,
       clearOnPay: mode === "cart",
       getLines: () => {
         if (mode === "cart") {
