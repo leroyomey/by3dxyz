@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import { site } from "../data/site";
 
 const notifyEmail = import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
+const checkoutUrl = import.meta.env.PUBLIC_CHECKOUT_URL?.trim() || "";
 ---
 
 <Layout title="Contact" description="Email by3DXYZ about an order, a print file, or a custom 3D print.">
@@ -40,7 +41,7 @@ const notifyEmail = import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.em
   </section>
 </Layout>
 
-<script is:inline define:vars={{ notifyEmail, contactEmail: site.email }}>
+<script is:inline define:vars={{ notifyEmail, checkoutUrl, contactEmail: site.email }}>
   (function () {
     const form = document.querySelector("[data-contact-form]");
     const thanks = document.querySelector("[data-contact-thanks]");
@@ -65,19 +66,19 @@ const notifyEmail = import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.em
           return;
         }
       } catch (_err) {}
-      if (!notifyEmail) {
+      const inbox = String(checkoutUrl || "").replace(/\/$/, "") + "/inbox";
+      if (!checkoutUrl || !notifyEmail) {
         if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";
         return;
       }
       if (button instanceof HTMLButtonElement) button.disabled = true;
       if (status) status.textContent = "Sending…";
-      fetch("https://formsubmit.co/ajax/" + encodeURIComponent(notifyEmail), {
+      fetch(inbox, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
-          _subject: "by3DXYZ contact",
-          _template: "table",
-          _captcha: "false",
+          kind: "contact",
+          _honey: honey,
           name: String(data.get("name") || ""),
           email: String(data.get("email") || ""),
           message: String(data.get("message") || ""),

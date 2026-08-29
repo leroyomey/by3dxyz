@@ -255,6 +255,8 @@ export function mountPayPal(opts: {
   loadSdk(clientId, currency).then((paypal) => {
     if (!paypal) return;
 
+    let captureTicket = "";
+
     function goThanks(snapshot: ReturnType<typeof orderSnapshot>) {
       try {
         sessionStorage.setItem("by3dxyz-order", JSON.stringify(snapshot));
@@ -280,7 +282,8 @@ export function mountPayPal(opts: {
           body: JSON.stringify({ lines: requestLines(lines) }),
         }).then(async (res) => {
           const body = await res.json().catch(() => ({}));
-          if (!res.ok || !body.id) throw new Error(body.error || "Checkout failed.");
+          if (!res.ok || !body.id || !body.ticket) throw new Error(body.error || "Checkout failed.");
+          captureTicket = String(body.ticket);
           return body.id as string;
         });
       },
@@ -288,7 +291,7 @@ export function mountPayPal(opts: {
         return fetch(checkoutUrl + "/capture", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderID: data.orderID || "" }),
+          body: JSON.stringify({ orderID: data.orderID || "", ticket: captureTicket }),
         }).then(async (res) => {
           const body = await res.json().catch(() => ({}));
           if (!res.ok || !body.snapshot) throw new Error(body.error || "Capture failed.");

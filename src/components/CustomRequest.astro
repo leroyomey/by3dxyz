@@ -12,6 +12,7 @@ import { optionalFileLinkHelp, trustedFileLinkError } from "../data/trusted-file
 
 const notifyEmail =
   import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
+const checkoutUrl = import.meta.env.PUBLIC_CHECKOUT_URL?.trim() || "";
 const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexityId);
 ---
 
@@ -142,7 +143,7 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
   </form>
 </div>
 
-<script is:inline define:vars={{ notifyEmail, contactEmail: site.email, rate: customWork.hourlyRate, jobFloor: customWork.jobFloor, packages: customWork.packages, complexities: customWork.complexities, defaultJob: defaultCustomPackageId, defaultComplexity: defaultCustomComplexityId, fileLinkError: trustedFileLinkError }}>
+<script is:inline define:vars={{ notifyEmail, checkoutUrl, contactEmail: site.email, rate: customWork.hourlyRate, jobFloor: customWork.jobFloor, packages: customWork.packages, complexities: customWork.complexities, defaultJob: defaultCustomPackageId, defaultComplexity: defaultCustomComplexityId, fileLinkError: trustedFileLinkError }}>
   (function () {
     const root = document.querySelector("[data-custom]");
     const form = document.querySelector("[data-custom-form]");
@@ -334,31 +335,26 @@ const first = estimateCustom(defaultCustomPackageId, 1, 0, defaultCustomComplexi
         }
       }
       const job = String(data.get("job") || "");
-      const chosen = pack(job);
+      const inbox = String(checkoutUrl || "").replace(/\/$/, "") + "/inbox";
       const payload = {
-        _subject: String(data.get("_subject") || quoteSubjectLine(job)),
-        _template: "table",
-        _captcha: "false",
+        kind: "custom",
         _honey: honey,
         name: String(data.get("name") || ""),
         email: String(data.get("email") || ""),
-        job: chosen && chosen.name ? chosen.name : job,
         job_id: job,
-        quote_subject: String(data.get("_subject") || quoteSubjectLine(job)),
         quantity: String(data.get("qty") || "1"),
         extra_sizes: String(data.get("extra_sizes") || "0"),
         notes: String(data.get("notes") || ""),
         photo: String(data.get("photo") || "").trim(),
-        estimate: String(data.get("estimate") || ""),
       };
       if (isTweakJob(job)) payload.sku = String(data.get("sku") || "");
-      if (!notifyEmail) {
+      if (!checkoutUrl || !notifyEmail) {
         if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";
         return;
       }
       if (button instanceof HTMLButtonElement) button.disabled = true;
       if (status) status.textContent = "Sending…";
-      fetch("https://formsubmit.co/ajax/" + encodeURIComponent(notifyEmail), {
+      fetch(inbox, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),

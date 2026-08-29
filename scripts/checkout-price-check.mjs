@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadVariantSets, money, quoteLines } from "./checkout-price.mjs";
+import { loadVariantSets, money, quoteLines, quotesMatch } from "./checkout-price.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = join(root, "src", "data");
@@ -54,6 +54,11 @@ const ignored = quoteLines(catalog, variantSets, [
   { sku: "BO-001", qty: 1, options: { color: "Green", size: "5in/12.7cm" }, unit: 1, total: 1 },
 ]);
 ok(ignored[0].unit === 13, "Client unit:1 must not change the quote");
+
+ok(quotesMatch(rib, rib), "Matching quotes should pass");
+ok(!quotesMatch(rib, cheap), "Qty change must fail the quote match");
+const cheapPaid = [{ ...rib[0], unit: 1 }];
+ok(!quotesMatch(cheapPaid, rib), "A $1 PayPal unit must fail the quote match");
 
 if (errors.length) {
   for (const line of errors) console.error(line);

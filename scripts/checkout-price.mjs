@@ -70,6 +70,24 @@ export function quoteLines(catalog, variantSets, requests) {
   });
 }
 
+function quoteKey(line) {
+  return [
+    String(line.sku || "").toUpperCase(),
+    String(line.optionLine || ""),
+    String(line.qty),
+    money(line.unit),
+  ].join("|");
+}
+
+export function quotesMatch(paid, quoted) {
+  if (!Array.isArray(paid) || !Array.isArray(quoted) || paid.length !== quoted.length || !paid.length) {
+    return false;
+  }
+  const left = paid.map(quoteKey).sort();
+  const right = quoted.map(quoteKey).sort();
+  return left.every((key, i) => key === right[i]);
+}
+
 export function itemName(line) {
   return `${line.sku ? `${line.sku} ` : ""}${line.name}`.trim();
 }

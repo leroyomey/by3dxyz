@@ -5,11 +5,15 @@ import colorVariants from "../../../src/data/color-variants.json";
 import decorVariants from "../../../src/data/decor-variants.json";
 import {
   loadVariantSets,
+  linesTotal,
+  money,
   notifyPayload,
   publicOrderSnapshot,
   purchaseUnit,
   quoteLines,
+  quotesMatch,
 } from "../../../scripts/checkout-price.mjs";
+import { buildInboxPayload } from "./inbox.js";
 
 const variantSets = loadVariantSets([ribVariants, pickVariants, colorVariants, decorVariants]);
 const hits = new Map();
@@ -67,10 +71,34 @@ function isPayPalOrderId(value) {
   return /^[A-Z0-9]{8,30}$/i.test(value);
 }
 
+function bytesToTicket(buf) {
+  const bytes = new Uint8Array(buf);
+  let bin = "";
+  for (const byte of bytes) bin += String.fromCharCode(byte);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+async function captureTicket(env, orderId) {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(String(env.PAYPAL_SECRET || "")),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode("by3dxyz-capture:" + orderId));
+  return bytesToTicket(mac);
+}
+
+async function ticketMatches(env, orderId, ticket) {
+  const expected = await captureTicket(env, orderId);
+  return expected === String(ticket || "") && expected.length > 20;
+}
+
 function safeError(err) {
   const msg = err instanceof Error ? err.message : "Checkout failed.";
   if (
-    /not for sale|Quantity must|Cart is empty|Too many lines|options for|color is not offered/i.test(
+    /not for sale|Quantity must|Cart is empty|Too many lines|options for|color is not offered|Please check the form/i.test(
       msg,
     )
   ) {
@@ -160,7 +188,7 @@ async function createOrder(env, request) {
     }),
   });
   if (!created.id) throw new Error("PayPal did not return an order.");
-  return { id: created.id };
+  return { id: created.id, ticket: await captureTicket(env, created.id) };
 }
 
 function optionsFromDescription(description) {
@@ -199,10 +227,31 @@ function linesFromPaypal(details) {
   });
 }
 
+function quotedFromPaid(paid) {
+  return quoteLines(
+    catalog,
+    variantSets,
+    paid.map((line) => ({ sku: line.sku, qty: line.qty, options: line.options || {} })),
+  );
+}
+
+function assertCatalogPrice(details, paid) {
+  const quoted = quotedFromPaid(paid);
+  if (!quotesMatch(paid, quoted)) throw new Error("Checkout failed.");
+  const paidTotal = money(details?.purchase_units?.[0]?.amount?.value);
+  if (paidTotal !== money(linesTotal(quoted))) throw new Error("Checkout failed.");
+}
+
 async function captureOrder(env, request) {
   const body = await request.json();
   const orderID = String(body.orderID || "").trim();
-  if (!isPayPalOrderId(orderID)) throw new Error("Missing PayPal order.");
+  if (!isPayPalOrderId(orderID) || !(await ticketMatches(env, orderID, body.ticket))) {
+    throw new Error("Missing PayPal order.");
+  }
+  const pending = await paypalFetch(env, "/v2/checkout/orders/" + encodeURIComponent(orderID));
+  const pendingLines = linesFromPaypal(pending);
+  if (!pendingLines.length) throw new Error("Checkout failed.");
+  assertCatalogPrice(pending, pendingLines);
   let details = await paypalFetch(env, "/v2/checkout/orders/" + encodeURIComponent(orderID) + "/capture", {
     method: "POST",
     body: "{}",
@@ -212,15 +261,45 @@ async function captureOrder(env, request) {
   }
   const lines = linesFromPaypal(details);
   if (!lines.length) throw new Error("PayPal capture had no line items.");
+  assertCatalogPrice(details, lines);
   const currency = details?.purchase_units?.[0]?.amount?.currency_code || lines[0]?.currency || "USD";
   const notifyOk = await Promise.race([
     notifyShop(env, lines, details, currency),
     new Promise((resolve) => setTimeout(() => resolve(false), 8000)),
   ]);
   return {
-    snapshot: publicOrderSnapshot(lines, details, currency, Boolean(notifyOk)),
+    snapshot: publicOrderSnapshot(quotedFromPaid(lines), details, currency, Boolean(notifyOk)),
     notifyOk: Boolean(notifyOk),
   };
+}
+
+async function postFormsubmit(env, payload) {
+  const email = String(env.ORDER_NOTIFY_EMAIL || "").trim();
+  if (!email) throw new Error("Checkout is not configured.");
+  const url = "https://formsubmit.co/ajax/" + encodeURIComponent(email);
+  const send = () =>
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(payload),
+    }).then((res) => {
+      if (!res.ok) throw new Error(String(res.status));
+      return res;
+    });
+  try {
+    await send();
+    return true;
+  } catch {
+    await send();
+    return true;
+  }
+}
+
+async function inboxOrder(env, request) {
+  const built = buildInboxPayload(await request.json());
+  if (built.skip) return { ok: true };
+  await postFormsubmit(env, built.payload);
+  return { ok: true };
 }
 
 export default {
@@ -232,20 +311,29 @@ export default {
     if (!isAllowedOrigin(env, request)) {
       return json(env, request, { error: "Checkout failed." }, 403);
     }
-    if (!env.PAYPAL_CLIENT_ID || !env.PAYPAL_SECRET) {
-      return json(env, request, { error: "Checkout is not configured." }, 503);
-    }
+    const size = Number(request.headers.get("Content-Length") || 0);
+    if (size > 50000) return json(env, request, { error: "Checkout failed." }, 413);
     const url = new URL(request.url);
     const ip = clientIp(request);
     try {
+      if (url.pathname === "/inbox") {
+        if (tooMany(ip + ":inbox", 6, 10 * 60 * 1000)) {
+          return json(env, request, { error: "Try again in a few minutes." }, 429);
+        }
+        if (!env.ORDER_NOTIFY_EMAIL) return json(env, request, { error: "Could not send." }, 503);
+        return json(env, request, await inboxOrder(env, request));
+      }
+      if (!env.PAYPAL_CLIENT_ID || !env.PAYPAL_SECRET) {
+        return json(env, request, { error: "Checkout is not configured." }, 503);
+      }
       if (url.pathname === "/order") {
-        if (tooMany(ip + ":order", 20, 10 * 60 * 1000)) {
+        if (tooMany(ip + ":order", 8, 15 * 60 * 1000)) {
           return json(env, request, { error: "Try checkout again in a few minutes." }, 429);
         }
         return json(env, request, await createOrder(env, request));
       }
       if (url.pathname === "/capture") {
-        if (tooMany(ip + ":capture", 30, 10 * 60 * 1000)) {
+        if (tooMany(ip + ":capture", 12, 15 * 60 * 1000)) {
           return json(env, request, { error: "Try checkout again in a few minutes." }, 429);
         }
         return json(env, request, await captureOrder(env, request));

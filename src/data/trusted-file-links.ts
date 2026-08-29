@@ -95,6 +95,8 @@ export function isTrustedFileLink(raw: string): boolean {
   }
 
   if (url.protocol !== "https:") return false;
+  if (url.username || url.password) return false;
+  if (url.port && url.port !== "443") return false;
 
   const host = url.hostname.replace(/\.$/, "").toLowerCase();
   if (!host || isIpHostname(host)) return false;

@@ -5,6 +5,7 @@ import { trustedFileLinkError } from "../data/trusted-file-links";
 
 const notifyEmail =
   import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
+const checkoutUrl = import.meta.env.PUBLIC_CHECKOUT_URL?.trim() || "";
 ---
 
 <div class="print-board" data-print>
@@ -95,7 +96,7 @@ const notifyEmail =
   </form>
 </div>
 
-<script is:inline define:vars={{ notifyEmail, contactEmail: site.email, fileLinkError: trustedFileLinkError }}>
+<script is:inline define:vars={{ notifyEmail, checkoutUrl, contactEmail: site.email, fileLinkError: trustedFileLinkError }}>
   (function () {
     const root = document.querySelector("[data-print]");
     const form = document.querySelector("[data-print-form]");
@@ -137,10 +138,9 @@ const notifyEmail =
           return;
         }
       }
+      const inbox = String(checkoutUrl || "").replace(/\/$/, "") + "/inbox";
       const payload = {
-        _subject: "by3DXYZ print a file request",
-        _template: "table",
-        _captcha: "false",
+        kind: "print",
         _honey: honey,
         name: String(data.get("name") || ""),
         email: String(data.get("email") || ""),
@@ -150,13 +150,13 @@ const notifyEmail =
         quantity: String(data.get("qty") || "1"),
         notes: String(data.get("notes") || ""),
       };
-      if (!notifyEmail) {
+      if (!checkoutUrl || !notifyEmail) {
         if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";
         return;
       }
       if (button instanceof HTMLButtonElement) button.disabled = true;
       if (status) status.textContent = "Sending…";
-      fetch("https://formsubmit.co/ajax/" + encodeURIComponent(notifyEmail), {
+      fetch(inbox, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
