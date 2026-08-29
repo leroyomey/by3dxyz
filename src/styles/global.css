@@ -1321,8 +1321,8 @@ a.btn-primary[href*="etsy.com"]:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  flex-wrap: nowrap;
+  gap: 4px 16px;
+  flex-wrap: wrap;
 }
 
 .product-back .back-link {
@@ -1335,7 +1335,8 @@ a.btn-primary[href*="etsy.com"]:hover {
   align-items: center;
   justify-content: flex-end;
   gap: 16px;
-  min-width: 0;
+  flex: 1 1 auto;
+  min-width: max-content;
   margin-left: auto;
 }
 

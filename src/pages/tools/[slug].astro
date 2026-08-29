@@ -52,25 +52,25 @@ const jsonLd = {
 >
   <article class="wrap product-detail">
     <div class="gallery">
-      <div class="product-back">
-        <a class="back-link" href="/tools" data-back>← Back</a>
+      <nav class="product-back" aria-label="Catalog">
+        <a class="back-link" href="/tools">← Back</a>
         <div class="product-adjacent">
           {
             prev && (
               <a class="back-link" href={`/tools/${prev.slug}`} aria-label={`Previous part: ${prevTitle}`}>
-                ← Previous Part
+                ← Previous part
               </a>
             )
           }
           {
             next && (
               <a class="back-link" href={`/tools/${next.slug}`} aria-label={`Next part: ${nextTitle}`}>
-                Next Part →
+                Next part →
               </a>
             )
           }
         </div>
-      </div>
+      </nav>
       <div class="gallery-main">
         <img src={product.images[0]} alt={title} data-main-image />
       </div>
@@ -109,18 +109,6 @@ const jsonLd = {
     const panel = document.querySelector("[data-product-panel]");
     if (!(panel instanceof HTMLElement) || panel.dataset.bound === "1") return;
     panel.dataset.bound = "1";
-
-    const back = document.querySelector("[data-back]");
-    back?.addEventListener("click", (event) => {
-      let fromHere = false;
-      try {
-        fromHere = Boolean(document.referrer) && new URL(document.referrer).origin === location.origin;
-      } catch (_err) {}
-      if (fromHere && window.history.length > 1) {
-        event.preventDefault();
-        window.history.back();
-      }
-    });
 
     const sentinel = document.querySelector("[data-buy-sentinel]");
     if (sentinel && "IntersectionObserver" in window) {
