@@ -68,10 +68,45 @@ export function bySku(a: { sku: string }, b: { sku: string }) {
 export const allProducts: Product[] = [...(catalog as Product[])].sort(bySku);
 export const products: Product[] = allProducts.filter((product) => !product.inactive);
 
-export const categories = [
-  "All",
-  ...Array.from(new Set(products.map((product) => product.category))).sort(),
+export type ProductFamily = "rim-shaper" | "paddle" | "throwing-rib" | "pick" | "decor" | "other";
+
+export const shopFilters: { id: string; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "featured", label: "Featured" },
+  { id: "rim-shaper", label: "Rim shapers" },
+  { id: "paddle", label: "Paddles" },
+  { id: "throwing-rib", label: "Ribs" },
+  { id: "pick", label: "Picks" },
+  { id: "decor", label: "Decor" },
 ];
+
+export function productFamily(product: { sku: string; category?: string; name?: string }): ProductFamily {
+  const sku = (product.sku || "").toUpperCase();
+  if (sku === "BO-003" || sku === "BO-020") return "rim-shaper";
+  if (sku === "BO-019-1" || sku === "BO-019-2" || /paddle/i.test(product.category || "")) return "paddle";
+  if (/^GP-/.test(sku) || /pick/i.test(product.category || "") || /pick/i.test(product.name || "")) return "pick";
+  if (/decor/i.test(product.category || "") || sku === "BO-053") return "decor";
+  if (product.category === "Ribs" || /throwing rib/i.test(product.name || "")) return "throwing-rib";
+  return "other";
+}
+
+export function cardShort(product: Product) {
+  if (productFamily(product) === "throwing-rib") return "2 to 8 in, or a set of 3.";
+  return product.short;
+}
+
+export function relatedProducts(product: Product, count = 3) {
+  const family = productFamily(product);
+  const [base] = skuSortKey(product.sku);
+  return products
+    .filter((item) => item.sku !== product.sku && productFamily(item) === family)
+    .sort((a, b) => {
+      const da = Math.abs(skuSortKey(a.sku)[0] - base);
+      const db = Math.abs(skuSortKey(b.sku)[0] - base);
+      return da - db || bySku(a, b);
+    })
+    .slice(0, count);
+}
 
 export function getProduct(slug: string) {
   return allProducts.find((product) => product.slug === slug);

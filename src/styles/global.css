@@ -1362,7 +1362,8 @@ a.btn-primary[href*="etsy.com"]:hover {
   grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
   grid-template-areas:
     "gallery panel"
-    "body body";
+    "body body"
+    "related related";
   gap: 28px 48px;
   align-items: start;
   padding: 28px 0 72px;
@@ -1438,6 +1439,18 @@ a.btn-primary[href*="etsy.com"]:hover {
   font-size: 0.75rem;
   font-weight: 400;
   color: var(--accent);
+}
+
+.related-parts {
+  grid-area: related;
+  margin: 8px 0 0;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  min-width: 0;
+}
+
+.related-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .product-review {
@@ -2182,7 +2195,8 @@ a.btn-primary[href*="etsy.com"]:hover {
   }
 
   .shop-results .product-grid,
-  .catalog-band .product-grid-band {
+  .catalog-band .product-grid-band,
+  .related-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -2238,7 +2252,8 @@ a.btn-primary[href*="etsy.com"]:hover {
     grid-template-areas:
       "gallery"
       "panel"
-      "body";
+      "body"
+      "related";
   }
 
   .product-panel {

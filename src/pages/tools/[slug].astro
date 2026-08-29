@@ -4,7 +4,8 @@ import BuyOptions from "../../components/BuyOptions.astro";
 import CartSignal from "../../components/CartSignal.astro";
 import EtsyReview from "../../components/EtsyReview.astro";
 import StockSignal from "../../components/StockSignal.astro";
-import { allProducts, getProduct, nextProduct, prevProduct, productCopy, productTitle } from "../../data/products";
+import ProductCard from "../../components/ProductCard.astro";
+import { allProducts, getProduct, nextProduct, prevProduct, productCopy, productTitle, relatedProducts } from "../../data/products";
 import { listingLine } from "../../data/site";
 
 export function getStaticPaths() {
@@ -19,6 +20,7 @@ const title = productTitle(product);
 const about = productCopy(product.description);
 const next = nextProduct(product.slug);
 const prev = prevProduct(product.slug);
+const related = relatedProducts(product);
 const nextTitle = next ? productTitle(next) : "";
 const prevTitle = prev ? productTitle(prev) : "";
 const origin = Astro.site ?? Astro.url;
@@ -101,6 +103,18 @@ const jsonLd = {
       <p class="muted listing-line">{listingLine}</p>
       <EtsyReview product={product} />
     </section>
+    {
+      related.length > 0 && (
+        <section class="related-parts" aria-label="Related parts">
+          <p class="product-body-label">Related parts</p>
+          <div class="product-grid related-grid">
+            {related.map((item) => (
+              <ProductCard product={item} preview />
+            ))}
+          </div>
+        </section>
+      )
+    }
   </article>
 </Layout>
 

@@ -1,7 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import ProductGrid from "../../components/ProductGrid.astro";
-import { products, categories, etsyFavorersTotal } from "../../data/products";
+import { products, shopFilters, etsyFavorersTotal } from "../../data/products";
 import CartSignal from "../../components/CartSignal.astro";
 import { site } from "../../data/site";
 
@@ -28,9 +28,9 @@ const favorers = etsyFavorersTotal(products);
       </div>
       <div class="shop-filters" role="group" aria-label="Filter by type">
         {
-          categories.map((category, index) => (
-            <button class="chip" type="button" data-filter={category} aria-pressed={index === 0 ? "true" : "false"}>
-              {category}
+          shopFilters.map((filter, index) => (
+            <button class="chip" type="button" data-filter={filter.id} aria-pressed={index === 0 ? "true" : "false"}>
+              {filter.label}
             </button>
           ))
         }
@@ -49,21 +49,23 @@ const favorers = etsyFavorersTotal(products);
     if (!(root instanceof HTMLElement) || root.dataset.bound === "1") return;
     root.dataset.bound = "1";
     const chips = [...root.querySelectorAll("[data-filter]")];
-    const cards = [...root.querySelectorAll("[data-category]")];
+    const cards = [...root.querySelectorAll("[data-family]")];
     const empty = root.querySelector("[data-empty]");
     const search = root.querySelector("[data-search]");
-    let active = "All";
+    let active = "all";
 
     function apply() {
       const query = (search instanceof HTMLInputElement ? search.value : "").trim().toLowerCase();
       let visible = 0;
       cards.forEach((card) => {
         if (!(card instanceof HTMLElement)) return;
-        const category = card.dataset.category ?? "";
+        const family = card.dataset.family ?? "";
+        const featured = card.dataset.featured === "1";
         const name = card.dataset.name ?? "";
-        const matchCategory = active === "All" || category === active;
-        const matchSearch = !query || name.includes(query) || category.toLowerCase().includes(query);
-        const show = matchCategory && matchSearch;
+        const matchFilter =
+          active === "all" || (active === "featured" && featured) || family === active;
+        const matchSearch = !query || name.includes(query);
+        const show = matchFilter && matchSearch;
         card.classList.toggle("hidden", !show);
         if (show) visible += 1;
       });

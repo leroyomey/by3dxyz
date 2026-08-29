@@ -1,7 +1,6 @@
 ---
 import type { Product } from "../data/products";
-import { displayPrice, productTitle } from "../data/products";
-import { listingLine } from "../data/site";
+import { cardShort, displayPrice, productFamily, productTitle } from "../data/products";
 import BuyButtons from "./BuyButtons.astro";
 import CartSignal from "./CartSignal.astro";
 import NewBadge from "./NewBadge.astro";
@@ -15,15 +14,23 @@ interface Props {
 const { product, preview = false } = Astro.props;
 const pageUrl = `/tools/${product.slug}`;
 const title = productTitle(product);
+const family = productFamily(product);
+const short = cardShort(product);
 ---
 
-<article class:list={["product-card", preview && "is-preview"]} data-category={product.category} data-name={`${title}`.toLowerCase()}>
+<article
+  class:list={["product-card", preview && "is-preview"]}
+  data-category={product.category}
+  data-family={family}
+  data-featured={product.featured ? "1" : ""}
+  data-name={`${title} ${short} ${family}`.toLowerCase()}
+>
   <a class="thumb" href={pageUrl}>
     <img src={product.images[0]} alt={title} />
   </a>
   <div class="body">
     <h3><a href={pageUrl}>{title}</a></h3>
-    <p class="muted listing-line">{listingLine}</p>
+    <p class="muted listing-line">{short}</p>
     <div class="price-row">
       <div class="price">{displayPrice(product)}</div>
       <NewBadge listedAt={product.listedAt} />
