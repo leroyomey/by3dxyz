@@ -11,6 +11,7 @@ public/images/share/
 .env.*
 !.env.example
 workers/checkout/.dev.vars
+workers/checkout/.wrangler/
 
 # This PC only. Delete _private, .cursor, and .env before sharing the project folder.
 _private/

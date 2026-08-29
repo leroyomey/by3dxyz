@@ -247,9 +247,9 @@ export function mountPayPal(opts: {
   getLines: () => CartLine[] | null;
   clearOnPay?: boolean;
 }): void {
-  const { container, clientId, currency, notifyEmail, getLines, clearOnPay } = opts;
+  const { container, clientId, currency, getLines, clearOnPay } = opts;
   const checkoutUrl = checkoutEndpoint(opts.checkoutUrl || "");
-  if (!clientId || container.dataset.ready === "true") return;
+  if (!clientId || !checkoutUrl || container.dataset.ready === "true") return;
   container.dataset.ready = "true";
 
   loadSdk(clientId, currency).then((paypal) => {
@@ -271,62 +271,28 @@ export function mountPayPal(opts: {
         if (!lines || !lines.length) return actions.reject();
         return actions.resolve();
       },
-      createOrder: function (
-        _data: unknown,
-        actions: { order: { create: (req: unknown) => Promise<string> } },
-      ) {
+      createOrder: function () {
         const lines = getLines();
         if (!lines || !lines.length) return Promise.reject(new Error("empty"));
-        if (checkoutUrl) {
-          return fetch(checkoutUrl + "/order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ lines: requestLines(lines) }),
-          }).then(async (res) => {
-            const body = await res.json().catch(() => ({}));
-            if (!res.ok || !body.id) throw new Error(body.error || "Checkout failed.");
-            return body.id as string;
-          });
-        }
-        return actions.order.create({
-          application_context: {
-            brand_name: "by3DXYZ",
-            user_action: "PAY_NOW",
-            shipping_preference: "GET_FROM_FILE",
-          },
-          purchase_units: [purchaseUnit(lines, currency)],
+        return fetch(checkoutUrl + "/order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lines: requestLines(lines) }),
+        }).then(async (res) => {
+          const body = await res.json().catch(() => ({}));
+          if (!res.ok || !body.id) throw new Error(body.error || "Checkout failed.");
+          return body.id as string;
         });
       },
-      onApprove: function (
-        data: { orderID?: string },
-        actions: { order: { capture: () => Promise<PayPalDetails> } },
-      ) {
-        if (checkoutUrl) {
-          return fetch(checkoutUrl + "/capture", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ orderID: data.orderID || "" }),
-          }).then(async (res) => {
-            const body = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(body.error || "Capture failed.");
-            const snapshot =
-              body.snapshot ||
-              orderSnapshot(getLines() || [], body.details, currency, Boolean(body.notifyOk));
-            snapshot.notifyOk = Boolean(body.notifyOk);
-            goThanks(snapshot);
-          });
-        }
-        return actions.order.capture().then((details) => {
-          const lines = getLines() || [];
-          return Promise.race([
-            notifyShop(lines, details, currency, notifyEmail),
-            new Promise<boolean>((resolve) => {
-              setTimeout(() => resolve(false), 8000);
-            }),
-          ]).then(
-            (ok) => goThanks(orderSnapshot(lines, details, currency, Boolean(ok))),
-            () => goThanks(orderSnapshot(lines, details, currency, false)),
-          );
+      onApprove: function (data: { orderID?: string }) {
+        return fetch(checkoutUrl + "/capture", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderID: data.orderID || "" }),
+        }).then(async (res) => {
+          const body = await res.json().catch(() => ({}));
+          if (!res.ok || !body.snapshot) throw new Error(body.error || "Capture failed.");
+          goThanks(body.snapshot);
         });
       },
     };
@@ -379,7 +345,7 @@ export function bootPayPalMounts(): void {
     const notifyEmail = node.getAttribute("data-paypal-notify") || "";
     const checkoutUrl = node.getAttribute("data-paypal-checkout") || "";
     const mode = node.getAttribute("data-paypal-mode") || "buy";
-    if (!clientId) continue;
+    if (!clientId || !checkoutUrl) continue;
     mountPayPal({
       container: node,
       clientId,

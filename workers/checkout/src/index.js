@@ -6,12 +6,13 @@ import decorVariants from "../../../src/data/decor-variants.json";
 import {
   loadVariantSets,
   notifyPayload,
-  orderSnapshot,
+  publicOrderSnapshot,
   purchaseUnit,
   quoteLines,
 } from "../../../scripts/checkout-price.mjs";
 
 const variantSets = loadVariantSets([ribVariants, pickVariants, colorVariants, decorVariants]);
+const hits = new Map();
 
 let tokenCache = { value: "", exp: 0 };
 
@@ -22,9 +23,14 @@ function origins(env) {
     .filter(Boolean);
 }
 
+function isAllowedOrigin(env, request) {
+  const origin = request.headers.get("Origin") || "";
+  return origins(env).includes(origin);
+}
+
 function corsHeaders(env, request) {
   const origin = request.headers.get("Origin") || "";
-  const allow = origins(env).includes(origin) ? origin : origins(env)[0];
+  const allow = isAllowedOrigin(env, request) ? origin : origins(env)[0];
   return {
     "Access-Control-Allow-Origin": allow,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -38,6 +44,39 @@ function json(env, request, body, status = 200) {
     status,
     headers: { "Content-Type": "application/json", ...corsHeaders(env, request) },
   });
+}
+
+function clientIp(request) {
+  return request.headers.get("CF-Connecting-IP") || request.headers.get("CF-Connecting-IPv6") || "unknown";
+}
+
+function tooMany(ip, limit, windowMs) {
+  const now = Date.now();
+  const key = ip + ":" + String(limit) + ":" + String(windowMs);
+  const fresh = (hits.get(key) || []).filter((stamp) => now - stamp < windowMs);
+  if (fresh.length >= limit) {
+    hits.set(key, fresh);
+    return true;
+  }
+  fresh.push(now);
+  hits.set(key, fresh);
+  return false;
+}
+
+function isPayPalOrderId(value) {
+  return /^[A-Z0-9]{8,30}$/i.test(value);
+}
+
+function safeError(err) {
+  const msg = err instanceof Error ? err.message : "Checkout failed.";
+  if (
+    /not for sale|Quantity must|Cart is empty|Too many lines|options for|color is not offered/i.test(
+      msg,
+    )
+  ) {
+    return msg;
+  }
+  return "Checkout failed.";
 }
 
 async function paypalToken(env) {
@@ -143,7 +182,10 @@ function linesFromPaypal(details) {
   const items = details?.purchase_units?.[0]?.items || [];
   return items.map((item) => {
     const sku = String(item.sku || "");
-    const name = String(item.name || "").replace(new RegExp("^" + sku.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s+"), "");
+    const name = String(item.name || "").replace(
+      new RegExp("^" + sku.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s+"),
+      "",
+    );
     return {
       sku,
       name,
@@ -160,7 +202,7 @@ function linesFromPaypal(details) {
 async function captureOrder(env, request) {
   const body = await request.json();
   const orderID = String(body.orderID || "").trim();
-  if (!orderID) throw new Error("Missing PayPal order.");
+  if (!isPayPalOrderId(orderID)) throw new Error("Missing PayPal order.");
   let details = await paypalFetch(env, "/v2/checkout/orders/" + encodeURIComponent(orderID) + "/capture", {
     method: "POST",
     body: "{}",
@@ -175,7 +217,10 @@ async function captureOrder(env, request) {
     notifyShop(env, lines, details, currency),
     new Promise((resolve) => setTimeout(() => resolve(false), 8000)),
   ]);
-  return { details, snapshot: orderSnapshot(lines, details, currency, Boolean(notifyOk)), notifyOk: Boolean(notifyOk) };
+  return {
+    snapshot: publicOrderSnapshot(lines, details, currency, Boolean(notifyOk)),
+    notifyOk: Boolean(notifyOk),
+  };
 }
 
 export default {
@@ -184,16 +229,30 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(env, request) });
     }
     if (request.method !== "POST") return json(env, request, { error: "Method not allowed." }, 405);
+    if (!isAllowedOrigin(env, request)) {
+      return json(env, request, { error: "Checkout failed." }, 403);
+    }
     if (!env.PAYPAL_CLIENT_ID || !env.PAYPAL_SECRET) {
       return json(env, request, { error: "Checkout is not configured." }, 503);
     }
     const url = new URL(request.url);
+    const ip = clientIp(request);
     try {
-      if (url.pathname === "/order" || url.pathname === "/") return json(env, request, await createOrder(env, request));
-      if (url.pathname === "/capture") return json(env, request, await captureOrder(env, request));
+      if (url.pathname === "/order") {
+        if (tooMany(ip + ":order", 20, 10 * 60 * 1000)) {
+          return json(env, request, { error: "Try checkout again in a few minutes." }, 429);
+        }
+        return json(env, request, await createOrder(env, request));
+      }
+      if (url.pathname === "/capture") {
+        if (tooMany(ip + ":capture", 30, 10 * 60 * 1000)) {
+          return json(env, request, { error: "Try checkout again in a few minutes." }, 429);
+        }
+        return json(env, request, await captureOrder(env, request));
+      }
       return json(env, request, { error: "Not found." }, 404);
     } catch (err) {
-      return json(env, request, { error: err instanceof Error ? err.message : "Checkout failed." }, 400);
+      return json(env, request, { error: safeError(err) }, 400);
     }
   },
 };

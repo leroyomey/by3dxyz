@@ -58,6 +58,13 @@ const notifyEmail = import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.em
         if (status) status.textContent = "Take a second, then send again.";
         return;
       }
+      try {
+        const last = Number(sessionStorage.getItem("contact-sent") || 0);
+        if (last && Date.now() - last < 30000) {
+          if (status) status.textContent = "Message already sent. Wait a moment before another.";
+          return;
+        }
+      } catch (_err) {}
       if (!notifyEmail) {
         if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";
         return;
@@ -78,6 +85,9 @@ const notifyEmail = import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.em
       })
         .then(function (res) {
           if (!res.ok) throw new Error(String(res.status));
+          try {
+            sessionStorage.setItem("contact-sent", String(Date.now()));
+          } catch (_err) {}
           form.hidden = true;
           if (thanks) thanks.removeAttribute("hidden");
         })

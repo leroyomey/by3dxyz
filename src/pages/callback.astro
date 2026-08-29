@@ -27,9 +27,14 @@
     </p>
     <script is:inline>
       (function () {
-        var q = window.location.search || "";
-        if (!q) return;
-        window.location.replace("http://127.0.0.1:3456/callback" + q);
+        var params = new URLSearchParams(window.location.search);
+        var code = params.get("code") || "";
+        var state = params.get("state") || "";
+        if (!code) return;
+        var next = new URLSearchParams();
+        next.set("code", code);
+        if (state) next.set("state", state);
+        window.location.replace("http://127.0.0.1:3456/callback?" + next.toString());
       })();
     </script>
   </body>

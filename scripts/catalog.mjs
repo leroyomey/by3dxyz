@@ -858,7 +858,15 @@ async function cmdListedAt() {
 if (command === "list") cmdList();
 else if (command === "add") cmdAdd(args);
 else if (command === "import") cmdImport(rest[0] || incomingCsv);
-else if (command === "etsy-diff") await cmdEtsyDiff(args.replace === "true");
+else if (command === "etsy-diff") {
+  if (args.replace === "true" && args["yes-replace"] !== "true") {
+    console.error("Refusing catalog replace. That rebuilds the site catalog from Etsy and drops unlinked rows.");
+    console.error("If you mean it: npm run catalog:etsy -- --replace --yes-replace");
+    process.exitCode = 1;
+  } else {
+    await cmdEtsyDiff(args.replace === "true");
+  }
+}
 else if (command === "etsy-sync") await cmdEtsySync();
 else if (command === "listed-at") await cmdListedAt();
 else if (command === "etsy-auth") {
@@ -890,7 +898,7 @@ else {
   npm run catalog:add -- --name "Coil Gauge [BO-009]" --price 14 --category "Coil tools" --etsyUrl "https://www.etsy.com/listing/123"
   npm run catalog:import
   npm run catalog:etsy
-  npm run catalog:etsy -- --replace
+  npm run catalog:etsy -- --replace --yes-replace
   npm run catalog:sync
   npm run catalog:listed-at
   npm run catalog:auth

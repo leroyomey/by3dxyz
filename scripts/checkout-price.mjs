@@ -201,6 +201,23 @@ export function orderSnapshot(lines, details, currency, notifyOk) {
   };
 }
 
+/** Browser /thanks copy. Buyer email and ship-to stay on the shop notify only. */
+export function publicOrderSnapshot(lines, details, currency, notifyOk) {
+  const snapshot = orderSnapshot(lines, details, currency, notifyOk);
+  return {
+    sku: snapshot.sku,
+    name: snapshot.name,
+    options: snapshot.options,
+    optionLine: snapshot.optionLine,
+    qty: snapshot.qty,
+    total: snapshot.total,
+    currency: snapshot.currency,
+    paypalOrderId: snapshot.paypalOrderId,
+    notifyOk: snapshot.notifyOk,
+    lines: snapshot.lines,
+  };
+}
+
 export function requestLines(lines) {
   return (lines || []).map((line) => ({
     sku: line.sku,
