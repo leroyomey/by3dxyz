@@ -1,13 +1,21 @@
 ---
-import { featuredProducts, products, type Product } from "../data/products";
+import { products } from "../data/products";
 import { site } from "../data/site";
 import { printFile } from "../data/print-file";
+import { pickDailyParts, type DailyPart } from "../data/daily-parts";
+import NewBadge from "./NewBadge.astro";
 
-const picked: Product[] = [];
-for (const product of [...featuredProducts(), ...products]) {
-  if (picked.length >= 12) break;
-  if (!picked.some((item) => item.id === product.id)) picked.push(product);
-}
+const catalog: DailyPart[] = products.map((product) => ({
+  id: product.id,
+  sku: product.sku,
+  slug: product.slug,
+  name: product.name,
+  image: product.images[0] || "",
+  featured: Boolean(product.featured),
+  listedAt: product.listedAt,
+}));
+const picked = pickDailyParts(catalog);
+const dailyKey = picked.map((product) => product.id).join("|");
 ---
 
 <section class="bleed-hero">
@@ -87,14 +95,72 @@ for (const product of [...featuredProducts(), ...products]) {
     </div>
     <a class="btn btn-ghost" href="/tools">Shop</a>
   </div>
-  <div class="sku-rail">
+  <div class="sku-rail" data-daily-parts data-daily-key={dailyKey}>
     {
       picked.map((product) => (
         <a class="sku-chip" href={`/tools/${product.slug}`}>
+          {product.image ? <img src={product.image} alt="" width="40" height="40" /> : null}
           <span class="sku-id">{product.sku}</span>
           <span class="sku-name">{product.name}</span>
+          <NewBadge listedAt={product.listedAt} />
         </a>
       ))
     }
   </div>
+  <template data-daily-catalog>{JSON.stringify(catalog)}</template>
 </section>
+
+<script>
+  import { pickDailyParts, type DailyPart } from "../data/daily-parts";
+  import { isNewListing } from "../data/listing-age";
+
+  function chipFor(product: DailyPart) {
+    const link = document.createElement("a");
+    link.className = "sku-chip";
+    link.href = `/tools/${product.slug}`;
+    if (product.image) {
+      const image = document.createElement("img");
+      image.src = product.image;
+      image.alt = "";
+      image.width = 40;
+      image.height = 40;
+      link.appendChild(image);
+    }
+    const sku = document.createElement("span");
+    sku.className = "sku-id";
+    sku.textContent = product.sku;
+    const name = document.createElement("span");
+    name.className = "sku-name";
+    name.textContent = product.name;
+    link.append(sku, name);
+    if (isNewListing(product.listedAt)) {
+      const badge = document.createElement("span");
+      badge.className = "badge-new";
+      badge.dataset.listedAt = String(product.listedAt || "");
+      badge.textContent = "New";
+      link.appendChild(badge);
+    }
+    return link;
+  }
+
+  function paintDailyParts() {
+    const hold = document.querySelector("[data-daily-catalog]");
+    const rail = document.querySelector("[data-daily-parts]");
+    if (!(hold instanceof HTMLElement) || !(rail instanceof HTMLElement)) return;
+    let catalog: DailyPart[] = [];
+    try {
+      catalog = JSON.parse(hold.textContent || "[]");
+    } catch {
+      return;
+    }
+    if (!Array.isArray(catalog) || !catalog.length) return;
+    const picked = pickDailyParts(catalog);
+    const next = picked.map((product) => product.id).join("|");
+    if (rail.dataset.dailyKey === next) return;
+    rail.dataset.dailyKey = next;
+    rail.replaceChildren(...picked.map(chipFor));
+  }
+
+  paintDailyParts();
+  document.addEventListener("astro:page-load", paintDailyParts);
+</script>

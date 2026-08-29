@@ -4,7 +4,7 @@ import BuyOptions from "../../components/BuyOptions.astro";
 import CartSignal from "../../components/CartSignal.astro";
 import EtsyReview from "../../components/EtsyReview.astro";
 import StockSignal from "../../components/StockSignal.astro";
-import { products, getProduct, nextProduct, productCopy, productTitle } from "../../data/products";
+import { products, getProduct, nextProduct, prevProduct, productCopy, productTitle } from "../../data/products";
 import { listingLine } from "../../data/site";
 
 export function getStaticPaths() {
@@ -18,7 +18,9 @@ if (!product) {
 const title = productTitle(product);
 const about = productCopy(product.description);
 const next = nextProduct(product.slug);
+const prev = prevProduct(product.slug);
 const nextTitle = next ? productTitle(next) : "";
+const prevTitle = prev ? productTitle(prev) : "";
 const origin = Astro.site ?? Astro.url;
 const pageUrl = new URL(`/tools/${product.slug}`, origin).href;
 const soldOut = typeof product.etsyQuantity === "number" && product.etsyQuantity <= 0;
@@ -52,13 +54,22 @@ const jsonLd = {
     <div class="gallery">
       <div class="product-back">
         <a class="back-link" href="/tools" data-back>← Back</a>
-        {
-          next && (
-            <a class="back-link" href={`/tools/${next.slug}`} aria-label={`Next part: ${nextTitle}`}>
-              Next Part →
-            </a>
-          )
-        }
+        <div class="product-adjacent">
+          {
+            prev && (
+              <a class="back-link" href={`/tools/${prev.slug}`} aria-label={`Previous part: ${prevTitle}`}>
+                ← Previous Part
+              </a>
+            )
+          }
+          {
+            next && (
+              <a class="back-link" href={`/tools/${next.slug}`} aria-label={`Next part: ${nextTitle}`}>
+                Next Part →
+              </a>
+            )
+          }
+        </div>
       </div>
       <div class="gallery-main">
         <img src={product.images[0]} alt={title} data-main-image />

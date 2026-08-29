@@ -366,6 +366,27 @@ async function refreshEtsyCarts(products) {
   return { changed, failed, total };
 }
 
+function listedAtFromListing(item) {
+  const unix = item?.original_creation_timestamp ?? item?.created_timestamp;
+  const n = typeof unix === "number" ? unix : typeof unix === "string" && /^\d+$/.test(unix) ? Number(unix) : NaN;
+  if (!Number.isFinite(n) || n <= 0) return "";
+  return new Date(n * 1000).toISOString();
+}
+
+function applyListedAt(products, listings) {
+  const byId = new Map(listings.map((item) => [String(item.listing_id), item]));
+  let filled = 0;
+  for (const product of products) {
+    const item = byId.get(String(product.etsyListingId || listingIdFromUrl(product.etsyUrl)));
+    if (!item) continue;
+    const iso = listedAtFromListing(item);
+    if (!iso || product.listedAt === iso) continue;
+    product.listedAt = iso;
+    filled += 1;
+  }
+  return filled;
+}
+
 function applyEtsyDemand(products, listings) {
   const byId = new Map(listings.map((item) => [String(item.listing_id), item]));
   let favorers = 0;
@@ -564,6 +585,7 @@ async function listingToProduct(item, apiKey, featured, existing = []) {
   const slug = sku ? slugify(`${name} ${sku}`) : slugify(name);
   const { short, description } = listingCopy(item, name, sku);
   const images = await downloadListingImages(id, slug, apiKey);
+  const listedAt = listedAtFromListing(item);
   return {
     id: slug,
     sku,
@@ -581,6 +603,7 @@ async function listingToProduct(item, apiKey, featured, existing = []) {
     featured,
     variantSet: variantSetFor(name, isGuitarPick(item.title) ? "pick" : ""),
     etsyQuantity: typeof item.quantity === "number" ? item.quantity : undefined,
+    ...(listedAt ? { listedAt } : {}),
   };
 }
 
@@ -747,6 +770,11 @@ async function cmdEtsySync() {
         existing.etsyQuantity = item.quantity;
         changed = true;
       }
+      const listedAt = listedAtFromListing(item);
+      if (listedAt && existing.listedAt !== listedAt) {
+        existing.listedAt = listedAt;
+        changed = true;
+      }
       if (changed) {
         updated += 1;
         notes.push(`Update ${existing.sku || name}`);
@@ -761,10 +789,12 @@ async function cmdEtsySync() {
 
   const carts = await refreshEtsyCarts(products);
   const demand = applyEtsyDemand(products, usable);
+  const listed = applyListedAt(products, usable);
   const inventory = await refreshEtsyInventory(products);
   notes.push(`Etsy carts: ${carts.total} (updated ${carts.changed}, failed ${carts.failed})`);
   notes.push(`Etsy favorites: ${demand.favorers}`);
   notes.push(`Etsy stock: ${demand.stock}`);
+  notes.push(`Listing dates: ${listed}`);
   if (inventory.linked) {
     notes.push(`Etsy option stock: ${inventory.updated} listings (failed ${inventory.failed})`);
   } else {
@@ -787,11 +817,36 @@ async function cmdEtsySync() {
 const [command, ...rest] = process.argv.slice(2);
 const args = parseArgs(rest);
 
+async function cmdListedAt() {
+  loadEnv();
+  const apiKey = etsyApiKeyHeader();
+  const etsyShop = process.env.ETSY_SHOP_NAME || "by3dxyz";
+  if (!apiKey || !apiKey.includes(":")) {
+    console.error("Set ETSY_API_KEY and ETSY_API_SHARED_SECRET in .env");
+    process.exitCode = 1;
+    return;
+  }
+  let listings;
+  try {
+    listings = await fetchEtsyListings(apiKey, etsyShop);
+  } catch (err) {
+    console.error(err.message);
+    process.exitCode = 1;
+    return;
+  }
+  const products = loadProducts();
+  const filled = applyListedAt(products, listings);
+  saveProducts(products);
+  console.log(`Etsy active: ${listings.length}`);
+  console.log(`Listing dates written: ${filled}`);
+}
+
 if (command === "list") cmdList();
 else if (command === "add") cmdAdd(args);
 else if (command === "import") cmdImport(rest[0] || incomingCsv);
 else if (command === "etsy-diff") await cmdEtsyDiff(args.replace === "true");
 else if (command === "etsy-sync") await cmdEtsySync();
+else if (command === "listed-at") await cmdListedAt();
 else if (command === "etsy-auth") {
   loadEnv();
   await cmdEtsyAuth();
@@ -823,6 +878,7 @@ else {
   npm run catalog:etsy
   npm run catalog:etsy -- --replace
   npm run catalog:sync
+  npm run catalog:listed-at
   npm run catalog:auth
 
 Identity is SKU (BO-001) from (BO-001) or [BO-001] at the end of the Etsy title, plus listing ID.

@@ -1,0 +1,33 @@
+---
+import { isNewListing } from "../data/listing-age";
+
+interface Props {
+  listedAt?: string | number;
+}
+
+const { listedAt } = Astro.props;
+const show = isNewListing(listedAt);
+const stamp = listedAt == null ? "" : String(listedAt);
+---
+
+{
+  show && (
+    <span class="badge-new" data-listed-at={stamp}>
+      New
+    </span>
+  )
+}
+
+<script>
+  import { isNewListing } from "../data/listing-age";
+
+  function expireNewBadges() {
+    document.querySelectorAll("[data-listed-at]").forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      node.hidden = !isNewListing(node.getAttribute("data-listed-at"));
+    });
+  }
+
+  expireNewBadges();
+  document.addEventListener("astro:page-load", expireNewBadges);
+</script>

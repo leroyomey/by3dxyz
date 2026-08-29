@@ -80,6 +80,17 @@ for (const product of products) {
 
   if (!product.etsyListingId) warn(`${label}: not linked to an Etsy listing`);
 
+  if (product.listedAt != null && product.listedAt !== "") {
+    const raw = product.listedAt;
+    const date =
+      typeof raw === "number"
+        ? new Date(raw < 1e12 ? raw * 1000 : raw)
+        : /^\d+$/.test(String(raw))
+          ? new Date(Number(raw) < 1e12 ? Number(raw) * 1000 : Number(raw))
+          : new Date(raw);
+    if (Number.isNaN(date.getTime())) err(`${label}: listedAt is not a date`);
+  }
+
   for (const field of ["short", "description"]) {
     if (String(product[field] || "").includes("—")) {
       warn(`${label}: em dash in ${field}. Customer copy uses a period, comma, or hyphen.`);

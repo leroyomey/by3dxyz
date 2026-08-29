@@ -27,6 +27,7 @@ export type Product = {
   etsyListingId: string;
   paypalUrl: string;
   featured: boolean;
+  listedAt?: string;
   variantSet?: string;
   variants?: VariantGroup[];
   etsyCarts?: number;
@@ -77,8 +78,15 @@ export function getProduct(slug: string) {
 export function nextProduct(slug: string) {
   if (!products.length) return undefined;
   const index = products.findIndex((product) => product.slug === slug);
-  if (index === -1) return undefined;
-  return products[(index + 1) % products.length];
+  if (index === -1 || index >= products.length - 1) return undefined;
+  return products[index + 1];
+}
+
+export function prevProduct(slug: string) {
+  if (!products.length) return undefined;
+  const index = products.findIndex((product) => product.slug === slug);
+  if (index <= 0) return undefined;
+  return products[index - 1];
 }
 
 export function getBySku(sku: string) {

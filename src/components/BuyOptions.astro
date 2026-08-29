@@ -2,6 +2,7 @@
 import type { Product } from "../data/products";
 import { productVariants, formatPrice } from "../data/products";
 import { site } from "../data/site";
+import NewBadge from "./NewBadge.astro";
 
 interface Props {
   product: Product;
@@ -40,6 +41,7 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
 >
   <div class="price-row">
     <p class="price" data-total>{formatPrice(product.price, product.currency)}</p>
+    <NewBadge listedAt={product.listedAt} />
     <span class="ship-free">FREE shipping</span>
   </div>
   <div class="buy-proof">

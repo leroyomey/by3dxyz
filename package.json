@@ -16,6 +16,7 @@
     "catalog:check": "node scripts/catalog-check.mjs",
     "catalog:etsy": "node scripts/catalog.mjs etsy-diff",
     "catalog:sync": "node scripts/catalog.mjs etsy-sync",
+    "catalog:listed-at": "node scripts/catalog.mjs listed-at",
     "catalog:auth": "node scripts/catalog.mjs etsy-auth",
     "etsy:prices": "node scripts/etsy-variant-prices.mjs",
     "etsy:sizes": "node scripts/etsy-size-check.mjs",
