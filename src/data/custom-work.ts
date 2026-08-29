@@ -55,7 +55,7 @@ export const customWork = {
     return `The largest piece we can print right now is about ${this.maxPieceIn} × ${this.maxPieceIn} × ${this.maxPieceIn} in (${this.maxPieceMm} mm wide, deep, and tall).`;
   },
   get quoteRevisions() {
-    return `The quote includes ${this.includedRevisions} revision rounds. After that, $${this.extraRevision} each.`;
+    return `The quote includes ${this.includedRevisions} revision rounds. Extra rounds are $${this.extraRevision} each.`;
   },
   packages: [
     {

@@ -210,8 +210,19 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
             .join("\n");
         }
 
+        function postNotify(payload) {
+          return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(notifyEmail), {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify(payload),
+          }).then(function (res) {
+            if (!res.ok) throw new Error(String(res.status));
+            return res;
+          });
+        }
+
         function notifyShop(state, details) {
-          if (!notifyEmail) return Promise.resolve();
+          if (!notifyEmail) return Promise.resolve(false);
           const payer = details && details.payer;
           const payload = {
             _subject: "by3DXYZ order " + (state.sku || state.name),
@@ -231,11 +242,16 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
             buyer_email: (payer && payer.email_address) || "",
             ship_to: shippingText(details),
           };
-          return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(notifyEmail), {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Accept: "application/json" },
-            body: JSON.stringify(payload),
-          }).catch(function () {});
+          return postNotify(payload)
+            .catch(function () {
+              return postNotify(payload);
+            })
+            .then(function () {
+              return true;
+            })
+            .catch(function () {
+              return false;
+            });
         }
 
         root.addEventListener("change", paint);
@@ -289,6 +305,7 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
             onApprove: function (_data, actions) {
               return actions.order.capture().then(function (details) {
                 const state = selected();
+                const payer = details && details.payer;
                 const snapshot = {
                   sku: state.sku,
                   name: state.name,
@@ -298,17 +315,26 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
                   total: money(state.total),
                   currency: currency,
                   paypalOrderId: (details && details.id) || "",
+                  buyerEmail: (payer && payer.email_address) || "",
+                  shipTo: shippingText(details),
+                  notifyOk: false,
                 };
-                try {
-                  sessionStorage.setItem("by3dxyz-order", JSON.stringify(snapshot));
-                } catch (_err) {}
+                function goThanks(ok) {
+                  snapshot.notifyOk = Boolean(ok);
+                  try {
+                    sessionStorage.setItem("by3dxyz-order", JSON.stringify(snapshot));
+                  } catch (_err) {}
+                  window.location.href = "/thanks";
+                }
                 return Promise.race([
                   notifyShop(state, details),
                   new Promise(function (resolve) {
-                    setTimeout(resolve, 5000);
+                    setTimeout(function () {
+                      resolve(false);
+                    }, 8000);
                   }),
-                ]).finally(function () {
-                  window.location.href = "/thanks";
+                ]).then(goThanks, function () {
+                  goThanks(false);
                 });
               });
             },

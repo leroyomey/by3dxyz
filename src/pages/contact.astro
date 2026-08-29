@@ -1,6 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { site } from "../data/site";
+
+const notifyEmail = import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
 ---
 
 <Layout title="Contact" description="Email by3DXYZ about an order, a print file, or a custom 3D print.">
@@ -16,15 +18,73 @@ import { site } from "../data/site";
     </div>
   </section>
   <section class="wrap section">
-    <form class="form" action={`mailto:${site.email}`} method="get">
+    <div class="request-thanks" data-contact-thanks hidden>
+      <h2>Thank you</h2>
+      <p>The shop will email you. For a file you already have, use Print a file. For a new part, use Custom.</p>
+    </div>
+    <form class="form" data-contact-form>
       <label for="name">Name</label>
-      <input id="name" name="name" required />
+      <input id="name" name="name" autocomplete="name" required />
       <label for="email">Email</label>
-      <input id="email" name="email" type="email" required />
+      <input id="email" name="email" type="email" autocomplete="email" required />
       <label for="message">Message</label>
-      <textarea id="message" name="body" rows="6" required></textarea>
-      <button class="btn btn-teal" type="submit">Open email</button>
+      <textarea id="message" name="message" rows="6" required></textarea>
+      <div class="form-trap" aria-hidden="true">
+        <label for="contact-company">Company website</label>
+        <input id="contact-company" name="_honey" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <p class="muted" data-contact-status></p>
+      <button class="btn btn-teal" type="submit" data-contact-submit>Send message</button>
     </form>
     <p class="muted">Or email {site.email} directly.</p>
   </section>
 </Layout>
+
+<script is:inline define:vars={{ notifyEmail, contactEmail: site.email }}>
+  (function () {
+    const form = document.querySelector("[data-contact-form]");
+    const thanks = document.querySelector("[data-contact-thanks]");
+    if (!(form instanceof HTMLFormElement)) return;
+    const openedAt = Date.now();
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const status = document.querySelector("[data-contact-status]");
+      const button = document.querySelector("[data-contact-submit]");
+      const data = new FormData(form);
+      const honey = String(data.get("_honey") || "").trim();
+      if (honey) return;
+      if (Date.now() - openedAt < 4000) {
+        if (status) status.textContent = "Take a second, then send again.";
+        return;
+      }
+      if (!notifyEmail) {
+        if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";
+        return;
+      }
+      if (button instanceof HTMLButtonElement) button.disabled = true;
+      if (status) status.textContent = "Sending…";
+      fetch("https://formsubmit.co/ajax/" + encodeURIComponent(notifyEmail), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          _subject: "by3DXYZ contact",
+          _template: "table",
+          _captcha: "false",
+          name: String(data.get("name") || ""),
+          email: String(data.get("email") || ""),
+          message: String(data.get("message") || ""),
+        }),
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error(String(res.status));
+          form.hidden = true;
+          if (thanks) thanks.removeAttribute("hidden");
+        })
+        .catch(function () {
+          if (status) status.textContent = "Could not send. Email " + contactEmail + " instead.";
+          if (button instanceof HTMLButtonElement) button.disabled = false;
+        });
+    });
+  })();
+</script>

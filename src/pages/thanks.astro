@@ -21,13 +21,22 @@ import { site } from "../data/site";
       PayPal has your payment. The shop will print and mail your order using the SKU, selected options, quantity, and
       ship-to address. Questions: {site.email}
     </p>
+    <div class="notify-fail" data-notify-fail hidden>
+      <p>
+        The shop inbox did not get this ticket automatically. PayPal still has the payment. Email the order to the shop
+        so we have the SKU and options on file.
+      </p>
+      <p>
+        <a class="btn btn-teal" data-order-mailto href={`mailto:${site.email}`}>Email this order to the shop</a>
+      </p>
+    </div>
     <p>
       <a class="btn btn-teal" href="/tools">Back to the shop</a>
     </p>
   </section>
 </Layout>
 
-<script>
+<script define:vars={{ shopEmail: site.email }}>
   function paintOrder() {
     try {
       const raw = sessionStorage.getItem("by3dxyz-order");
@@ -53,6 +62,31 @@ import { site } from "../data/site";
             : "";
         }
         box.removeAttribute("hidden");
+        if (order.notifyOk === false) {
+          const fail = document.querySelector("[data-notify-fail]");
+          const mail = document.querySelector("[data-order-mailto]");
+          const lines = [
+            "by3DXYZ paid order",
+            "SKU: " + (order.sku || ""),
+            "Tool: " + (order.name || ""),
+            order.optionLine ? "Options: " + order.optionLine : "",
+            "Quantity: " + String(order.qty || ""),
+            "Total: " + String(order.total || "") + " " + (order.currency || ""),
+            order.paypalOrderId ? "PayPal order: " + order.paypalOrderId : "",
+            order.buyerEmail ? "Buyer: " + order.buyerEmail : "",
+            order.shipTo ? "Ship to:\n" + order.shipTo : "",
+          ].filter(Boolean);
+          if (mail instanceof HTMLAnchorElement) {
+            mail.href =
+              "mailto:" +
+              encodeURIComponent(shopEmail) +
+              "?subject=" +
+              encodeURIComponent("by3DXYZ order " + (order.sku || order.name || "")) +
+              "&body=" +
+              encodeURIComponent(lines.join("\n"));
+          }
+          fail?.removeAttribute("hidden");
+        }
       }
     } catch (_err) {}
   }

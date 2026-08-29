@@ -2113,14 +2113,6 @@ a.btn-primary[href*="etsy.com"]:hover {
 .footer-brand .axis-y { color: var(--y); }
 .footer-brand .axis-z { color: var(--z); }
 
-.visit-count {
-  margin: 10px 0 0;
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  letter-spacing: 0.04em;
-  color: var(--ink-soft);
-}
-
 .footer-copy {
   margin: 18px auto 0;
   font-size: 0.8125rem;
