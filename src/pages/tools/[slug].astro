@@ -5,7 +5,16 @@ import CartSignal from "../../components/CartSignal.astro";
 import EtsyReview from "../../components/EtsyReview.astro";
 import StockSignal from "../../components/StockSignal.astro";
 import ProductCard from "../../components/ProductCard.astro";
-import { allProducts, getProduct, nextProduct, prevProduct, productCopy, productTitle, relatedProducts } from "../../data/products";
+import {
+  allProducts,
+  getProduct,
+  nextProduct,
+  prevProduct,
+  productCopy,
+  productPriceBounds,
+  productTitle,
+  relatedProducts,
+} from "../../data/products";
 import { listingLine } from "../../data/site";
 
 export function getStaticPaths() {
@@ -26,21 +35,35 @@ const prevTitle = prev ? productTitle(prev) : "";
 const origin = Astro.site ?? Astro.url;
 const pageUrl = new URL(`/tools/${product.slug}`, origin).href;
 const soldOut = Boolean(product.inactive);
+const bounds = productPriceBounds(product);
+const availability = soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock";
+const offerBase = {
+  url: pageUrl,
+  priceCurrency: bounds.currency,
+  availability,
+  itemCondition: "https://schema.org/NewCondition",
+};
 const jsonLd = {
   "@type": "Product",
   name: title,
   description: product.short,
   sku: product.sku,
+  mpn: product.sku,
   image: product.images.map((src) => new URL(src, origin).href),
   brand: { "@type": "Brand", name: "by3DXYZ" },
-  offers: {
-    "@type": "Offer",
-    url: pageUrl,
-    priceCurrency: product.currency || "USD",
-    price: Number(product.price).toFixed(2),
-    availability: soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
-    itemCondition: "https://schema.org/NewCondition",
-  },
+  offers:
+    bounds.max > bounds.min
+      ? {
+          "@type": "AggregateOffer",
+          ...offerBase,
+          lowPrice: bounds.min.toFixed(2),
+          highPrice: bounds.max.toFixed(2),
+        }
+      : {
+          "@type": "Offer",
+          ...offerBase,
+          price: Number(bounds.min).toFixed(2),
+        },
 };
 ---
 

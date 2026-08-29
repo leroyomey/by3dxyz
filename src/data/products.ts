@@ -188,13 +188,18 @@ export function etsyStockLabel(_quantity: number | undefined, inactive = false) 
   return "Made to order";
 }
 
-export function displayPrice(product: Product) {
+export function productPriceBounds(product: Product) {
   const priced = productVariants(product)
     .flatMap((group) => group.values.map((value) => value.price))
     .filter((price): price is number => typeof price === "number");
   const min = priced.length ? Math.min(...priced) : product.price;
   const max = priced.length ? Math.max(...priced) : product.price;
-  const label = formatPrice(min, product.currency);
+  return { min, max, currency: product.currency || "USD" };
+}
+
+export function displayPrice(product: Product) {
+  const { min, max, currency } = productPriceBounds(product);
+  const label = formatPrice(min, currency);
   return max > min ? `${label}+` : label;
 }
 
