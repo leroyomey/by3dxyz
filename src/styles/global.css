@@ -1391,26 +1391,26 @@ a.btn-primary[href*="etsy.com"]:hover {
 }
 
 .product-detail {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
-  grid-template-areas:
-    "gallery panel"
-    "body body"
-    "related related";
-  gap: 28px 48px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
   padding: 28px 0 72px;
 }
 
+.product-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  gap: 28px 48px;
+  align-items: start;
+}
+
 .gallery {
-  grid-area: gallery;
   display: grid;
   gap: 12px;
   min-width: 0;
 }
 
 .product-panel {
-  grid-area: panel;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -1460,8 +1460,7 @@ a.btn-primary[href*="etsy.com"]:hover {
 }
 
 .product-body {
-  grid-area: body;
-  margin: 8px 0 0;
+  margin: 0;
   padding-top: 28px;
   border-top: 1px solid var(--line);
   max-width: 72ch;
@@ -1475,8 +1474,7 @@ a.btn-primary[href*="etsy.com"]:hover {
 }
 
 .related-parts {
-  grid-area: related;
-  margin: 8px 0 0;
+  margin: 0;
   padding-top: 28px;
   border-top: 1px solid var(--line);
   min-width: 0;
@@ -2377,13 +2375,8 @@ a.btn-primary[href*="etsy.com"]:hover {
     display: none;
   }
 
-  .product-detail {
+  .product-stage {
     grid-template-columns: 1fr;
-    grid-template-areas:
-      "gallery"
-      "panel"
-      "body"
-      "related";
   }
 
   .product-panel {
