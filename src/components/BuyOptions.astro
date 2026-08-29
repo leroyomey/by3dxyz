@@ -1,7 +1,7 @@
 ---
 import type { Product } from "../data/products";
 import { productVariants, formatPrice } from "../data/products";
-import { site } from "../data/site";
+import { shippingNote, site } from "../data/site";
 import NewBadge from "./NewBadge.astro";
 import PayPalButtons from "./PayPalButtons.astro";
 
@@ -37,7 +37,7 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
   <div class="price-row">
     <p class="price" data-total>{formatPrice(product.price, product.currency)}</p>
     <NewBadge listedAt={product.listedAt} />
-    <span class="ship-free">FREE shipping</span>
+    <span class="ship-note">{shippingNote}</span>
   </div>
   <div class="buy-proof">
     <slot />

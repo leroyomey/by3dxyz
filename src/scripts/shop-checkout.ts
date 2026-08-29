@@ -129,6 +129,18 @@ export function mountPayPal(opts: {
 
     let captureTicket = "";
 
+    function syncShipping(orderID: string, country: string) {
+      if (!captureTicket || !orderID) return Promise.reject(new Error("Checkout failed."));
+      return fetch(checkoutUrl + "/shipping", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderID, ticket: captureTicket, country: country || "" }),
+      }).then(async (res) => {
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(body.error || "Checkout failed.");
+      });
+    }
+
     function goThanks(snapshot: unknown) {
       try {
         sessionStorage.setItem("by3dxyz-order", JSON.stringify(snapshot));
@@ -159,6 +171,24 @@ export function mountPayPal(opts: {
             captureTicket = String(body.ticket);
             return body.id as string;
           }),
+        );
+      },
+      onShippingChange: function (
+        data: { orderID?: string; shipping_address?: { country_code?: string } },
+        actions: { resolve: () => unknown; reject: () => unknown },
+      ) {
+        return syncShipping(data.orderID || "", data.shipping_address?.country_code || "").then(
+          () => actions.resolve(),
+          () => actions.reject(),
+        );
+      },
+      onShippingAddressChange: function (
+        data: { orderID?: string; shippingAddress?: { countryCode?: string } },
+        actions: { reject: () => unknown },
+      ) {
+        return syncShipping(data.orderID || "", data.shippingAddress?.countryCode || "").then(
+          () => undefined,
+          () => actions.reject(),
         );
       },
       onApprove: function (data: { orderID?: string }) {

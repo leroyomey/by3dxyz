@@ -1211,6 +1211,7 @@ a.btn-primary[href*="etsy.com"]:hover {
   margin: 0;
 }
 
+.ship-note,
 .ship-free,
 .badge-new {
   display: inline-flex;
@@ -1229,6 +1230,15 @@ a.btn-primary[href*="etsy.com"]:hover {
   color: var(--acid);
   background: rgba(200, 255, 0, 0.1);
   box-shadow: inset 0 0 0 1px rgba(200, 255, 0, 0.35);
+}
+
+.ship-note {
+  color: var(--acid);
+  background: rgba(200, 255, 0, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(200, 255, 0, 0.35);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  white-space: normal;
 }
 
 .badge-new {

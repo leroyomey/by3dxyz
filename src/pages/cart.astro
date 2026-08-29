@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import PayPalButtons from "../components/PayPalButtons.astro";
+import { shippingNote } from "../data/site";
 
 const clientId = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID ?? "";
 ---
@@ -9,7 +10,7 @@ const clientId = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID ?? "";
   <section class="wrap page-hero cart-page">
     <p class="kicker">Shop</p>
     <h1>Cart</h1>
-    <p class="lede">Pay once for every part here. FREE shipping.</p>
+    <p class="lede">Pay once for every part here. {shippingNote}</p>
     <p class="cart-empty muted" data-cart-empty hidden>
       Nothing in the cart yet. <a href="/tools">Back to the shop</a>
     </p>
@@ -17,7 +18,7 @@ const clientId = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID ?? "";
       <ul class="cart-lines" data-cart-lines></ul>
       <div class="cart-total-row">
         <p class="price" data-cart-total></p>
-        <span class="ship-free">FREE shipping</span>
+        <span class="ship-note">{shippingNote}</span>
       </div>
       {
         clientId ? (

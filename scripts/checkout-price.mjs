@@ -3,6 +3,25 @@
 export const QTY_MAX = 10;
 export const LINE_MAX = 20;
 
+/** One flat for a small tracked international parcel. Change this number only. */
+export const INTERNATIONAL_SHIPPING_USD = 18;
+
+const FREE_SHIP_COUNTRIES = new Set(["US", "PR", "GU", "VI", "AS", "MP", "UM"]);
+
+export function shipCountry(code) {
+  return String(code || "").trim().toUpperCase();
+}
+
+export function countryFromPaypal(details) {
+  return shipCountry(details?.purchase_units?.[0]?.shipping?.address?.country_code);
+}
+
+export function shippingAmount(countryCode) {
+  const code = shipCountry(countryCode);
+  if (!code) throw new Error("Checkout failed.");
+  return FREE_SHIP_COUNTRIES.has(code) ? 0 : INTERNATIONAL_SHIPPING_USD;
+}
+
 export function money(value) {
   return (Math.round(Number(value) * 100) / 100).toFixed(2);
 }
@@ -113,15 +132,25 @@ export function linesTotal(lines) {
   return lines.reduce((sum, line) => sum + Number(money(line.unit)) * line.qty, 0);
 }
 
-export function purchaseUnit(lines, currency) {
-  const value = money(linesTotal(lines));
+export function orderTotal(lines, shipping) {
+  return Number(money(linesTotal(lines))) + Number(money(shipping));
+}
+
+export function purchaseUnit(lines, currency, shipping = 0) {
+  const items = money(linesTotal(lines));
+  const ship = money(shipping);
+  const value = money(Number(items) + Number(ship));
   return {
+    reference_id: "default",
     custom_id: customId(lines),
     description: orderSummary(lines).slice(0, 127),
     amount: {
       currency_code: currency,
       value,
-      breakdown: { item_total: { currency_code: currency, value } },
+      breakdown: {
+        item_total: { currency_code: currency, value: items },
+        shipping: { currency_code: currency, value: ship },
+      },
     },
     items: lines.map((line) => ({
       name: itemName(line).slice(0, 127),
@@ -132,6 +161,20 @@ export function purchaseUnit(lines, currency) {
       category: "PHYSICAL_GOODS",
     })),
   };
+}
+
+export function paypalPatchAmount(lines, currency, shipping) {
+  return [
+    {
+      op: "replace",
+      path: "/purchase_units/@reference_id=='default'/amount",
+      value: purchaseUnit(lines, currency, shipping).amount,
+    },
+  ];
+}
+
+export function paidShipping(details) {
+  return money(details?.purchase_units?.[0]?.amount?.breakdown?.shipping?.value || 0);
 }
 
 export function skuList(lines) {
@@ -161,6 +204,7 @@ export function shippingText(details) {
 export function notifyPayload(lines, details, currency) {
   const payer = details?.payer;
   const first = lines[0];
+  const ship = shippingAmount(countryFromPaypal(details));
   const items = lines
     .map((line, index) =>
       [
@@ -185,7 +229,8 @@ export function notifyPayload(lines, details, currency) {
     line_count: String(lines.length),
     quantity: String(lines.reduce((sum, line) => sum + line.qty, 0)),
     unit_price: first ? money(first.unit) : money(0),
-    total: money(linesTotal(lines)) + " " + currency,
+    shipping: money(ship) + " " + currency,
+    total: money(orderTotal(lines, ship)) + " " + currency,
     paypal_order_id: details?.id || "",
     buyer_name: [payer?.name?.given_name, payer?.name?.surname].filter(Boolean).join(" "),
     buyer_email: payer?.email_address || "",
@@ -196,13 +241,15 @@ export function notifyPayload(lines, details, currency) {
 export function orderSnapshot(lines, details, currency, notifyOk) {
   const first = lines[0];
   const payer = details?.payer;
+  const ship = shippingAmount(countryFromPaypal(details));
   return {
     sku: skuList(lines),
     name: lines.map((line) => line.name).join(", "),
     options: first?.options || {},
     optionLine: lines.map((line) => [line.sku, line.optionLine].filter(Boolean).join(" ")).join("; "),
     qty: lines.reduce((sum, line) => sum + line.qty, 0),
-    total: money(linesTotal(lines)),
+    shipping: money(ship),
+    total: money(orderTotal(lines, ship)),
     currency,
     paypalOrderId: details?.id || "",
     buyerEmail: payer?.email_address || "",
@@ -228,6 +275,7 @@ export function publicOrderSnapshot(lines, details, currency, notifyOk) {
     options: snapshot.options,
     optionLine: snapshot.optionLine,
     qty: snapshot.qty,
+    shipping: snapshot.shipping,
     total: snapshot.total,
     currency: snapshot.currency,
     paypalOrderId: snapshot.paypalOrderId,

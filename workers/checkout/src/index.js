@@ -4,14 +4,17 @@ import pickVariants from "../../../src/data/pick-variants.json";
 import colorVariants from "../../../src/data/color-variants.json";
 import decorVariants from "../../../src/data/decor-variants.json";
 import {
+  countryFromPaypal,
   loadVariantSets,
-  linesTotal,
   money,
   notifyPayload,
+  orderTotal,
+  paypalPatchAmount,
   publicOrderSnapshot,
   purchaseUnit,
   quoteLines,
   quotesMatch,
+  shippingAmount,
 } from "../../../scripts/checkout-price.mjs";
 import { buildInboxPayload } from "./inbox.js";
 
@@ -203,11 +206,31 @@ async function createOrder(env, request, ip) {
         user_action: "PAY_NOW",
         shipping_preference: "GET_FROM_FILE",
       },
-      purchase_units: [purchaseUnit(lines, currency)],
+      purchase_units: [purchaseUnit(lines, currency, 0)],
     }),
   });
   if (!created.id) throw new Error("PayPal did not return an order.");
   return { id: created.id, ticket: await captureTicket(env, created.id) };
+}
+
+async function updateShipping(env, request) {
+  const body = await request.json();
+  const orderID = String(body.orderID || "").trim();
+  if (!isPayPalOrderId(orderID) || !(await ticketMatches(env, orderID, body.ticket))) {
+    throw new Error("Missing PayPal order.");
+  }
+  const pending = await paypalFetch(env, "/v2/checkout/orders/" + encodeURIComponent(orderID));
+  const paid = linesFromPaypal(pending);
+  const quoted = quotedFromPaid(paid);
+  if (!quoted.length || !quotesMatch(paid, quoted)) throw new Error("Checkout failed.");
+  const country = countryFromPaypal(pending) || String(body.country || "").trim();
+  const shipping = shippingAmount(country);
+  const currency = quoted[0]?.currency || "USD";
+  await paypalFetch(env, "/v2/checkout/orders/" + encodeURIComponent(orderID), {
+    method: "PATCH",
+    body: JSON.stringify(paypalPatchAmount(quoted, currency, shipping)),
+  });
+  return { ok: true, shipping: money(shipping) };
 }
 
 function optionsFromDescription(description) {
@@ -257,8 +280,27 @@ function quotedFromPaid(paid) {
 function assertCatalogPrice(details, paid) {
   const quoted = quotedFromPaid(paid);
   if (!quotesMatch(paid, quoted)) throw new Error("Checkout failed.");
+  const shipping = shippingAmount(countryFromPaypal(details));
+  const paidShip = money(details?.purchase_units?.[0]?.amount?.breakdown?.shipping?.value || 0);
+  if (paidShip !== money(shipping)) throw new Error("Checkout failed.");
   const paidTotal = money(details?.purchase_units?.[0]?.amount?.value);
-  if (paidTotal !== money(linesTotal(quoted))) throw new Error("Checkout failed.");
+  if (paidTotal !== money(orderTotal(quoted, shipping))) throw new Error("Checkout failed.");
+}
+
+function withShipCountry(details, fallback) {
+  const unit = details?.purchase_units?.[0];
+  const prior = fallback?.purchase_units?.[0];
+  if (!unit || !prior) return details;
+  const units = details.purchase_units.slice();
+  units[0] = {
+    ...unit,
+    shipping: unit.shipping || prior.shipping,
+    amount: {
+      ...unit.amount,
+      breakdown: unit.amount?.breakdown || prior.amount?.breakdown,
+    },
+  };
+  return { ...details, purchase_units: units };
 }
 
 async function captureOrder(env, request) {
@@ -278,6 +320,7 @@ async function captureOrder(env, request) {
   if (!details?.purchase_units?.[0]?.items?.length) {
     details = await paypalFetch(env, "/v2/checkout/orders/" + encodeURIComponent(orderID));
   }
+  details = withShipCountry(details, pending);
   const lines = linesFromPaypal(details);
   if (!lines.length) throw new Error("PayPal capture had no line items.");
   assertCatalogPrice(details, lines);
@@ -350,6 +393,12 @@ export default {
           return json(env, request, { error: "Try checkout again in a few minutes." }, 429);
         }
         return json(env, request, await createOrder(env, request, ip));
+      }
+      if (url.pathname === "/shipping") {
+        if (tooMany(ip + ":shipping", 16, 15 * 60 * 1000)) {
+          return json(env, request, { error: "Try checkout again in a few minutes." }, 429);
+        }
+        return json(env, request, await updateShipping(env, request));
       }
       if (url.pathname === "/capture") {
         if (tooMany(ip + ":capture", 12, 15 * 60 * 1000)) {
