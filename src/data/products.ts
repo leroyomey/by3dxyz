@@ -43,6 +43,7 @@ const variantSets: Record<string, VariantGroup[]> = {
   rib: ribVariantSet.groups as VariantGroup[],
   color: colorVariantSet.groups as VariantGroup[],
   pick: pickVariantSet.groups as VariantGroup[],
+  decor: decorVariantSet.groups as VariantGroup[],
 };
 
 export function skuSortKey(sku: string) {
