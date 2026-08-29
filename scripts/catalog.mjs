@@ -115,21 +115,23 @@ function shopName(title = "") {
   return name;
 }
 
-function isDecor(title = "") {
-  return /spider\s*web/i.test(title);
+function isDecor(name = "", extra = {}) {
+  const sku = String(extra.sku || "").toUpperCase();
+  const category = extra.category || "";
+  return /decor/i.test(category) || /decor/i.test(name) || /spider\s*web/i.test(name) || sku === "BO-053";
 }
 
-function variantSetFor(name, explicit = "") {
+function variantSetFor(name, explicit = "", sku = "") {
   if (explicit) return explicit;
   if (name === "Throwing Rib") return "rib";
   if (/guitar\s*pick/i.test(name)) return "pick";
-  if (isDecor(name)) return "decor";
+  if (isDecor(name, { sku })) return "decor";
   return "";
 }
 
-function categoryFor(name) {
+function categoryFor(name, sku = "") {
   if (/guitar\s*pick/i.test(name)) return "Picks";
-  if (isDecor(name)) return "Decor";
+  if (isDecor(name, { sku })) return "Decor";
   if (/paddle/i.test(name)) return "Paddles";
   if (/rib/i.test(name)) return "Ribs";
   return "Tools";
@@ -190,10 +192,13 @@ function listingCopy(item, name, sku) {
   return { short, description: fromEtsy || name };
 }
 
+function skuBaseNum(sku = "") {
+  const match = String(sku).toUpperCase().match(/^BO-(\d+)/);
+  return match ? Number(match[1]) : NaN;
+}
+
 function nextSku(products) {
-  const nums = products
-    .map((p) => Number(String(p.sku || "").replace(/^BO-/i, "")))
-    .filter((n) => Number.isFinite(n) && n > 0);
+  const nums = products.map((p) => skuBaseNum(p.sku)).filter((n) => Number.isFinite(n) && n > 0);
   const next = (nums.length ? Math.max(...nums) : 0) + 1;
   return `BO-${String(next).padStart(3, "0")}`;
 }
@@ -278,7 +283,7 @@ function toProduct(row, products) {
     name,
     price: Number(row.price),
     currency: row.currency || "USD",
-    category: row.category || "Tools",
+    category: row.category || categoryFor(name, sku),
     short: row.short || name,
     description: row.description || row.short || name,
     images: images.length ? images : [`/images/products/${slug}.svg`],
@@ -286,7 +291,7 @@ function toProduct(row, products) {
     etsyListingId,
     paypalUrl: row.paypalUrl || "",
     featured: String(row.featured).toLowerCase() === "true",
-    variantSet: variantSetFor(name, row.variantSet),
+    variantSet: variantSetFor(name, row.variantSet, sku),
   };
 }
 
@@ -593,7 +598,7 @@ async function listingToProduct(item, apiKey, featured, existing = []) {
     name,
     price: (item.price?.amount ?? 0) / (item.price?.divisor || 100),
     currency: item.price?.currency_code || "USD",
-    category: categoryFor(name),
+    category: categoryFor(name, sku),
     short,
     description,
     images: images.length ? images : [`/images/products/${slug}.jpg`],
@@ -601,7 +606,7 @@ async function listingToProduct(item, apiKey, featured, existing = []) {
     etsyListingId: id,
     paypalUrl: "",
     featured,
-    variantSet: variantSetFor(name, isGuitarPick(item.title) ? "pick" : ""),
+    variantSet: variantSetFor(name, isGuitarPick(item.title) ? "pick" : "", sku),
     etsyQuantity: typeof item.quantity === "number" ? item.quantity : undefined,
     ...(listedAt ? { listedAt } : {}),
   };
@@ -685,7 +690,7 @@ async function cmdEtsyDiff(replace = false) {
       const sku = skuFromListing(item);
       const name = shopName(item.title || "Untitled").replaceAll('"', '""');
       const url = `https://www.etsy.com/listing/${item.listing_id}`;
-      return `${sku},"${name}",${price},${categoryFor(name)},"${name}","${name}",${url},${item.listing_id},,false`;
+      return `${sku},"${name}",${price},${categoryFor(name, sku)},"${name}","${name}",${url},${item.listing_id},,false`;
     });
     const out = join(root, "catalog", "etsy-new.csv");
     writeFileSync(out, `${header}\n${rows.join("\n")}\n`);
@@ -869,7 +874,7 @@ else if (command === "apply-variants") {
       n += 1;
     } else if (/guitar\s*pick/i.test(product.name)) {
       product.variantSet = "pick";
-    } else if (isDecor(product.name)) {
+    } else if (isDecor(product.name, { sku: product.sku, category: product.category })) {
       product.variantSet = "decor";
     } else if (!product.variantSet) {
       product.variantSet = "";
