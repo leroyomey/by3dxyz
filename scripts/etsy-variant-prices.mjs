@@ -1,7 +1,7 @@
 // Print the real per-option prices Etsy charges for a listing, so the website
 // variant JSON can match. Usage:
 //   node scripts/etsy-variant-prices.mjs 4563997517
-//   node scripts/etsy-variant-prices.mjs BO-053
+//   node scripts/etsy-variant-prices.mjs SW-001
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -30,7 +30,7 @@ function apiKeyHeader() {
 
 const arg = (process.argv[2] || "").trim();
 if (!arg) {
-  console.error("Pass an Etsy listing id or a SKU. Example: node scripts/etsy-variant-prices.mjs BO-053");
+  console.error("Pass an Etsy listing id or a SKU. Example: node scripts/etsy-variant-prices.mjs SW-001");
   process.exit(1);
 }
 

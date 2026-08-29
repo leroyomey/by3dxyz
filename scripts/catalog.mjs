@@ -72,7 +72,10 @@ function skuFromTitle(title = "") {
 }
 
 function skuFromListing(item) {
-  return skuFromTitle(item.title) || skuFromText(item.description || "") || pickShopSku(item.title || "");
+  const title = item.title || "";
+  if (isGuitarPick(title)) return pickShopSku(title);
+  if (isSpiderWeb(title)) return decorShopSku(title);
+  return skuFromTitle(title) || skuFromText(item.description || "");
 }
 
 function uniqueSku(wanted, listingId, products) {
@@ -80,7 +83,9 @@ function uniqueSku(wanted, listingId, products) {
   const clash = products.find(
     (p) => p.sku && p.sku.toUpperCase() === wanted.toUpperCase() && String(p.etsyListingId) !== id,
   );
-  return clash ? `GP-${id}` : wanted;
+  if (!clash) return wanted;
+  const prefix = /^SW-/i.test(wanted) ? "SW" : "GP";
+  return `${prefix}-${id}`;
 }
 
 function nameWithoutSku(title = "") {
@@ -106,8 +111,21 @@ function pickShopName(title = "") {
   return pack ? `Guitar Picks ${pack[1]} Pack` : "Guitar Picks";
 }
 
+function isSpiderWeb(title = "") {
+  return /spider\s*web/i.test(title);
+}
+
+function decorShopSku(title = "") {
+  return isSpiderWeb(title) ? "SW-001" : "";
+}
+
+function decorShopName(title = "") {
+  return isSpiderWeb(title) ? "Spider Web Decor" : "";
+}
+
 function shopName(title = "") {
   if (isGuitarPick(title)) return pickShopName(title);
+  if (isSpiderWeb(title)) return decorShopName(title);
   const sku = skuFromTitle(title);
   let name = nameWithoutSku(title).replace(/^by3DXYZ\s+/i, "");
   if (/pottery throwing rib/i.test(name) && sku) return "Throwing Rib";
@@ -118,7 +136,7 @@ function shopName(title = "") {
 function isDecor(name = "", extra = {}) {
   const sku = String(extra.sku || "").toUpperCase();
   const category = extra.category || "";
-  return /decor/i.test(category) || /decor/i.test(name) || /spider\s*web/i.test(name) || sku === "BO-053";
+  return /decor/i.test(category) || /decor/i.test(name) || /spider\s*web/i.test(name) || /^SW-/.test(sku);
 }
 
 function variantSetFor(name, explicit = "", sku = "") {
@@ -199,7 +217,8 @@ function skuBaseNum(sku = "") {
 
 function nextSku(products) {
   const nums = products.map((p) => skuBaseNum(p.sku)).filter((n) => Number.isFinite(n) && n > 0);
-  const next = (nums.length ? Math.max(...nums) : 0) + 1;
+  // BO-053 was used once for decor and is retired. Pottery continues at BO-054.
+  const next = Math.max(nums.length ? Math.max(...nums) : 0, 53) + 1;
   return `BO-${String(next).padStart(3, "0")}`;
 }
 
@@ -585,7 +604,12 @@ function cmdImport(filePath = incomingCsv) {
 
 async function listingToProduct(item, apiKey, featured, existing = []) {
   const id = String(item.listing_id);
-  const sku = uniqueSku(skuFromListing(item) || (isGuitarPick(item.title) ? `GP-${id}` : ""), id, existing);
+  const sku = uniqueSku(
+    skuFromListing(item) ||
+      (isGuitarPick(item.title) ? `GP-${id}` : isSpiderWeb(item.title) ? `SW-${id}` : ""),
+    id,
+    existing,
+  );
   const name = shopName(item.title || "Untitled");
   const slug = sku ? slugify(`${name} ${sku}`) : slugify(name);
   const { short, description } = listingCopy(item, name, sku);

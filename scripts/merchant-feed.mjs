@@ -32,6 +32,7 @@ function productTitle(product) {
   const name = String(product.name || "").trim();
   if (!sku) return name;
   if (name.toUpperCase().startsWith(sku)) return name;
+  if (/^SW-/.test(sku)) return name;
   return `${sku} ${name}`;
 }
 

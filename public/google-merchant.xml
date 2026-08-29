@@ -747,8 +747,8 @@
       <g:product_type>Ribs</g:product_type>
     </item>
     <item>
-      <g:id>BO-053</g:id>
-      <g:title>BO-053 Spider Web Decor</g:title>
+      <g:id>SW-001</g:id>
+      <g:title>Spider Web Decor</g:title>
       <g:description>Bring a little creepy character to your space with this 3D printed spider web decorative accent from by3DXYZ.</g:description>
       <g:link>https://by3dxyz.com/tools/gothic-spider-web-decor-3d-printed-halloween-decoration-2-4-</g:link>
       <g:image_link>https://by3dxyz.com/images/products/gothic-spider-web-decor-3d-printed-halloween-decoration-2-3-.jpg</g:image_link>
@@ -756,7 +756,7 @@
       <g:price>10.99 USD</g:price>
       <g:condition>new</g:condition>
       <g:brand>by3DXYZ</g:brand>
-      <g:mpn>BO-053</g:mpn>
+      <g:mpn>SW-001</g:mpn>
       <g:identifier_exists>false</g:identifier_exists>
       <g:product_type>Decor</g:product_type>
     </item>

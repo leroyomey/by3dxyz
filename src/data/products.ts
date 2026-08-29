@@ -85,7 +85,7 @@ export function productFamily(product: { sku: string; category?: string; name?: 
   if (sku === "BO-003" || sku === "BO-020") return "rim-shaper";
   if (sku === "BO-019-1" || sku === "BO-019-2" || /paddle/i.test(product.category || "")) return "paddle";
   if (/^GP-/.test(sku) || /pick/i.test(product.category || "") || /pick/i.test(product.name || "")) return "pick";
-  if (/decor/i.test(product.category || "") || sku === "BO-053") return "decor";
+  if (/^SW-/.test(sku) || /decor/i.test(product.category || "") || /decor/i.test(product.name || "")) return "decor";
   if (product.category === "Ribs" || /throwing rib/i.test(product.name || "")) return "throwing-rib";
   return "other";
 }
@@ -157,6 +157,7 @@ export function productTitle(product: { name: string; sku?: string }) {
   const name = (product.name || "").trim();
   if (!sku) return name;
   if (name.toUpperCase().startsWith(sku)) return name;
+  if (/^SW-/.test(sku)) return name;
   return `${sku} ${name}`;
 }
 
