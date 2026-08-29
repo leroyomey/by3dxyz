@@ -4,11 +4,11 @@ import BuyOptions from "../../components/BuyOptions.astro";
 import CartSignal from "../../components/CartSignal.astro";
 import EtsyReview from "../../components/EtsyReview.astro";
 import StockSignal from "../../components/StockSignal.astro";
-import { products, getProduct, nextProduct, prevProduct, productCopy, productTitle } from "../../data/products";
+import { allProducts, getProduct, nextProduct, prevProduct, productCopy, productTitle } from "../../data/products";
 import { listingLine } from "../../data/site";
 
 export function getStaticPaths() {
-  return products.map((product) => ({ params: { slug: product.slug } }));
+  return allProducts.map((product) => ({ params: { slug: product.slug } }));
 }
 
 const product = getProduct(Astro.params.slug ?? "");
@@ -23,7 +23,7 @@ const nextTitle = next ? productTitle(next) : "";
 const prevTitle = prev ? productTitle(prev) : "";
 const origin = Astro.site ?? Astro.url;
 const pageUrl = new URL(`/tools/${product.slug}`, origin).href;
-const soldOut = typeof product.etsyQuantity === "number" && product.etsyQuantity <= 0;
+const soldOut = Boolean(product.inactive);
 const jsonLd = {
   "@type": "Product",
   name: title,
@@ -53,7 +53,7 @@ const jsonLd = {
   <article class="wrap product-detail">
     <div class="gallery">
       <nav class="product-back" aria-label="Catalog">
-        <a class="back-link" href="/tools">← Back</a>
+        <a class="back-link" href="/tools">← Back to shop</a>
         <div class="product-adjacent">
           {
             prev && (
@@ -90,8 +90,8 @@ const jsonLd = {
       <span class="buy-stick-sentinel" data-buy-sentinel aria-hidden="true"></span>
       <h1>{title}</h1>
       <BuyOptions product={product}>
-        <StockSignal quantity={product.etsyQuantity} />
-        <CartSignal carts={product.etsyCarts} favorers={product.etsyFavorers} />
+        <StockSignal inactive={product.inactive} />
+        <CartSignal favorers={product.etsyFavorers} />
         <p class="lede">{product.short}</p>
       </BuyOptions>
     </div>

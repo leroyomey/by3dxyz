@@ -100,8 +100,8 @@ function pickShopSku(title = "") {
 }
 
 function pickShopName(title = "") {
-  if (/griptonite/i.test(title)) return "Griptonite Guitar Picks";
   if (/plain\s*jane/i.test(title)) return "Plain Jane Guitar Picks";
+  if (/griptonite/i.test(title)) return "Griptonite Guitar Picks";
   const pack = String(title).match(/(\d+)\s*pack/i);
   return pack ? `Guitar Picks ${pack[1]} Pack` : "Guitar Picks";
 }
@@ -151,7 +151,7 @@ function plainText(value = "") {
 function listingCopy(item, name, sku) {
   const fromEtsy = plainText(item.description);
   if (name === "Throwing Rib") {
-    const short = "Sold separately or as a set of 3. Sizes: 4in, 5in, and 6in.";
+    const short = "Sold separately or as a set of 3. Sizes: 2in through 8in.";
     return { short, description: fromEtsy || short };
   }
   if (/Rim Shaper/i.test(name)) {
@@ -732,19 +732,23 @@ async function cmdEtsySync() {
   let products = loadProducts();
   let added = 0;
   let updated = 0;
-  let removed = 0;
+  let hidden = 0;
+  let restored = 0;
   const notes = [];
 
-  const kept = [];
   for (const product of products) {
-    if (!product.etsyListingId || activeIds.has(product.etsyListingId)) {
-      kept.push(product);
-      continue;
+    if (!product.etsyListingId) continue;
+    const active = activeIds.has(String(product.etsyListingId));
+    if (!active && !product.inactive) {
+      product.inactive = true;
+      hidden += 1;
+      notes.push(`Hide ${product.sku || product.name} (not in Etsy active)`);
+    } else if (active && product.inactive) {
+      delete product.inactive;
+      restored += 1;
+      notes.push(`Show ${product.sku || product.name} (back on Etsy)`);
     }
-    removed += 1;
-    notes.push(`Remove ${product.sku || product.name} (gone from Etsy)`);
   }
-  products = kept;
 
   for (const item of usable) {
     const existing = findExisting(products, item);
@@ -753,6 +757,10 @@ async function cmdEtsySync() {
     const name = shopName(item.title || "Untitled");
     if (existing) {
       let changed = false;
+      if (name && existing.name !== name) {
+        existing.name = name;
+        changed = true;
+      }
       if (existing.price !== price) {
         existing.price = price;
         changed = true;
@@ -806,7 +814,8 @@ async function cmdEtsySync() {
     `Etsy active: ${listings.length}`,
     `Added: ${added}`,
     `Updated: ${updated}`,
-    `Removed: ${removed}`,
+    `Hidden: ${hidden}`,
+    `Restored: ${restored}`,
     `On website: ${products.length}`,
     ...notes,
   ];

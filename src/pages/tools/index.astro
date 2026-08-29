@@ -1,11 +1,10 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import ProductGrid from "../../components/ProductGrid.astro";
-import { products, categories, etsyCartsTotal, etsyFavorersTotal } from "../../data/products";
+import { products, categories, etsyFavorersTotal } from "../../data/products";
 import CartSignal from "../../components/CartSignal.astro";
 import { site } from "../../data/site";
 
-const inCarts = etsyCartsTotal(products);
 const favorers = etsyFavorersTotal(products);
 ---
 
@@ -36,7 +35,7 @@ const favorers = etsyFavorersTotal(products);
           ))
         }
       </div>
-      <CartSignal carts={inCarts} favorers={favorers} scope="shop" />
+      <CartSignal favorers={favorers} scope="shop" />
     </div>
     <div class="shop-results">
       <ProductGrid products={products} />

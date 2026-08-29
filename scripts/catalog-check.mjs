@@ -57,6 +57,12 @@ for (const product of products) {
   seenSlug.set(product.slug, true);
 
   if (!product.name) err(`${label}: no name`);
+  if (/plain\s*jane/i.test(String(product.sku || "") + String(product.name || "")) && /griptonite/i.test(product.name || "")) {
+    err(`${label}: Plain Jane must not say Griptonite`);
+  }
+  if (/guitar\s*pick/i.test(product.name || "") && /50\s*pack|351\s*style|multiple\s*sizes/i.test(product.name || "")) {
+    err(`${label}: pick name must stay short (not the Etsy title)`);
+  }
   if (!product.category) err(`${label}: no category`);
   if (!(Number(product.price) > 0)) err(`${label}: price is ${product.price}`);
 

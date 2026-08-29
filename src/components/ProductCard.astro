@@ -32,8 +32,8 @@ const title = productTitle(product);
     {
       !preview && (
         <>
-          <StockSignal quantity={product.etsyQuantity} />
-          <CartSignal carts={product.etsyCarts} favorers={product.etsyFavorers} />
+          <StockSignal inactive={product.inactive} />
+          <CartSignal favorers={product.etsyFavorers} />
           <BuyButtons product={product} compact />
         </>
       )

@@ -34,6 +34,7 @@ export type Product = {
   etsyFavorers?: number;
   etsyQuantity?: number;
   etsyStock?: Record<string, number>;
+  inactive?: boolean;
 };
 
 type VariantFile = { id: string; groups: VariantGroup[] };
@@ -64,7 +65,8 @@ export function bySku(a: { sku: string }, b: { sku: string }) {
   return aa[0] - bb[0] || aa[1] - bb[1] || a.sku.localeCompare(b.sku);
 }
 
-export const products: Product[] = [...(catalog as Product[])].sort(bySku);
+export const allProducts: Product[] = [...(catalog as Product[])].sort(bySku);
+export const products: Product[] = allProducts.filter((product) => !product.inactive);
 
 export const categories = [
   "All",
@@ -72,25 +74,26 @@ export const categories = [
 ];
 
 export function getProduct(slug: string) {
-  return products.find((product) => product.slug === slug);
+  return allProducts.find((product) => product.slug === slug);
 }
 
 export function nextProduct(slug: string) {
-  if (!products.length) return undefined;
-  const index = products.findIndex((product) => product.slug === slug);
-  if (index === -1 || index >= products.length - 1) return undefined;
-  return products[index + 1];
+  const index = allProducts.findIndex((product) => product.slug === slug);
+  if (index === -1) return undefined;
+  return allProducts.slice(index + 1).find((product) => !product.inactive);
 }
 
 export function prevProduct(slug: string) {
-  if (!products.length) return undefined;
-  const index = products.findIndex((product) => product.slug === slug);
+  const index = allProducts.findIndex((product) => product.slug === slug);
   if (index <= 0) return undefined;
-  return products[index - 1];
+  return allProducts
+    .slice(0, index)
+    .reverse()
+    .find((product) => !product.inactive);
 }
 
 export function getBySku(sku: string) {
-  return products.find((product) => product.sku.toUpperCase() === sku.toUpperCase());
+  return allProducts.find((product) => product.sku.toUpperCase() === sku.toUpperCase());
 }
 
 export function featuredProducts() {
@@ -131,18 +134,11 @@ export function etsyFavorersTotal(list: Product[] = products) {
 }
 
 export function etsyDemandLabel(
-  carts: number | undefined,
+  _carts: number | undefined,
   favorers: number | undefined,
   scope: "item" | "shop" = "item",
 ) {
-  const inCarts = Number(carts) || 0;
   const likes = Number(favorers) || 0;
-  if (inCarts > 0) {
-    if (scope === "shop") {
-      return inCarts === 1 ? "1 person has a tool in an Etsy cart." : `${inCarts} people have a tool in an Etsy cart.`;
-    }
-    return inCarts === 1 ? "In 1 Etsy cart" : `In ${inCarts} Etsy carts`;
-  }
   if (likes > 0) {
     if (scope === "shop") {
       return likes === 1 ? "1 favorite on Etsy." : `${likes} favorites on Etsy.`;
@@ -152,10 +148,9 @@ export function etsyDemandLabel(
   return "";
 }
 
-export function etsyStockLabel(quantity: number | undefined) {
-  if (typeof quantity !== "number" || !Number.isFinite(quantity)) return "";
-  if (quantity <= 0) return "Sold out";
-  return quantity === 1 ? "1 in stock" : `${quantity} in stock`;
+export function etsyStockLabel(_quantity: number | undefined, inactive = false) {
+  if (inactive) return "Not available";
+  return "Made to order";
 }
 
 export function displayPrice(product: Product) {
