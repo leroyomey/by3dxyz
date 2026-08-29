@@ -1008,13 +1008,6 @@ a.btn-primary[href*="etsy.com"]:hover {
   flex: 1 1 20rem;
 }
 
-.shop-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  flex: 1 1 20rem;
-}
-
 .shop-filters .chip {
   flex: 0 0 auto;
   width: auto;
@@ -1605,7 +1598,7 @@ a.btn-primary[href*="etsy.com"]:hover {
   color: var(--ink);
   background: var(--void);
   border: 1px solid var(--line);
-  padding: 11px 14px;
+  padding: 11px 32px 11px 14px;
   min-height: 44px;
   width: 100%;
   max-width: 100%;
@@ -1638,6 +1631,17 @@ a.btn-primary[href*="etsy.com"]:hover {
   max-width: 68ch;
 }
 
+/* .wrap centres a capped box, so a wrap that is also .prose drifts to the
+   middle of the page. Keep the wrap full width and cap the blocks inside it. */
+.page-hero.prose {
+  max-width: none;
+  padding-bottom: 56px;
+}
+
+.page-hero.prose > * {
+  max-width: 68ch;
+}
+
 .prose p {
   color: var(--ink-soft);
 }
@@ -1662,9 +1666,12 @@ a.btn-primary[href*="etsy.com"]:hover {
   max-width: 520px;
 }
 
-.form.print-form,
 .form.quote-split {
   max-width: none;
+}
+
+.form.print-form {
+  max-width: 52rem;
 }
 
 .form label {
@@ -1691,6 +1698,7 @@ a.btn-primary[href*="etsy.com"]:hover {
 
 .form select {
   appearance: none;
+  padding-right: 32px;
   background-image: linear-gradient(45deg, transparent 50%, var(--accent) 50%),
     linear-gradient(135deg, var(--accent) 50%, transparent 50%);
   background-position:

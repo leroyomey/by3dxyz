@@ -24,9 +24,9 @@
       "label": "Pack size",
       "placeholder": "Select a pack size",
       "values": [
-        { "name": "2 Pack" },
-        { "name": "4 Pack" },
-        { "name": "6 Pack" }
+        { "name": "2 Pack", "price": 10.99 },
+        { "name": "4 Pack", "price": 19.99 },
+        { "name": "6 Pack", "price": 27.99 }
       ]
     }
   ]
