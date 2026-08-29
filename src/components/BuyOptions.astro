@@ -37,8 +37,8 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
   <div class="price-row">
     <p class="price" data-total>{formatPrice(product.price, product.currency)}</p>
     <NewBadge listedAt={product.listedAt} />
-    <span class="ship-note">{shippingNote}</span>
   </div>
+  <p class="muted ship-line">{shippingNote}</p>
   <div class="buy-proof">
     <slot />
   </div>

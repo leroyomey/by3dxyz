@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { shippingNote, site } from "../data/site";
+import { site } from "../data/site";
 ---
 
 <Layout title="Thank you" description="Your by3DXYZ order was received." robots="noindex, nofollow">
@@ -20,7 +20,7 @@ import { shippingNote, site } from "../data/site";
     </div>
     <p>
       PayPal has your payment. The shop will print and mail your order using the SKU, selected options, quantity, and
-      ship-to address. {shippingNote} Questions: {site.email}
+      ship-to address. Questions: {site.email}
     </p>
     <div class="notify-fail" data-notify-fail hidden>
       <p>

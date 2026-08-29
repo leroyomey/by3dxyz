@@ -1,5 +1,8 @@
 ---
-import { site } from "../data/site";
+import { shippingNote, site } from "../data/site";
+
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const checkoutHere = path === "/cart" || /^\/tools\/.+/.test(path);
 ---
 
 <footer class="site-footer">
@@ -30,5 +33,8 @@ import { site } from "../data/site";
       <a href="/privacy">Privacy</a>
     </div>
   </div>
-  <p class="wrap footer-copy">© 2026 {site.name}</p>
+  <p class="wrap footer-copy">
+    <span>© 2026 {site.name}</span>
+    {checkoutHere ? null : <span class="footer-ship">{shippingNote}</span>}
+  </p>
 </footer>

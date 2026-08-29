@@ -2265,7 +2265,19 @@ a.btn-primary[href*="etsy.com"]:hover {
 .footer-brand .axis-z { color: var(--z); }
 
 .footer-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 24px;
   margin: 18px auto 0;
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+}
+
+.footer-ship,
+.ship-line {
+  margin: 0;
   font-size: 0.8125rem;
   color: var(--ink-soft);
 }

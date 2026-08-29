@@ -1,6 +1,5 @@
 ---
 import type { Product } from "../data/products";
-import { shippingNote } from "../data/site";
 import { cardShort, displayPrice, productFamily, productTitle } from "../data/products";
 import BuyButtons from "./BuyButtons.astro";
 import CartSignal from "./CartSignal.astro";
@@ -35,7 +34,6 @@ const short = cardShort(product);
     <div class="price-row">
       <div class="price">{displayPrice(product)}</div>
       <NewBadge listedAt={product.listedAt} />
-      <span class="ship-note">{shippingNote}</span>
     </div>
     {
       !preview && (
