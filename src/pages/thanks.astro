@@ -9,7 +9,8 @@ import { site } from "../data/site";
     <h1>Thank you</h1>
     <div data-order-summary hidden>
       <p>We received:</p>
-      <ul>
+      <ul class="order-lines" data-order-lines hidden></ul>
+      <ul data-order-single>
         <li><strong>SKU</strong> <span data-order-sku></span></li>
         <li><strong>Tool</strong> <span data-order-name></span></li>
         <li data-order-options-row hidden><strong>Options</strong> <span data-order-options></span></li>
@@ -49,13 +50,46 @@ import { site } from "../data/site";
         const optionsRow = box.querySelector("[data-order-options-row]");
         const qty = box.querySelector("[data-order-qty]");
         const total = box.querySelector("[data-order-total]");
-        if (sku) sku.textContent = order.sku || "";
-        if (name) name.textContent = order.name || "";
-        if (options && order.optionLine) {
-          options.textContent = order.optionLine;
-          optionsRow?.removeAttribute("hidden");
+        const lineBox = box.querySelector("[data-order-lines]");
+        const single = box.querySelector("[data-order-single]");
+        const orderLines = Array.isArray(order.lines) ? order.lines : [];
+        if (lineBox && orderLines.length) {
+          lineBox.replaceChildren();
+          for (const line of orderLines) {
+            const item = document.createElement("li");
+            const bits = [
+              [line.sku, line.name].filter(Boolean).join(" "),
+              line.optionLine,
+              line.qty ? "Qty " + String(line.qty) : "",
+              line.total ? "$" + String(line.total) : "",
+            ].filter(Boolean);
+            item.textContent = bits.join(". ");
+            lineBox.append(item);
+          }
+          const sum = document.createElement("li");
+          const sumLabel = document.createElement("strong");
+          sumLabel.textContent = "Total";
+          sum.append(
+            sumLabel,
+            " ",
+            order.total
+              ? `${order.currency === "USD" ? "$" : ""}${order.total} ${order.currency || ""}`.trim()
+              : "",
+          );
+          lineBox.append(sum);
+          lineBox.removeAttribute("hidden");
+          single?.setAttribute("hidden", "");
+        } else {
+          if (sku) sku.textContent = order.sku || "";
+          if (name) name.textContent = order.name || "";
+          if (options && order.optionLine) {
+            options.textContent = order.optionLine;
+            optionsRow?.removeAttribute("hidden");
+          }
+          if (qty) qty.textContent = String(order.qty || "");
+          lineBox?.setAttribute("hidden", "");
+          single?.removeAttribute("hidden");
         }
-        if (qty) qty.textContent = String(order.qty || "");
         if (total) {
           total.textContent = order.total
             ? `${order.currency === "USD" ? "$" : ""}${order.total} ${order.currency || ""}`.trim()
@@ -67,10 +101,24 @@ import { site } from "../data/site";
           const mail = document.querySelector("[data-order-mailto]");
           const lines = [
             "by3DXYZ paid order",
-            "SKU: " + (order.sku || ""),
-            "Tool: " + (order.name || ""),
-            order.optionLine ? "Options: " + order.optionLine : "",
-            "Quantity: " + String(order.qty || ""),
+            ...(orderLines.length
+              ? orderLines.map((line) =>
+                  [
+                    [line.sku, line.name].filter(Boolean).join(" "),
+                    line.optionLine,
+                    line.qty ? "Qty " + String(line.qty) : "",
+                    line.unit ? "$" + String(line.unit) + " each" : "",
+                    line.total ? "$" + String(line.total) : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" | "),
+                )
+              : [
+                  "SKU: " + (order.sku || ""),
+                  "Tool: " + (order.name || ""),
+                  order.optionLine ? "Options: " + order.optionLine : "",
+                  "Quantity: " + String(order.qty || ""),
+                ]),
             "Total: " + String(order.total || "") + " " + (order.currency || ""),
             order.paypalOrderId ? "PayPal order: " + order.paypalOrderId : "",
             order.buyerEmail ? "Buyer: " + order.buyerEmail : "",

@@ -16,4 +16,6 @@ interface Window {
   by3dxyzVisitBusy?: boolean;
   by3dxyzVisitDone?: boolean;
   by3dxyzVisitN?: number;
+  by3dxyzBuyClick?: boolean;
+  by3dxyzCartUi?: boolean;
 }

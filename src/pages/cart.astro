@@ -1,0 +1,115 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PayPalButtons from "../components/PayPalButtons.astro";
+import { site } from "../data/site";
+
+const clientId = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID ?? "";
+const notifyEmail = import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
+---
+
+<Layout title="Cart" description="Pay once for the parts in your by3DXYZ cart." robots="noindex, nofollow">
+  <section class="wrap page-hero cart-page">
+    <p class="kicker">Shop</p>
+    <h1>Cart</h1>
+    <p class="lede">Pay once for every part here. FREE shipping.</p>
+    <p class="cart-empty muted" data-cart-empty hidden>
+      Nothing in the cart yet. <a href="/tools">Back to the shop</a>
+    </p>
+    <div class="cart-box" data-cart-box hidden>
+      <ul class="cart-lines" data-cart-lines></ul>
+      <div class="cart-total-row">
+        <p class="price" data-cart-total></p>
+        <span class="ship-free">FREE shipping</span>
+      </div>
+      {
+        clientId ? (
+          <PayPalButtons clientId={clientId} currency="USD" notifyEmail={notifyEmail} mode="cart" />
+        ) : (
+          <p class="muted">Checkout is not available on this preview.</p>
+        )
+      }
+    </div>
+  </section>
+</Layout>
+
+<script>
+  import { CART_QTY_MAX, cartTotal, lineKey, loadCart, removeLine, setLineQty } from "../scripts/shop-cart";
+
+  function money(value: number, currency = "USD") {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(value);
+  }
+
+  function paintCart() {
+    const lines = loadCart();
+    const empty = document.querySelector("[data-cart-empty]");
+    const box = document.querySelector("[data-cart-box]");
+    const list = document.querySelector("[data-cart-lines]");
+    const total = document.querySelector("[data-cart-total]");
+    const paypal = document.querySelector("[data-paypal-mount]");
+    if (!list) return;
+    list.replaceChildren();
+    for (const line of lines) {
+      const key = lineKey(line);
+      const item = document.createElement("li");
+      item.className = "cart-line";
+      const title = document.createElement(line.href ? "a" : "strong");
+      title.className = "cart-line-name";
+      title.textContent = `${line.sku} ${line.name}`.trim();
+      if (title instanceof HTMLAnchorElement) title.href = line.href;
+      const opts = document.createElement("p");
+      opts.className = "muted cart-line-options";
+      opts.textContent = line.optionLine || "Standard";
+      const controls = document.createElement("div");
+      controls.className = "cart-line-controls";
+      const qtyLabel = document.createElement("label");
+      qtyLabel.className = "option-field cart-line-qty";
+      const qtyWord = document.createElement("span");
+      qtyWord.textContent = "Quantity";
+      const qty = document.createElement("select");
+      qty.setAttribute("data-cart-qty", key);
+      for (let n = 1; n <= CART_QTY_MAX; n += 1) {
+        const option = document.createElement("option");
+        option.value = String(n);
+        option.textContent = String(n);
+        if (n === line.qty) option.selected = true;
+        qty.append(option);
+      }
+      qtyLabel.append(qtyWord, qty);
+      const price = document.createElement("p");
+      price.className = "cart-line-price";
+      price.textContent = money(line.unit * line.qty, line.currency);
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "cart-line-remove";
+      remove.setAttribute("data-cart-remove", key);
+      remove.textContent = "Remove";
+      controls.append(qtyLabel, price, remove);
+      item.append(title, opts, controls);
+      list.append(item);
+    }
+    if (total) total.textContent = money(cartTotal(lines));
+    empty?.toggleAttribute("hidden", lines.length > 0);
+    box?.toggleAttribute("hidden", lines.length === 0);
+    paypal?.classList.toggle("is-disabled", lines.length === 0);
+  }
+
+  if (!window.by3dxyzCartUi) {
+    window.by3dxyzCartUi = true;
+    document.addEventListener("change", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLSelectElement) || !target.hasAttribute("data-cart-qty")) return;
+      setLineQty(target.getAttribute("data-cart-qty") || "", Number(target.value));
+      paintCart();
+    });
+    document.addEventListener("click", (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const button = target?.closest("[data-cart-remove]");
+      if (!button) return;
+      removeLine(button.getAttribute("data-cart-remove") || "");
+      paintCart();
+    });
+  }
+
+  paintCart();
+  document.addEventListener("astro:page-load", paintCart);
+</script>

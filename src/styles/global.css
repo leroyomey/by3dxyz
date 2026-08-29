@@ -254,6 +254,39 @@ main {
   text-shadow: 0 0 14px rgba(0, 240, 255, 0.7);
 }
 
+.nav-cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  min-height: 44px;
+  color: rgba(234, 242, 255, 0.68);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.nav-cart:hover,
+.nav-cart[aria-current="page"] {
+  color: var(--accent);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
+}
+
+.cart-n {
+  min-width: 1.35em;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.4;
+}
+
 .nav-cta,
 .cart-btn,
 .btn,
@@ -1608,8 +1641,105 @@ a.btn-primary[href*="etsy.com"]:hover {
   margin-top: 2px;
 }
 
+.buy-actions {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.buy-cart-note {
+  margin: 0;
+}
+
 .buy-pay-label {
   margin: 0 0 2px;
+}
+
+.cart-page .lede {
+  margin-bottom: 20px;
+}
+
+.cart-box {
+  display: grid;
+  gap: 20px;
+  max-width: 40rem;
+}
+
+.cart-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.cart-line {
+  display: grid;
+  gap: 6px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.cart-line-name {
+  font-weight: 700;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cart-line-name:hover {
+  color: var(--accent);
+}
+
+.cart-line-options {
+  margin: 0;
+}
+
+.cart-line-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 16px;
+}
+
+.cart-line-qty {
+  max-width: 140px;
+}
+
+.cart-line-price {
+  margin: 0;
+  font-weight: 700;
+}
+
+.cart-line-remove {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.cart-line-remove:hover {
+  color: var(--accent);
+}
+
+.cart-total-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.cart-total-row .price {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.order-lines {
+  display: grid;
+  gap: 8px;
 }
 
 .paypal-box.is-disabled {
@@ -2348,6 +2478,11 @@ a.btn-primary[href*="etsy.com"]:hover {
 
   .logo-mark {
     display: none;
+  }
+
+  .nav-cart {
+    padding: 8px 8px;
+    font-size: 0.8125rem;
   }
 
   .nav-cta {

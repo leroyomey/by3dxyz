@@ -3,6 +3,7 @@ import type { Product } from "../data/products";
 import { productVariants, formatPrice } from "../data/products";
 import { site } from "../data/site";
 import NewBadge from "./NewBadge.astro";
+import PayPalButtons from "./PayPalButtons.astro";
 
 interface Props {
   product: Product;
@@ -27,10 +28,12 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
 
 <div
   class="buy-options"
+  id="buy"
   data-buy
   data-currency={product.currency}
   data-name={product.name}
   data-sku={product.sku}
+  data-href={`/tools/${product.slug}`}
   data-base-price={product.price}
 >
   <div class="price-row">
@@ -86,13 +89,20 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
       }
   </p>
   {
-    clientId && !soldOut ? (
-      <div class="paypal-box" id="buy">
-        <p class="muted buy-pay-label">Pay with PayPal or card</p>
-        <div id="paypal-paypal"></div>
-        <div id="paypal-paylater"></div>
-        <div id="paypal-card"></div>
+    !soldOut ? (
+      <div class="buy-actions">
+        <button type="button" class="btn btn-ghost" data-add-cart disabled={needsOptions}>
+          Add to cart
+        </button>
+        <p class="muted buy-cart-note" data-cart-added hidden>
+          Added. <a href="/cart">View cart</a>
+        </p>
       </div>
+    ) : null
+  }
+  {
+    clientId && !soldOut ? (
+      <PayPalButtons clientId={clientId} currency={product.currency} notifyEmail={notifyEmail} mode="buy" />
     ) : null
   }
   <a class="buy-alt" href={etsyUrl} target="_blank" rel="noopener noreferrer">also on Etsy</a>
@@ -101,301 +111,61 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
   </p>
 </div>
 
-{
-  clientId && !soldOut && (
-    <script
-      is:inline
-      define:vars={{ clientId, currency: product.currency, notifyEmail }}
-    >
-      (function () {
-        const root = document.querySelector("[data-buy]");
-        const container = document.getElementById("buy");
-        if (!root || !container || !clientId) return;
-        function selected() {
-          const name = root.getAttribute("data-name") || "by3DXYZ part";
-          const sku = (root.getAttribute("data-sku") || "").toUpperCase();
-          const base = Number(root.getAttribute("data-base-price") || "0");
-          const qty = Number(root.querySelector("[data-qty]")?.value || "1");
-          const selects = [...root.querySelectorAll("select[data-option]")];
-          const options = {};
-          const parts = [];
-          let unit = base;
-          let ready = true;
-          for (const select of selects) {
-            if (!(select instanceof HTMLSelectElement)) continue;
-            const id = select.getAttribute("data-option") || "option";
-            const label = select.getAttribute("data-option-label") || id;
-            if (!select.value) {
-              ready = false;
-              continue;
-            }
-            const picked = select.selectedOptions[0];
-            const priced = Number(picked?.getAttribute("data-price") || "");
-            if (Number.isFinite(priced) && priced > 0) unit = priced;
-            options[id] = select.value;
-            parts.push(label + ": " + select.value);
-          }
-          const total = unit * qty;
-          const optionLine = parts.join("; ");
-          const summary = [sku, name, optionLine, "Qty " + qty].filter(Boolean).join(" - ");
-          const customId = [sku, parts.map((part) => part.replace(": ", "=")).join("|"), "qty=" + qty]
-            .filter(Boolean)
-            .join("|")
-            .slice(0, 127);
-          return {
-            sku,
-            name,
-            qty,
-            unit,
-            total,
-            ready,
-            options,
-            optionLine,
-            summary,
-            customId,
-            itemName: (sku ? sku + " " : "") + name,
-          };
-        }
+<script>
+  import { addToCart, readBuyState } from "../scripts/shop-cart";
 
-        function paint() {
-          const selects = [...root.querySelectorAll("select[data-option]")];
-          const picked = {};
-          let complete = selects.length === 0;
-          if (selects.length) {
-            complete = true;
-            for (const select of selects) {
-              if (!(select instanceof HTMLSelectElement) || !select.value) complete = false;
-              else picked[select.getAttribute("data-option") || "option"] = select.value;
-            }
-          }
-          const state = selected();
-          const total = root.querySelector("[data-total]");
-          const hint = root.querySelector("[data-need-options]");
-          const stockEl = root.querySelector("[data-variant-stock]");
-          const needs = hint?.getAttribute("data-need-options") === "true";
-          if (total) {
-            total.textContent = new Intl.NumberFormat("en-US", { style: "currency", currency }).format(state.total);
-          }
-          if (stockEl) {
-            stockEl.textContent = "";
-            stockEl.classList.remove("is-out");
-          }
-          if (hint && needs) {
-            hint.textContent = complete ? "" : hint.getAttribute("data-option-hint") || "Please choose a color.";
-          }
-          container.classList.toggle("is-disabled", !state.ready);
-        }
+  function paintBuy(root: Element) {
+    const state = readBuyState(root);
+    const currency = root.getAttribute("data-currency") || "USD";
+    const total = root.querySelector("[data-total]");
+    const hint = root.querySelector("[data-need-options]");
+    const stockEl = root.querySelector("[data-variant-stock]");
+    const add = root.querySelector("[data-add-cart]");
+    const paypal = root.querySelector("[data-paypal-mount]");
+    const needs = hint?.getAttribute("data-need-options") === "true";
+    if (total) {
+      total.textContent = new Intl.NumberFormat("en-US", { style: "currency", currency }).format(
+        state.line.unit * state.line.qty,
+      );
+    }
+    if (stockEl) {
+      stockEl.textContent = "";
+      stockEl.classList.remove("is-out");
+    }
+    if (hint && needs) {
+      hint.textContent = state.ready ? "" : hint.getAttribute("data-option-hint") || "Please choose a color.";
+    }
+    if (add instanceof HTMLButtonElement) add.disabled = !state.ready;
+    paypal?.classList.toggle("is-disabled", !state.ready);
+  }
 
-        function money(value) {
-          return Number(value).toFixed(2);
-        }
+  function bindBuy() {
+    for (const root of document.querySelectorAll("[data-buy]")) {
+      if (!(root instanceof HTMLElement)) continue;
+      if (root.dataset.buyBound !== "true") {
+        root.dataset.buyBound = "true";
+        root.addEventListener("change", () => paintBuy(root));
+      }
+      paintBuy(root);
+    }
+  }
 
-        function shippingText(details) {
-          const unit = details && details.purchase_units && details.purchase_units[0];
-          const ship = unit && unit.shipping;
-          const addr = (ship && ship.address) || {};
-          const payer = details && details.payer;
-          const payerName =
-            (ship && ship.name && ship.name.full_name) ||
-            (payer && payer.name && [payer.name.given_name, payer.name.surname].filter(Boolean).join(" ")) ||
-            "";
-          return [
-            payerName,
-            addr.address_line_1,
-            addr.address_line_2,
-            [addr.admin_area_2, addr.admin_area_1, addr.postal_code].filter(Boolean).join(", "),
-            addr.country_code,
-          ]
-            .filter(Boolean)
-            .join("\n");
-        }
+  if (!window.by3dxyzBuyClick) {
+    window.by3dxyzBuyClick = true;
+    document.addEventListener("click", (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const button = target?.closest("[data-add-cart]");
+      if (!button) return;
+      const root = button.closest("[data-buy]");
+      if (!root) return;
+      const state = readBuyState(root);
+      if (!state.ready) return;
+      addToCart(state.line);
+      const note = root.querySelector("[data-cart-added]");
+      note?.removeAttribute("hidden");
+    });
+  }
 
-        function postNotify(payload) {
-          return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(notifyEmail), {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Accept: "application/json" },
-            body: JSON.stringify(payload),
-          }).then(function (res) {
-            if (!res.ok) throw new Error(String(res.status));
-            return res;
-          });
-        }
-
-        function notifyShop(state, details) {
-          if (!notifyEmail) return Promise.resolve(false);
-          const payer = details && details.payer;
-          const payload = {
-            _subject: "by3DXYZ order " + (state.sku || state.name),
-            _template: "table",
-            _captcha: "false",
-            sku: state.sku,
-            product: state.name,
-            color: state.options.color || "",
-            size: state.options.size || state.options.pack || "",
-            options: state.optionLine,
-            quantity: String(state.qty),
-            unit_price: money(state.unit),
-            total: money(state.total) + " " + currency,
-            paypal_order_id: (details && details.id) || "",
-            buyer_name:
-              (payer && payer.name && [payer.name.given_name, payer.name.surname].filter(Boolean).join(" ")) || "",
-            buyer_email: (payer && payer.email_address) || "",
-            ship_to: shippingText(details),
-          };
-          return postNotify(payload)
-            .catch(function () {
-              return postNotify(payload);
-            })
-            .then(function () {
-              return true;
-            })
-            .catch(function () {
-              return false;
-            });
-        }
-
-        root.addEventListener("change", paint);
-        paint();
-
-        function start() {
-          if (!window.paypal || container.dataset.ready) return;
-          container.dataset.ready = "true";
-          const paypal = window.paypal;
-          const shared = {
-            onClick: function (_data, actions) {
-              const state = selected();
-              if (!state.ready) return actions.reject();
-              return actions.resolve();
-            },
-            createOrder: function (_data, actions) {
-              const state = selected();
-              const value = money(state.total);
-              const unit = money(state.unit);
-              return actions.order.create({
-                application_context: {
-                  brand_name: "by3DXYZ",
-                  user_action: "PAY_NOW",
-                  shipping_preference: "GET_FROM_FILE",
-                },
-                purchase_units: [
-                  {
-                    custom_id: state.customId,
-                    description: state.summary.slice(0, 127),
-                    amount: {
-                      currency_code: currency,
-                      value: value,
-                      breakdown: {
-                        item_total: { currency_code: currency, value: value },
-                      },
-                    },
-                    items: [
-                      {
-                        name: state.itemName.slice(0, 127),
-                        sku: state.sku.slice(0, 127),
-                        description: (state.optionLine || "Standard").slice(0, 127),
-                        quantity: String(state.qty),
-                        unit_amount: { currency_code: currency, value: unit },
-                        category: "PHYSICAL_GOODS",
-                      },
-                    ],
-                  },
-                ],
-              });
-            },
-            onApprove: function (_data, actions) {
-              return actions.order.capture().then(function (details) {
-                const state = selected();
-                const payer = details && details.payer;
-                const snapshot = {
-                  sku: state.sku,
-                  name: state.name,
-                  options: state.options,
-                  optionLine: state.optionLine,
-                  qty: state.qty,
-                  total: money(state.total),
-                  currency: currency,
-                  paypalOrderId: (details && details.id) || "",
-                  buyerEmail: (payer && payer.email_address) || "",
-                  shipTo: shippingText(details),
-                  notifyOk: false,
-                };
-                function goThanks(ok) {
-                  snapshot.notifyOk = Boolean(ok);
-                  try {
-                    sessionStorage.setItem("by3dxyz-order", JSON.stringify(snapshot));
-                  } catch (_err) {}
-                  window.location.href = "/thanks";
-                }
-                return Promise.race([
-                  notifyShop(state, details),
-                  new Promise(function (resolve) {
-                    setTimeout(function () {
-                      resolve(false);
-                    }, 8000);
-                  }),
-                ]).then(goThanks, function () {
-                  goThanks(false);
-                });
-              });
-            },
-          };
-
-          function mount(source, selector, style) {
-            const node = document.querySelector(selector);
-            if (!source || !node) return;
-            const eligible =
-              typeof paypal.isFundingEligible !== "function" || paypal.isFundingEligible(source);
-            if (!eligible) {
-              node.hidden = true;
-              return;
-            }
-            paypal
-              .Buttons(Object.assign({ fundingSource: source, style: style }, shared))
-              .render(node)
-              .catch(function () {
-                node.hidden = true;
-              });
-          }
-
-          mount(paypal.FUNDING.PAYPAL, "#paypal-paypal", {
-            color: "gold",
-            shape: "rect",
-            label: "paypal",
-            height: 45,
-            tagline: false,
-          });
-          mount(paypal.FUNDING.PAYLATER, "#paypal-paylater", {
-            color: "gold",
-            shape: "rect",
-            label: "paypal",
-            height: 45,
-            tagline: false,
-          });
-          mount(paypal.FUNDING.CARD, "#paypal-card", {
-            color: "black",
-            shape: "rect",
-            label: "pay",
-            height: 45,
-            tagline: false,
-          });
-        }
-
-        const src =
-          "https://www.paypal.com/sdk/js?client-id=" +
-          encodeURIComponent(clientId) +
-          "&currency=" +
-          encodeURIComponent(currency) +
-          "&enable-funding=card,paylater&disable-funding=venmo";
-        const existing = document.querySelector('script[src^="https://www.paypal.com/sdk/js"]');
-        if (window.paypal) start();
-        else if (existing) existing.addEventListener("load", start);
-        else {
-          const script = document.createElement("script");
-          script.src = src;
-          script.onload = start;
-          document.head.appendChild(script);
-        }
-      })();
-    </script>
-  )
-}
+  bindBuy();
+  document.addEventListener("astro:page-load", bindBuy);
+</script>

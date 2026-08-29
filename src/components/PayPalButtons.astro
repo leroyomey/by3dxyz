@@ -1,0 +1,35 @@
+---
+interface Props {
+  clientId: string;
+  currency: string;
+  notifyEmail: string;
+  mode?: "buy" | "cart";
+}
+
+const { clientId, currency, notifyEmail, mode = "buy" } = Astro.props;
+---
+
+<div
+  class="paypal-box"
+  data-paypal-mount
+  data-paypal-mode={mode}
+  data-paypal-client={clientId}
+  data-paypal-currency={currency}
+  data-paypal-notify={notifyEmail}
+>
+  <p class="muted buy-pay-label">Pay with PayPal or card</p>
+  <div data-paypal-slot="paypal"></div>
+  <div data-paypal-slot="paylater"></div>
+  <div data-paypal-slot="card"></div>
+</div>
+
+<script>
+  import { bootPayPalMounts } from "../scripts/shop-checkout";
+
+  function boot() {
+    bootPayPalMounts();
+  }
+
+  boot();
+  document.addEventListener("astro:page-load", boot);
+</script>

@@ -31,6 +31,9 @@ const path = Astro.url.pathname;
       <a href="/about" aria-current={path === "/about" ? "page" : undefined}>About</a>
       <a href={site.etsyUrl} target="_blank" rel="noopener noreferrer">Etsy</a>
     </div>
+    <a class="nav-cart" href="/cart" data-cart-link aria-current={path === "/cart" ? "page" : undefined}>
+      Cart<span class="cart-n" data-cart-count hidden></span>
+    </a>
     <a class="nav-cta" href="/print" aria-current={path.startsWith("/print") ? "page" : undefined}>
       <span class="cta-wide">Get an estimate</span>
       <span class="cta-narrow">Estimate</span>
@@ -61,4 +64,12 @@ const path = Astro.url.pathname;
   });
 
   document.addEventListener("astro:after-swap", () => setMenu(false));
+</script>
+
+<script>
+  import { CART_EVENT, paintCartBadge } from "../scripts/shop-cart";
+
+  paintCartBadge();
+  document.addEventListener("astro:page-load", paintCartBadge);
+  window.addEventListener(CART_EVENT, paintCartBadge);
 </script>

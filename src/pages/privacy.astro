@@ -20,7 +20,7 @@ import { site } from "../data/site";
     <h2>Checkout</h2>
     <p>
       Payments on this site go through PayPal. Card details are handled by PayPal, not by our servers. After payment,
-      the shop receives the SKU, selected options, quantity, and the ship-to address PayPal collected, so
+      the shop receives each SKU, selected options, quantity, the total, and the ship-to address PayPal collected, so
       the order can be printed and mailed. See PayPal’s privacy policy for details.
     </p>
     <p>
@@ -28,8 +28,8 @@ import { site } from "../data/site";
     </p>
     <h2>Cookies and ads</h2>
     <p>
-      PayPal may set cookies on its checkout page. This site does not run its own shopping-cart cookies, and it does
-      not run ads.
+      PayPal may set cookies on its checkout page. This site keeps the cart in session storage on your device, not in
+      a shop cookie, and it does not run ads.
     </p>
     <h2>Contact</h2>
     <p>Shop questions: {site.email}</p>
