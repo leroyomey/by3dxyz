@@ -1,9 +1,18 @@
 /**
  * Write public/google-merchant.xml from the website catalog.
  * One row per SKU (not per color or size). No White. Website titles, not Etsy titles.
- * Owner pastes https://by3dxyz.com/google-merchant.xml into Google Merchant Center.
- * Shopping tab still needs their Google account: Search Console → Get started → Merchant Center.
+ *
+ * This file is the Google Merchant Center automation (same idea as Etsy → website sync).
+ * Owner stays on "Add products from a file" and sets a scheduled fetch of
+ * https://by3dxyz.com/google-merchant.xml (daily). Do not add products one by one.
+ * Do not build Merchant API OAuth unless the scheduled file feed cannot do the job.
+ *
+ * Shipping matches PayPal: US and US territories $0, other listed countries
+ * INTERNATIONAL_SHIPPING_USD. Google has no rest-of-world wildcard and caps 100
+ * shipping rows per product, so GMC account shipping should also be US $0 / rest $18
+ * for any extra target country. identifier_exists stays false.
  */
+import { INTERNATIONAL_SHIPPING_USD, FREE_SHIP_COUNTRIES } from "./checkout-price.mjs";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -36,6 +45,59 @@ function productTitle(product) {
   return `${sku} ${name}`;
 }
 
+/** Google Shopping countries that require a shipping rate. US is free via FREE_SHIP_COUNTRIES. */
+const SHOPPING_SHIP_COUNTRIES = [
+  "AU",
+  "AT",
+  "BE",
+  "BR",
+  "CA",
+  "CH",
+  "CZ",
+  "DE",
+  "DK",
+  "ES",
+  "FI",
+  "FR",
+  "GB",
+  "GR",
+  "HU",
+  "IE",
+  "IL",
+  "IN",
+  "IT",
+  "JP",
+  "KR",
+  "NL",
+  "NO",
+  "NZ",
+  "PL",
+  "PT",
+  "RO",
+  "SE",
+  "SK",
+  "US",
+];
+
+function shippingBlock(country, amount, currency) {
+  return [
+    "      <g:shipping>",
+    `        <g:country>${country}</g:country>`,
+    `        <g:price>${amount} ${currency}</g:price>`,
+    "      </g:shipping>",
+  ].join("\n");
+}
+
+function shippingXml(currency) {
+  const intl = Number(INTERNATIONAL_SHIPPING_USD).toFixed(2);
+  const free = [...FREE_SHIP_COUNTRIES].sort((a, b) => (a === "US" ? -1 : b === "US" ? 1 : a.localeCompare(b)));
+  const paid = SHOPPING_SHIP_COUNTRIES.filter((country) => !FREE_SHIP_COUNTRIES.has(country)).sort();
+  return [
+    ...free.map((country) => shippingBlock(country, "0.00", currency)),
+    ...paid.map((country) => shippingBlock(country, intl, currency)),
+  ].join("\n");
+}
+
 function itemXml(origin, product) {
   const title = productTitle(product);
   const link = `${origin}/tools/${product.slug}`;
@@ -63,6 +125,7 @@ function itemXml(origin, product) {
     `      <g:mpn>${escapeXml(product.sku)}</g:mpn>`,
     "      <g:identifier_exists>false</g:identifier_exists>",
     product.category ? `      <g:product_type>${escapeXml(product.category)}</g:product_type>` : "",
+    shippingXml(currency),
     "    </item>",
   ]
     .filter(Boolean)

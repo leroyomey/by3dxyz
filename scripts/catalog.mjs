@@ -8,6 +8,7 @@ import {
   inventoryToStock,
 } from "./etsy-oauth.mjs";
 import { writeSitemap } from "./sitemap.mjs";
+import { writeMerchantFeed } from "./merchant-feed.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const productsPath = join(root, "src", "data", "products.json");
@@ -44,6 +45,7 @@ function loadProducts() {
 function saveProducts(products) {
   writeFileSync(productsPath, `${JSON.stringify(products, null, 2)}\n`);
   writeSitemap(products);
+  writeMerchantFeed(products);
 }
 
 function slugify(value) {

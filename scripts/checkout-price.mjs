@@ -6,7 +6,7 @@ export const LINE_MAX = 20;
 /** One flat for a small tracked international parcel. Change this number only. */
 export const INTERNATIONAL_SHIPPING_USD = 18;
 
-const FREE_SHIP_COUNTRIES = new Set(["US", "PR", "GU", "VI", "AS", "MP", "UM"]);
+export const FREE_SHIP_COUNTRIES = new Set(["US", "PR", "GU", "VI", "AS", "MP", "UM"]);
 
 export function shipCountry(code) {
   return String(code || "").trim().toUpperCase();

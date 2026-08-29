@@ -1,6 +1,7 @@
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { INTERNATIONAL_SHIPPING_USD } from "./checkout-price.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = join(root, "src", "data");
@@ -101,6 +102,27 @@ for (const product of products) {
     if (String(product[field] || "").includes("—")) {
       warn(`${label}: em dash in ${field}. Customer copy uses a period, comma, or hyphen.`);
     }
+  }
+}
+
+const feedPath = join(publicDir, "google-merchant.xml");
+if (!existsSync(feedPath)) {
+  err("public/google-merchant.xml is missing. Run npm run merchant:feed");
+} else {
+  const feed = readFileSync(feedPath, "utf8");
+  if (!feed.includes("<g:identifier_exists>false</g:identifier_exists>")) {
+    err("Merchant feed must set identifier_exists false");
+  }
+  if (!feed.includes("<g:country>US</g:country>") || !/<g:shipping>[\s\S]*?<g:country>US<\/g:country>[\s\S]*?<g:price>0\.00 USD<\/g:price>/.test(feed)) {
+    err("Merchant feed must list US shipping at $0");
+  }
+  const intl = Number(INTERNATIONAL_SHIPPING_USD).toFixed(2);
+  if (!feed.includes(`<g:price>${intl} USD</g:price>`)) {
+    err(`Merchant feed must list international shipping at $${intl}`);
+  }
+  const decorTitle = feed.match(/<g:id>SW-001<\/g:id>\s*<g:title>([^<]+)<\/g:title>/)?.[1];
+  if (decorTitle && decorTitle !== "Spider Web Decor") {
+    err(`SW-001 merchant title must stay Spider Web Decor (got ${decorTitle})`);
   }
 }
 
