@@ -2,6 +2,7 @@ import catalog from "./products.json";
 import colorVariantSet from "./color-variants.json";
 import pickVariantSet from "./pick-variants.json";
 import ribVariantSet from "./rib-variants.json";
+import decorVariantSet from "./decor-variants.json";
 
 export type VariantValue = {
   name: string;
