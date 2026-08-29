@@ -11,8 +11,6 @@ interface Props {
 
 const { product } = Astro.props;
 const clientId = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID ?? "";
-const notifyEmail =
-  import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
 const variants = productVariants(product);
 const needsOptions = variants.length > 0;
 const extraGroup = variants.find((group) => group.id !== "color");
@@ -102,7 +100,7 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
   }
   {
     clientId && !soldOut ? (
-      <PayPalButtons clientId={clientId} currency={product.currency} notifyEmail={notifyEmail} mode="buy" />
+      <PayPalButtons clientId={clientId} currency={product.currency} mode="buy" />
     ) : null
   }
   <a class="buy-alt" href={etsyUrl} target="_blank" rel="noopener noreferrer">also on Etsy</a>

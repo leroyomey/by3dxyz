@@ -17,11 +17,6 @@ interface Window {
     remove: (id: string) => void;
   };
   by3dxyzIsTrustedFileLink?: (raw: string) => boolean;
-  by3dxyzVisitTimer?: number;
-  by3dxyzVisitBound?: boolean;
-  by3dxyzVisitBusy?: boolean;
-  by3dxyzVisitDone?: boolean;
-  by3dxyzVisitN?: number;
   by3dxyzBuyClick?: boolean;
   by3dxyzCartUi?: boolean;
 }

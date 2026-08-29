@@ -4,11 +4,10 @@ import { turnstileSiteKey } from "../data/turnstile";
 interface Props {
   clientId: string;
   currency: string;
-  notifyEmail: string;
   mode?: "buy" | "cart";
 }
 
-const { clientId, currency, notifyEmail, mode = "buy" } = Astro.props;
+const { clientId, currency, mode = "buy" } = Astro.props;
 const checkoutUrl = import.meta.env.PUBLIC_CHECKOUT_URL?.trim() || "";
 ---
 
@@ -18,7 +17,6 @@ const checkoutUrl = import.meta.env.PUBLIC_CHECKOUT_URL?.trim() || "";
   data-paypal-mode={mode}
   data-paypal-client={clientId}
   data-paypal-currency={currency}
-  data-paypal-notify={notifyEmail}
   data-paypal-checkout={checkoutUrl}
   data-turnstile-site={turnstileSiteKey}
 >

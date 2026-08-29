@@ -1,10 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import PayPalButtons from "../components/PayPalButtons.astro";
-import { site } from "../data/site";
 
 const clientId = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID ?? "";
-const notifyEmail = import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.email;
 ---
 
 <Layout title="Cart" description="Pay once for the parts in your by3DXYZ cart." robots="noindex, nofollow">
@@ -23,7 +21,7 @@ const notifyEmail = import.meta.env.PUBLIC_ORDER_NOTIFY_EMAIL?.trim() || site.em
       </div>
       {
         clientId ? (
-          <PayPalButtons clientId={clientId} currency="USD" notifyEmail={notifyEmail} mode="cart" />
+          <PayPalButtons clientId={clientId} currency="USD" mode="cart" />
         ) : (
           <p class="muted">Checkout is not available on this preview.</p>
         )
