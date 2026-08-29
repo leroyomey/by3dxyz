@@ -146,6 +146,7 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
           const parts = [];
           if (options.color) parts.push(options.color);
           if (options.size) parts.push(options.size);
+          if (options.pack) parts.push(options.pack);
           const key = stockKey(parts);
           if (key && Object.prototype.hasOwnProperty.call(map, key)) return Number(map[key]);
           return listingStock();
@@ -287,7 +288,7 @@ const etsyUrl = product.etsyUrl || site.etsyUrl;
             sku: state.sku,
             product: state.name,
             color: state.options.color || "",
-            size: state.options.size || "",
+            size: state.options.size || state.options.pack || "",
             options: state.optionLine,
             quantity: String(state.qty),
             unit_price: money(state.unit),

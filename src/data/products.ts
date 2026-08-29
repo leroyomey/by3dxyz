@@ -1,8 +1,4 @@
 import catalog from "./products.json";
-import colorVariantSet from "./color-variants.json";
-import pickVariantSet from "./pick-variants.json";
-import ribVariantSet from "./rib-variants.json";
-import decorVariantSet from "./decor-variants.json";
 
 export type VariantValue = {
   name: string;
@@ -39,12 +35,21 @@ export type Product = {
   etsyStock?: Record<string, number>;
 };
 
-const variantSets: Record<string, VariantGroup[]> = {
-  rib: ribVariantSet.groups as VariantGroup[],
-  color: colorVariantSet.groups as VariantGroup[],
-  pick: pickVariantSet.groups as VariantGroup[],
-  decor: decorVariantSet.groups as VariantGroup[],
-};
+type VariantFile = { id: string; groups: VariantGroup[] };
+
+// Drop a new `<name>-variants.json` in this folder and its "id" becomes a
+// usable variantSet. No edit here is needed to add one.
+const variantFiles = import.meta.glob("./*-variants.json", { eager: true }) as Record<
+  string,
+  VariantFile | { default: VariantFile }
+>;
+
+const variantSets: Record<string, VariantGroup[]> = Object.fromEntries(
+  Object.values(variantFiles)
+    .map((mod) => ("default" in mod ? mod.default : mod))
+    .filter((set) => set?.id && Array.isArray(set.groups))
+    .map((set) => [set.id, set.groups]),
+);
 
 export function skuSortKey(sku: string) {
   const match = String(sku).toUpperCase().match(/^BO-(\d+)(?:-(\d+))?$/);

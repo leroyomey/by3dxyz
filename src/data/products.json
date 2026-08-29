@@ -7151,12 +7151,12 @@
   },
   {
     "id": "Gothic Spider Web Decor | 2, 4 or 6 Pack",
-    "sku": "",
+    "sku": "BO-053",
     "slug": "gothic-spider-web-decor-3d-printed-halloween-decoration-2-4-",
-    "name": "Gothic Spider Web Decor | 2, 4 or 6 Pack",
+    "name": "Spider Web Decor",
     "price": 10.99,
     "currency": "USD",
-    "category": "Tools",
+    "category": "Decor",
     "short": "Bring a little creepy character to your space with this 3D printed spider web decorative accent from by3DXYZ.",
     "description": "Bring a little creepy character to your space with this 3D printed spider web decorative accent from by3DXYZ. Designed with an open, detailed web pattern, it makes an easy addition to Halloween displays, gothic décor, shelves, tables, windows, or party decorations. At approximately 4.15 × 4.16 inches, it's large enough to stand out while remaining easy to incorporate into an existing display.",
     "images": [
@@ -7166,7 +7166,7 @@
     "etsyListingId": "4563997517",
     "paypalUrl": "",
     "featured": false,
-    "variantSet": "",
+    "variantSet": "decor",
     "etsyQuantity": 10,
     "etsyFavorers": 0,
     "etsyStock": {

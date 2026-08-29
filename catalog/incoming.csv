@@ -1,4 +1,5 @@
 sku,name,price,category,short,description,etsyUrl,etsyListingId,images,featured,variantSet
-# New tools go below. Part numbers are BO-001 … BO-052 (same as [BO-001] at the end of the Etsy title).
+# New tools go below. Part numbers are BO-001 … BO-053 (same as [BO-001] at the end of the Etsy title).
 # Example:
-# BO-009,Coil Gauge,14,Coil tools,Even coils,Full description,https://www.etsy.com/listing/123456789/coil-gauge,123456789,/images/products/coil-gauge.jpg,false
+# BO-009,Coil Gauge,14,Coil tools,Even coils,Full description,https://www.etsy.com/listing/123456789/coil-gauge,123456789,/images/products/coil-gauge.jpg,false,rib
+BO-053,Spider Web Decor,10.99,Decor,"Bring a little creepy character to your space with this 3D printed spider web decorative accent from by3DXYZ.","Bring a little creepy character to your space with this 3D printed spider web decorative accent from by3DXYZ. Designed with an open, detailed web pattern, it makes an easy addition to Halloween displays, gothic décor, shelves, tables, windows, or party decorations. At approximately 4.15 × 4.16 inches, it's large enough to stand out while remaining easy to incorporate into an existing display.",https://www.etsy.com/listing/4563997517,4563997517,/images/products/gothic-spider-web-decor-3d-printed-halloween-decoration-2-3-.jpg,false,decor

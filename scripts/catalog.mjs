@@ -115,8 +115,21 @@ function shopName(title = "") {
   return name;
 }
 
+function isDecor(title = "") {
+  return /spider\s*web/i.test(title);
+}
+
+function variantSetFor(name, explicit = "") {
+  if (explicit) return explicit;
+  if (name === "Throwing Rib") return "rib";
+  if (/guitar\s*pick/i.test(name)) return "pick";
+  if (isDecor(name)) return "decor";
+  return "";
+}
+
 function categoryFor(name) {
   if (/guitar\s*pick/i.test(name)) return "Picks";
+  if (isDecor(name)) return "Decor";
   if (/paddle/i.test(name)) return "Paddles";
   if (/rib/i.test(name)) return "Ribs";
   return "Tools";
@@ -273,7 +286,7 @@ function toProduct(row, products) {
     etsyListingId,
     paypalUrl: row.paypalUrl || "",
     featured: String(row.featured).toLowerCase() === "true",
-    variantSet: row.variantSet || (name === "Throwing Rib" ? "rib" : /guitar\s*pick/i.test(name) ? "pick" : ""),
+    variantSet: variantSetFor(name, row.variantSet),
   };
 }
 
@@ -515,6 +528,23 @@ function cmdImport(filePath = incomingCsv) {
         linked += 1;
         continue;
       }
+      if (
+        product.sku &&
+        !clash.sku &&
+        product.etsyListingId &&
+        (clash.etsyListingId === product.etsyListingId || listingIdFromUrl(clash.etsyUrl) === product.etsyListingId)
+      ) {
+        clash.sku = product.sku;
+        clash.name = product.name || clash.name;
+        clash.category = product.category || clash.category;
+        clash.variantSet = product.variantSet || clash.variantSet;
+        clash.short = product.short || clash.short;
+        clash.description = product.description || clash.description;
+        if (Number.isFinite(product.price)) clash.price = product.price;
+        console.log(`Link listing ${product.etsyListingId} → ${clash.sku}`);
+        linked += 1;
+        continue;
+      }
       console.log(`Skip ${product.name} — already ${clash.sku}`);
       skipped += 1;
       continue;
@@ -549,7 +579,7 @@ async function listingToProduct(item, apiKey, featured, existing = []) {
     etsyListingId: id,
     paypalUrl: "",
     featured,
-    variantSet: name === "Throwing Rib" ? "rib" : isGuitarPick(item.title) || /guitar\s*pick/i.test(name) ? "pick" : "",
+    variantSet: variantSetFor(name, isGuitarPick(item.title) ? "pick" : ""),
     etsyQuantity: typeof item.quantity === "number" ? item.quantity : undefined,
   };
 }
@@ -775,6 +805,8 @@ else if (command === "apply-variants") {
       n += 1;
     } else if (/guitar\s*pick/i.test(product.name)) {
       product.variantSet = "pick";
+    } else if (isDecor(product.name)) {
+      product.variantSet = "decor";
     } else if (!product.variantSet) {
       product.variantSet = "";
     }

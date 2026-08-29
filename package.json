@@ -13,6 +13,7 @@
     "catalog:list": "node scripts/catalog.mjs list",
     "catalog:add": "node scripts/catalog.mjs add",
     "catalog:import": "node scripts/catalog.mjs import",
+    "catalog:check": "node scripts/catalog-check.mjs",
     "catalog:etsy": "node scripts/catalog.mjs etsy-diff",
     "catalog:sync": "node scripts/catalog.mjs etsy-sync",
     "catalog:auth": "node scripts/catalog.mjs etsy-auth",
