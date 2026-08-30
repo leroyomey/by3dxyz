@@ -115,7 +115,11 @@ export function customId(lines) {
   return lines
     .map((line) => {
       const color = line.options.color || "";
-      const extra = line.options.size || line.options.pack || "";
+      const extra = Object.entries(line.options || {})
+        .filter(([key]) => key !== "color")
+        .map(([, value]) => value)
+        .filter(Boolean)
+        .join("/");
       return [line.sku, color, extra, `x${line.qty}`].filter(Boolean).join(":");
     })
     .join(";")
@@ -223,7 +227,7 @@ export function notifyPayload(lines, details, currency) {
     sku: skuList(lines),
     product: lines.map((line) => line.name).join(", "),
     color: first?.options.color || "",
-    size: first?.options.size || first?.options.pack || "",
+    size: first?.options.size || first?.options.pack || first?.options.style || "",
     options: lines.map((line) => [line.sku, line.optionLine].filter(Boolean).join(" ")).join("\n"),
     items,
     line_count: String(lines.length),

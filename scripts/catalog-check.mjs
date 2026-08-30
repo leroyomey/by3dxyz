@@ -81,6 +81,16 @@ for (const product of products) {
     if (!variantSets.has(product.variantSet)) {
       err(`${label}: variantSet "${product.variantSet}" has no ${product.variantSet}-variants.json`);
     }
+    if (String(product.sku).toUpperCase() === "SW-002" && product.variantSet !== "coffin") {
+      err(`${label}: coffin shelf must use variantSet coffin, not ${product.variantSet}`);
+    }
+    if (String(product.sku).toUpperCase() === "SW-002") {
+      const groups = variantSets.get(product.variantSet)?.set?.groups || [];
+      const extra = groups.flatMap((group) => (group.values || []).map((value) => String(value.name || "")));
+      if (extra.some((name) => /2in\/|set of 3|2 pack|4 pack|6 pack/i.test(name))) {
+        err(`${label}: coffin shelf must not offer rib sizes or spider-web packs`);
+      }
+    }
   } else {
     warn(`${label}: no variantSet, so the page has no color dropdown`);
   }
@@ -123,6 +133,10 @@ if (!existsSync(feedPath)) {
   const decorTitle = feed.match(/<g:id>SW-001<\/g:id>\s*<g:title>([^<]+)<\/g:title>/)?.[1];
   if (decorTitle && decorTitle !== "Spider Web Decor") {
     err(`SW-001 merchant title must stay Spider Web Decor (got ${decorTitle})`);
+  }
+  const coffinTitle = feed.match(/<g:id>SW-002<\/g:id>\s*<g:title>([^<]+)<\/g:title>/)?.[1];
+  if (coffinTitle && coffinTitle !== "Coffin Shelf") {
+    err(`SW-002 merchant title must stay Coffin Shelf (got ${coffinTitle})`);
   }
 }
 

@@ -13,8 +13,18 @@ const { product } = Astro.props;
 const clientId = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID ?? "";
 const variants = productVariants(product);
 const needsOptions = variants.length > 0;
-const extraGroup = variants.find((group) => group.id !== "color");
-const extraWord = extraGroup ? extraGroup.label.trim().toLowerCase() : "";
+const extraLabels = variants
+  .filter((group) => group.id !== "color")
+  .map((group) => group.label.trim().toLowerCase())
+  .filter(Boolean);
+const extraWord =
+  extraLabels.length === 0
+    ? ""
+    : extraLabels.length === 1
+      ? extraLabels[0]
+      : extraLabels.length === 2
+        ? `${extraLabels[0]} and ${extraLabels[1]}`
+        : `${extraLabels.slice(0, -1).join(", ")}, and ${extraLabels[extraLabels.length - 1]}`;
 const optionHint = extraWord ? `Please choose a color and ${extraWord}.` : "Please choose a color.";
 const optionOutHint = extraWord
   ? `That color and ${extraWord} is currently sold out.`

@@ -3,6 +3,7 @@ import ribVariants from "../../../src/data/rib-variants.json";
 import pickVariants from "../../../src/data/pick-variants.json";
 import colorVariants from "../../../src/data/color-variants.json";
 import decorVariants from "../../../src/data/decor-variants.json";
+import coffinVariants from "../../../src/data/coffin-variants.json";
 import {
   countryFromPaypal,
   loadVariantSets,
@@ -18,7 +19,7 @@ import {
 } from "../../../scripts/checkout-price.mjs";
 import { buildInboxPayload } from "./inbox.js";
 
-const variantSets = loadVariantSets([ribVariants, pickVariants, colorVariants, decorVariants]);
+const variantSets = loadVariantSets([ribVariants, pickVariants, colorVariants, decorVariants, coffinVariants]);
 const hits = new Map();
 
 let tokenCache = { value: "", exp: 0 };

@@ -1,0 +1,42 @@
+{
+  "id": "coffin",
+  "groups": [
+    {
+      "id": "color",
+      "label": "Primary color",
+      "placeholder": "Select a color",
+      "values": [
+        { "name": "Black" },
+        { "name": "Green" },
+        { "name": "Orange" },
+        { "name": "Burnt Orange" },
+        { "name": "Red" },
+        { "name": "Candy Red" },
+        { "name": "Light Pink" },
+        { "name": "Fuchsia" },
+        { "name": "Yellow" },
+        { "name": "Vintage Rose" },
+        { "name": "New Army Green" }
+      ]
+    },
+    {
+      "id": "style",
+      "label": "Shelf style",
+      "placeholder": "Select a shelf style",
+      "values": [
+        { "name": "1 Shelf", "price": 34.99 },
+        { "name": "2 Shelves", "price": 42.99 }
+      ]
+    },
+    {
+      "id": "back",
+      "label": "Back / hanger",
+      "placeholder": "Select a back and hanger",
+      "values": [
+        { "name": "No Back / No Hanger" },
+        { "name": "Back / No Hanger" },
+        { "name": "Back / Hanger" }
+      ]
+    }
+  ]
+}

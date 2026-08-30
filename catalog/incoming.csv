@@ -1,5 +1,6 @@
 sku,name,price,category,short,description,etsyUrl,etsyListingId,images,featured,variantSet
-# New pottery tools go below. Part numbers are BO-001 … BO-054+ (same as [BO-001] at the end of the Etsy title). Decor uses SW-001, not a BO code.
+# New pottery tools go below. Part numbers are BO-001 … BO-054+ (same as [BO-001] at the end of the Etsy title). Decor uses SW-001 / SW-002, not a BO code.
 # Example:
 # BO-009,Coil Gauge,14,Coil tools,Even coils,Full description,https://www.etsy.com/listing/123456789/coil-gauge,123456789,/images/products/coil-gauge.jpg,false,rib
 SW-001,Spider Web Decor,10.99,Decor,"Bring a little creepy character to your space with this 3D printed spider web decorative accent from by3DXYZ.","Bring a little creepy character to your space with this 3D printed spider web decorative accent from by3DXYZ. Designed with an open, detailed web pattern, it makes an easy addition to Halloween displays, gothic décor, shelves, tables, windows, or party decorations. At approximately 4.15 × 4.16 inches, it's large enough to stand out while remaining easy to incorporate into an existing display.",https://www.etsy.com/listing/4563997517,4563997517,/images/products/gothic-spider-web-decor-3d-printed-halloween-decoration-2-3-.jpg,false,decor
+SW-002,Coffin Shelf,34.99,Decor,"A 9 inch coffin-shaped shelf, printed in PLA.","A 9 inch coffin-shaped wall shelf, printed in PLA. Choose a color, one or two shelves, and whether you want a back and a hanger.",https://www.etsy.com/listing/4565089743,4565089743,/images/products/coffin-shelf-sw-002.jpg,false,coffin

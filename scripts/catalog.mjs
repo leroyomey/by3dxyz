@@ -76,7 +76,7 @@ function skuFromTitle(title = "") {
 function skuFromListing(item) {
   const title = item.title || "";
   if (isGuitarPick(title)) return pickShopSku(title);
-  if (isSpiderWeb(title)) return decorShopSku(title);
+  if (isSpiderWeb(title) || isCoffinShelf(title)) return decorShopSku(title);
   return skuFromTitle(title) || skuFromText(item.description || "");
 }
 
@@ -117,17 +117,26 @@ function isSpiderWeb(title = "") {
   return /spider\s*web/i.test(title);
 }
 
+function isCoffinShelf(title = "") {
+  return /coffin\s*shelf/i.test(title);
+}
+
 function decorShopSku(title = "") {
-  return isSpiderWeb(title) ? "SW-001" : "";
+  if (isSpiderWeb(title)) return "SW-001";
+  if (isCoffinShelf(title)) return "SW-002";
+  return "";
 }
 
 function decorShopName(title = "") {
-  return isSpiderWeb(title) ? "Spider Web Decor" : "";
+  if (isSpiderWeb(title)) return "Spider Web Decor";
+  if (isCoffinShelf(title)) return "Coffin Shelf";
+  return "";
 }
 
 function shopName(title = "") {
   if (isGuitarPick(title)) return pickShopName(title);
   if (isSpiderWeb(title)) return decorShopName(title);
+  if (isCoffinShelf(title)) return decorShopName(title);
   const sku = skuFromTitle(title);
   let name = nameWithoutSku(title).replace(/^by3DXYZ\s+/i, "");
   if (/pottery throwing rib/i.test(name) && sku) return "Throwing Rib";
@@ -145,6 +154,7 @@ function variantSetFor(name, explicit = "", sku = "") {
   if (explicit) return explicit;
   if (name === "Throwing Rib") return "rib";
   if (/guitar\s*pick/i.test(name)) return "pick";
+  if (isCoffinShelf(name) || String(sku).toUpperCase() === "SW-002") return "coffin";
   if (isDecor(name, { sku })) return "decor";
   return "";
 }
@@ -207,6 +217,14 @@ function listingCopy(item, name, sku) {
     }
     const short = "A pack of guitar picks, printed in PLA.";
     return { short, description: short };
+  }
+  if (name === "Coffin Shelf" || String(sku).toUpperCase() === "SW-002") {
+    const short = "A 9 inch coffin-shaped shelf, printed in PLA.";
+    return {
+      short,
+      description:
+        "A 9 inch coffin-shaped wall shelf, printed in PLA. Choose a color, one or two shelves, and whether you want a back and a hanger.",
+    };
   }
   const short = fromEtsy.slice(0, 140) || name;
   return { short, description: fromEtsy || name };
@@ -908,6 +926,8 @@ else if (command === "apply-variants") {
       n += 1;
     } else if (/guitar\s*pick/i.test(product.name)) {
       product.variantSet = "pick";
+    } else if (isCoffinShelf(product.name) || String(product.sku).toUpperCase() === "SW-002") {
+      product.variantSet = "coffin";
     } else if (isDecor(product.name, { sku: product.sku, category: product.category })) {
       product.variantSet = "decor";
     } else if (!product.variantSet) {
