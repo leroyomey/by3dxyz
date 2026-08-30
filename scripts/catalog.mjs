@@ -505,25 +505,126 @@ async function fetchEtsyListings(apiKey, shopName) {
   return listings;
 }
 
-async function downloadListingImages(listingId, slug, apiKey) {
+function listingImageDest(slug, i) {
+  const destName = i === 0 ? `${slug}.jpg` : `${slug}-${i + 1}.jpg`;
+  return { destName, rel: `/images/products/${destName}`, abs: join(imagesDir, destName) };
+}
+
+async function fetchListingImageRows(listingId, apiKey) {
   const res = await fetch(
     `https://openapi.etsy.com/v3/application/listings/${listingId}/images`,
     { headers: etsyHeaders(apiKey) },
   );
-  if (!res.ok) return [];
-  const images = ((await res.json()).results ?? []).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0));
+  if (!res.ok) return null;
+  return ((await res.json()).results ?? []).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0));
+}
+
+async function writeListingImage(slug, i, url) {
+  const { rel, abs } = listingImageDest(slug, i);
+  const imgRes = await fetch(url);
+  if (!imgRes.ok) return "";
+  writeFileSync(abs, Buffer.from(await imgRes.arrayBuffer()));
+  return rel;
+}
+
+async function downloadListingImages(listingId, slug, apiKey) {
+  const rows = await fetchListingImageRows(listingId, apiKey);
+  if (!rows?.length) return [];
   mkdirSync(imagesDir, { recursive: true });
   const paths = [];
-  for (const [i, img] of images.slice(0, 2).entries()) {
-    const url = img.url_570xN || img.url_fullxfull;
+  // Do not cap at 2 or prefer url_570xN: that left galleries short and coffin/SW photos soft.
+  for (const [i, img] of rows.entries()) {
+    const url = img.url_fullxfull || img.url_570xN;
     if (!url) continue;
-    const destName = i === 0 ? `${slug}.jpg` : `${slug}-${i + 1}.jpg`;
-    const imgRes = await fetch(url);
-    if (!imgRes.ok) continue;
-    writeFileSync(join(imagesDir, destName), Buffer.from(await imgRes.arrayBuffer()));
-    paths.push(`/images/products/${destName}`);
+    const written = await writeListingImage(slug, i, url);
+    if (written) paths.push(written);
   }
   return paths;
+}
+
+function listingImagesOnDisk(product, etsyCount) {
+  const have = new Set(product.images || []);
+  for (let i = 0; i < etsyCount; i++) {
+    const { rel, abs } = listingImageDest(product.slug, i);
+    if (!have.has(rel) || !existsSync(abs)) return false;
+  }
+  return true;
+}
+
+async function fillMissingProductImages(product, apiKey) {
+  const listingId = product.etsyListingId || listingIdFromUrl(product.etsyUrl);
+  if (!listingId) return { status: "skip" };
+  const rows = await fetchListingImageRows(listingId, apiKey);
+  if (rows == null) return { status: "fail" };
+  if (!rows.length) return { status: "empty" };
+  if (listingImagesOnDisk(product, rows.length)) return { status: "ok", added: 0 };
+  mkdirSync(imagesDir, { recursive: true });
+  const paths = [];
+  let added = 0;
+  for (const [i, img] of rows.entries()) {
+    const { rel, abs } = listingImageDest(product.slug, i);
+    if (!existsSync(abs)) {
+      const url = img.url_fullxfull || img.url_570xN;
+      if (!url) continue;
+      const written = await writeListingImage(product.slug, i, url);
+      if (!written) continue;
+      paths.push(written);
+      added += 1;
+      continue;
+    }
+    paths.push(rel);
+  }
+  if (paths.length) product.images = paths;
+  return { status: added ? "added" : "wired", added, count: paths.length };
+}
+
+async function fillMissingListingImages(products, apiKey) {
+  let photos = 0;
+  let listings = 0;
+  let failed = 0;
+  for (const product of products) {
+    const result = await fillMissingProductImages(product, apiKey);
+    if (result.status === "fail" || result.status === "empty") failed += 1;
+    if (result.status === "added" || result.status === "wired") {
+      listings += 1;
+      photos += result.added || 0;
+    }
+  }
+  return { photos, listings, failed };
+}
+
+async function cmdImagesSync() {
+  loadEnv();
+  const apiKey = etsyApiKeyHeader();
+  if (!apiKey || !apiKey.includes(":")) {
+    console.error("Set ETSY_API_KEY and ETSY_API_SHARED_SECRET in .env");
+    process.exitCode = 1;
+    return;
+  }
+  const products = loadProducts();
+  let gained = 0;
+  let synced = 0;
+  const failed = [];
+  for (const product of products) {
+    const listingId = product.etsyListingId || listingIdFromUrl(product.etsyUrl);
+    if (!listingId) {
+      failed.push(`${product.sku}: no Etsy listing id`);
+      continue;
+    }
+    const before = Array.isArray(product.images) ? product.images.length : 0;
+    const images = await downloadListingImages(listingId, product.slug, apiKey);
+    if (!images.length) {
+      failed.push(`${product.sku}: Etsy images empty or request failed (${listingId})`);
+      continue;
+    }
+    product.images = images;
+    synced += 1;
+    if (images.length > before) gained += 1;
+    console.log(`${String(product.sku).padEnd(10)}  site:${before} → ${images.length}`);
+  }
+  saveProducts(products);
+  console.log(`\nSynced ${synced} listings. Gained photos: ${gained}. Could not sync: ${failed.length}`);
+  for (const line of failed) console.log(line);
 }
 
 function sortCatalog(products) {
@@ -857,6 +958,8 @@ async function cmdEtsySync() {
   } else {
     notes.push("Etsy option stock: skipped (run npm run catalog:auth once)");
   }
+  const photos = await fillMissingListingImages(products, apiKey);
+  notes.push(`Etsy photos: ${photos.photos} new on ${photos.listings} listings (failed ${photos.failed})`);
 
   saveProducts(sortCatalog(products));
   const summary = [
@@ -912,6 +1015,7 @@ else if (command === "etsy-diff") {
   }
 }
 else if (command === "etsy-sync") await cmdEtsySync();
+else if (command === "images-sync") await cmdImagesSync();
 else if (command === "listed-at") await cmdListedAt();
 else if (command === "etsy-auth") {
   loadEnv();
@@ -946,6 +1050,7 @@ else {
   npm run catalog:etsy
   npm run catalog:etsy -- --replace --yes-replace
   npm run catalog:sync
+  npm run catalog:images
   npm run catalog:listed-at
   npm run catalog:auth
 

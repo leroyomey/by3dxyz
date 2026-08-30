@@ -18,6 +18,7 @@
     "checkout:check": "node scripts/checkout-price-check.mjs",
     "catalog:etsy": "node scripts/catalog.mjs etsy-diff",
     "catalog:sync": "node scripts/catalog.mjs etsy-sync",
+    "catalog:images": "node scripts/catalog.mjs images-sync",
     "catalog:listed-at": "node scripts/catalog.mjs listed-at",
     "catalog:auth": "node scripts/catalog.mjs etsy-auth",
     "etsy:prices": "node scripts/etsy-variant-prices.mjs",
