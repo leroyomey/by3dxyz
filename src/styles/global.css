@@ -1479,22 +1479,29 @@ a.btn-primary[href*="etsy.com"]:hover {
   font-size: 0.9375rem;
 }
 
-.product-body .listing-line {
-  margin: 0 0 12px;
-}
-
 .product-body {
   margin: 0;
-  padding-top: 28px;
+  padding-top: 36px;
   border-top: 1px solid var(--line);
-  max-width: 72ch;
+  max-width: 62ch;
 }
 
 .product-body-label {
-  margin: 0 0 8px;
+  margin: 0 0 20px;
   font-size: 0.75rem;
   font-weight: 400;
   color: var(--accent);
+}
+
+.product-body .product-about {
+  margin: 0 0 1.35em;
+  color: var(--ink-soft);
+  font-size: 1.125rem;
+  line-height: 1.8;
+}
+
+.product-body .listing-line {
+  margin: 1.75em 0 1.25em;
 }
 
 .related-parts {

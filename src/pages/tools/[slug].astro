@@ -10,7 +10,7 @@ import {
   getProduct,
   nextProduct,
   prevProduct,
-  productCopy,
+  aboutParagraphs,
   productPriceBounds,
   productTitle,
   relatedProducts,
@@ -26,7 +26,7 @@ if (!product) {
   return Astro.redirect("/tools");
 }
 const title = productTitle(product);
-const about = productCopy(product.description);
+const about = aboutParagraphs(product.description);
 const next = nextProduct(product.slug);
 const prev = prevProduct(product.slug);
 const related = relatedProducts(product);
@@ -124,8 +124,10 @@ const jsonLd = {
     </div>
     <section class="product-body">
       <p class="product-body-label">About this part</p>
-      <p class="muted">{about}</p>
-      <p class="muted listing-line">{listingLine}</p>
+      {about.map((paragraph) => (
+        <p class="product-about">{paragraph}</p>
+      ))}
+      <p class="product-about listing-line">{listingLine}</p>
       <EtsyReview product={product} />
     </section>
     {

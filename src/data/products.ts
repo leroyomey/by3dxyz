@@ -152,6 +152,20 @@ export function productCopy(description: string) {
   return description.replace(/\s*Item\s*#:\s*[A-Z0-9-]+\s*$/i, "").trim();
 }
 
+/** Split a catalog blob into readable About paragraphs. Does not rewrite the source. */
+export function aboutParagraphs(description: string) {
+  const text = productCopy(description);
+  if (!text) return [];
+  const blocks = text
+    .split(/\n\s*\n/)
+    .map((block) => block.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+  return blocks.flatMap((block) => {
+    const parts = block.split(/(?<=[.!?])\s+(?=[A-Z])/).map((part) => part.trim()).filter(Boolean);
+    return parts.length ? parts : [block];
+  });
+}
+
 export function productTitle(product: { name: string; sku?: string }) {
   const sku = (product.sku || "").trim().toUpperCase();
   const name = (product.name || "").trim();
