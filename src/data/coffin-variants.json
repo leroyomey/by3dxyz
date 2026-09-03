@@ -24,7 +24,8 @@
       "label": "Shelf style",
       "placeholder": "Select a shelf style",
       "values": [
-        { "name": "1 Shelf", "price": 34.99 },
+        { "name": "1 Shelf - Top Shelf", "price": 34.99 },
+        { "name": "1 Shelf - Low Shelf", "price": 34.99 },
         { "name": "2 Shelves", "price": 42.99 }
       ]
     },

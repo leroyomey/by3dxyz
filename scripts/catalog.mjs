@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, appendFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, appendFileSync, readdirSync } from "node:fs";
 import { dirname, join, extname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -7,6 +7,7 @@ import {
   getAccessToken,
   inventoryToStock,
 } from "./etsy-oauth.mjs";
+import { syncVariantData } from "./etsy-variants.mjs";
 import { writeSitemap } from "./sitemap.mjs";
 import { writeMerchantFeed } from "./merchant-feed.mjs";
 
@@ -46,6 +47,32 @@ function saveProducts(products) {
   writeFileSync(productsPath, `${JSON.stringify(products, null, 2)}\n`);
   writeSitemap(products);
   writeMerchantFeed(products);
+}
+
+function loadVariantFileMap() {
+  const dir = join(root, "src", "data");
+  const files = {};
+  for (const name of readdirSync(dir).filter((file) => file.endsWith("-variants.json"))) {
+    const data = JSON.parse(readFileSync(join(dir, name), "utf8"));
+    if (data?.id) files[data.id] = { name, groups: data.groups, id: data.id };
+  }
+  return files;
+}
+
+function saveVariantFiles(files, changedIds) {
+  const dir = join(root, "src", "data");
+  for (const id of changedIds) {
+    const row = files[id];
+    if (!row?.name) continue;
+    writeFileSync(join(dir, row.name), `${JSON.stringify({ id: row.id, groups: row.groups }, null, 2)}\n`);
+  }
+}
+
+function applyLiveVariantFiles(products, inventories) {
+  const variantFiles = loadVariantFileMap();
+  const result = syncVariantData({ products, inventories, variantFiles });
+  saveVariantFiles(result.variantFiles, result.changedFileIds);
+  return result;
 }
 
 function slugify(value) {
@@ -451,9 +478,10 @@ function applyEtsyDemand(products, listings) {
 async function refreshEtsyInventory(products) {
   const token = await getAccessToken();
   if (!token) {
-    return { linked: false, updated: 0, failed: 0 };
+    return { linked: false, updated: 0, failed: 0, variantNotes: [] };
   }
   const apiKey = etsyApiKeyHeader();
+  const inventories = new Map();
   let updated = 0;
   let failed = 0;
   for (const product of products) {
@@ -465,12 +493,15 @@ async function refreshEtsyInventory(products) {
       await sleep(200);
       continue;
     }
-    const stock = inventoryToStock(inventory);
-    product.etsyStock = stock;
+    // etsyStock is quantity by option key. Dropdowns live in *-variants.json.
+    // Used to write stock only and skip those files, so new Etsy selections never reached the site.
+    inventories.set(String(id), inventory);
+    product.etsyStock = inventoryToStock(inventory);
     updated += 1;
     await sleep(200);
   }
-  return { linked: true, updated, failed };
+  const variants = applyLiveVariantFiles(products, inventories);
+  return { linked: true, updated, failed, variantNotes: variants.notes || [] };
 }
 
 function etsyHeaders(apiKey) {
@@ -955,6 +986,8 @@ async function cmdEtsySync() {
   notes.push(`Listing dates: ${listed}`);
   if (inventory.linked) {
     notes.push(`Etsy option stock: ${inventory.updated} listings (failed ${inventory.failed})`);
+    if (inventory.variantNotes?.length) notes.push(...inventory.variantNotes);
+    else notes.push("Etsy option lists: already matched live inventory");
   } else {
     notes.push("Etsy option stock: skipped (run npm run catalog:auth once)");
   }

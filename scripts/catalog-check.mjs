@@ -2,6 +2,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { INTERNATIONAL_SHIPPING_USD } from "./checkout-price.mjs";
+import { groupsFromInventory, isWhiteColor, syncVariantData } from "./etsy-variants.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = join(root, "src", "data");
@@ -90,6 +91,17 @@ for (const product of products) {
       if (extra.some((name) => /2in\/|set of 3|2 pack|4 pack|6 pack/i.test(name))) {
         err(`${label}: coffin shelf must not offer rib sizes or spider-web packs`);
       }
+      const styles = groups.find((group) => group.id === "style")?.values || [];
+      const styleNames = styles.map((value) => String(value.name || ""));
+      if (!styleNames.some((name) => /top shelf/i.test(name))) {
+        err(`${label}: coffin shelf must offer the Etsy Top Shelf style`);
+      }
+      if (!styleNames.some((name) => /low shelf/i.test(name))) {
+        err(`${label}: coffin shelf must offer the Etsy Low Shelf style`);
+      }
+      if (!styleNames.some((name) => /^2 shelves$/i.test(name))) {
+        err(`${label}: coffin shelf must offer 2 Shelves`);
+      }
     }
   } else {
     warn(`${label}: no variantSet, so the page has no color dropdown`);
@@ -146,6 +158,86 @@ if (existsSync(csvPath)) {
   if (!header.split(",").includes("variantSet")) {
     err("catalog/incoming.csv header is missing the variantSet column");
   }
+}
+
+const coffinLive = groupsFromInventory({
+  products: [
+    {
+      property_values: [
+        { property_name: "Primary color", values: ["Green"] },
+        { property_name: "Shelf Style", values: ["1  Shelf - Top Shelf"] },
+        { property_name: "Back / Hanger", values: ["No Back / No Hanger"] },
+      ],
+      offerings: [{ price: { amount: 3499, divisor: 100 }, is_enabled: true }],
+    },
+    {
+      property_values: [
+        { property_name: "Primary color", values: ["White"] },
+        { property_name: "Shelf Style", values: ["1 Shelf - Low Shelf"] },
+        { property_name: "Back / Hanger", values: ["Back / Hanger"] },
+      ],
+      offerings: [{ price: { amount: 3499, divisor: 100 }, is_enabled: true }],
+    },
+    {
+      property_values: [
+        { property_name: "Primary color", values: ["Green"] },
+        { property_name: "Shelf Style", values: ["2 Shelves"] },
+        { property_name: "Back / Hanger", values: ["Back / Hanger"] },
+      ],
+      offerings: [{ price: { amount: 4299, divisor: 100 }, is_enabled: true }],
+    },
+  ],
+});
+const coffinStyle = coffinLive.find((group) => group.id === "style");
+if (!coffinStyle?.values.some((row) => row.name === "1 Shelf - Top Shelf" && row.price === 34.99)) {
+  err("Live Etsy inventory must map Top Shelf at $34.99");
+}
+if (!coffinStyle?.values.some((row) => row.name === "1 Shelf - Low Shelf")) {
+  err("Live Etsy inventory must collapse Top/Low shelf names");
+}
+if (coffinLive.some((group) => (group.values || []).some((row) => isWhiteColor(row.name)))) {
+  err("Live Etsy inventory must drop White");
+}
+const synced = syncVariantData({
+  products: [{ sku: "SW-002", etsyListingId: "1", variantSet: "coffin" }],
+  inventories: new Map([
+    [
+      "1",
+      {
+        products: [
+          {
+            property_values: [
+              { property_name: "Primary color", values: ["Green"] },
+              { property_name: "Shelf Style", values: ["1 Shelf - Top Shelf"] },
+              { property_name: "Back / Hanger", values: ["No Back / No Hanger"] },
+            ],
+            offerings: [{ price: { amount: 3499, divisor: 100 }, is_enabled: true }],
+          },
+          {
+            property_values: [
+              { property_name: "Primary color", values: ["Green"] },
+              { property_name: "Shelf Style", values: ["1 Shelf - Low Shelf"] },
+              { property_name: "Back / Hanger", values: ["No Back / No Hanger"] },
+            ],
+            offerings: [{ price: { amount: 3499, divisor: 100 }, is_enabled: true }],
+          },
+        ],
+      },
+    ],
+  ]),
+  variantFiles: {
+    coffin: {
+      id: "coffin",
+      groups: [{ id: "style", label: "Shelf style", placeholder: "Select a shelf style", values: [{ name: "1 Shelf", price: 34.99 }] }],
+    },
+  },
+});
+if (!synced.changedFileIds.includes("coffin")) {
+  err("catalog:sync must rewrite coffin-variants.json when Etsy adds a shelf style");
+}
+const syncedStyles = synced.variantFiles.coffin.groups.find((group) => group.id === "style")?.values || [];
+if (syncedStyles.some((row) => row.name === "1 Shelf") || !syncedStyles.some((row) => row.name === "1 Shelf - Top Shelf")) {
+  err("catalog:sync must replace stale 1 Shelf with the live Top/Low names");
 }
 
 console.log(`Checked ${products.length} products and ${variantSets.size} variant sets.`);

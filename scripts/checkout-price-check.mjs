@@ -91,16 +91,30 @@ ok(caUnit.amount.breakdown.item_total.value === "13.00", "Shipping is not hidden
 ok(orderTotal(cheap, 0) === 13, "orderTotal US");
 ok(money(orderTotal(cheap, INTERNATIONAL_SHIPPING_USD)) === "31.00", "orderTotal CA");
 
-const coffinOne = quoteLines(catalog, variantSets, [
-  { sku: "SW-002", qty: 1, options: { color: "Green", style: "1 Shelf", back: "No Back / No Hanger" } },
+const coffinTop = quoteLines(catalog, variantSets, [
+  { sku: "SW-002", qty: 1, options: { color: "Green", style: "1 Shelf - Top Shelf", back: "No Back / No Hanger" } },
 ]);
-ok(coffinOne[0].unit === 34.99, "SW-002 1 shelf should be $34.99");
-ok(coffinOne[0].options.style === "1 Shelf", "SW-002 should keep shelf style");
-ok(coffinOne[0].options.back === "No Back / No Hanger", "SW-002 should keep back/hanger");
+ok(coffinTop[0].unit === 34.99, "SW-002 top shelf should be $34.99");
+ok(coffinTop[0].options.style === "1 Shelf - Top Shelf", "SW-002 should keep top shelf style");
+ok(coffinTop[0].optionLine.includes("1 Shelf - Top Shelf"), "SW-002 ticket must name Top Shelf");
+ok(coffinTop[0].options.back === "No Back / No Hanger", "SW-002 should keep back/hanger");
+const coffinLow = quoteLines(catalog, variantSets, [
+  { sku: "SW-002", qty: 1, options: { color: "Green", style: "1 Shelf - Low Shelf", back: "Back / No Hanger" } },
+]);
+ok(coffinLow[0].unit === 34.99, "SW-002 low shelf should be $34.99");
+ok(coffinLow[0].options.style === "1 Shelf - Low Shelf", "SW-002 should keep low shelf style");
 const coffinTwo = quoteLines(catalog, variantSets, [
   { sku: "SW-002", qty: 1, options: { color: "Green", style: "2 Shelves", back: "Back / Hanger" } },
 ]);
 ok(coffinTwo[0].unit === 42.99, "SW-002 2 shelves should be $42.99");
+try {
+  quoteLines(catalog, variantSets, [
+    { sku: "SW-002", qty: 1, options: { color: "Green", style: "1 Shelf", back: "No Back / No Hanger" } },
+  ]);
+  errors.push("SW-002 must not keep the old 1 Shelf value");
+} catch {
+  /* expected */
+}
 try {
   quoteLines(catalog, variantSets, [
     { sku: "SW-002", qty: 1, options: { color: "Green", style: "5in/12.7cm", back: "No Back / No Hanger" } },
@@ -119,7 +133,7 @@ try {
 }
 try {
   quoteLines(catalog, variantSets, [
-    { sku: "SW-002", qty: 1, options: { color: "White", style: "1 Shelf", back: "No Back / No Hanger" } },
+    { sku: "SW-002", qty: 1, options: { color: "White", style: "1 Shelf - Top Shelf", back: "No Back / No Hanger" } },
   ]);
   errors.push("SW-002 must reject White");
 } catch {
