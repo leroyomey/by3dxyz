@@ -77,8 +77,8 @@ def main() -> None:
     x += int(draw.textlength("Y", font=display_b))
     draw.text((x, y), "Z", font=display_b, fill=INK)
 
-    draw.text((72, 268), "Pottery tools", font=sub, fill=INK)
-    draw.text((72, 328), "3D-printed parts for the studio.", font=body, fill=INK_SOFT)
+    draw.text((72, 268), "3D printing service", font=sub, fill=INK)
+    draw.text((72, 328), "Print a file, custom work, or shop.", font=body, fill=INK_SOFT)
     draw.text((72, 368), "Same shape every time.", font=body, fill=INK_SOFT)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
